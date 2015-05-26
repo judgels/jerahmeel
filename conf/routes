@@ -1,0 +1,93 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Imports
+->          /                                                                          frontendcommons.Routes
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                                                              controllers.Assets.at(path="/public", file)
+GET         /vassets/*file                                                             controllers.Assets.versioned(path="/public", file: Asset)
+
+
+GET         /                                                                          @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.index()
+GET         /auth/:returnUri                                                           @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.auth(returnUri: String)
+GET         /authRole/:returnUri                                                       @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.authRole(returnUri: String)
+GET         /afterLogin/:returnUri                                                     @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.afterLogin(returnUri: String)
+GET         /afterProfile/:returnUri                                                   @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.afterProfile(returnUri: String)
+POST        /viewAs                                                                    @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.postViewAs()
+GET         /resetViewAs                                                               @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.resetViewAs()
+
+GET         /curriculums                                                               @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.viewCurriculums()
+GET         /curriculums/                                                              @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.listCurriculums(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /curriculums/create                                                        @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.createCurriculum()
+POST        /curriculums/create                                                        @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.postCreateCurriculum()
+GET         /curriculums/$cId<[0-9]{1,18}>/update/general                              @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.updateCurriculumGeneral(cId: Long)
+POST        /curriculums/$cId<[0-9]{1,18}>/update/general                              @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.postUpdateCurriculumGeneral(cId: Long)
+GET         /curriculums/$cId<[0-9]{1,18}>/view                                        @org.iatoki.judgels.jerahmeel.controllers.CurriculumController.viewCurriculum(cId: Long)
+
+GET         /curriculums/$cId<[0-9]{1,18}>/update/courses                              @org.iatoki.judgels.jerahmeel.controllers.CurriculumCourseController.viewCourses(cId: Long)
+GET         /curriculums/$cId<[0-9]{1,18}>/update/courses/                             @org.iatoki.judgels.jerahmeel.controllers.CurriculumCourseController.listCreateCourses(cId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+POST        /curriculums/$cId<[0-9]{1,18}>/update/courses/create                       @org.iatoki.judgels.jerahmeel.controllers.CurriculumCourseController.postCreateCourse(cId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /curriculums/$cId<[0-9]{1,18}>/$c2Id<[0-9]{1,18}>/delete                   @org.iatoki.judgels.jerahmeel.controllers.CurriculumCourseController.deleteCourse(cId: Long, c2Id: Long)
+
+GET         /courses                                                                   @org.iatoki.judgels.jerahmeel.controllers.CourseController.viewCourses()
+GET         /courses/                                                                  @org.iatoki.judgels.jerahmeel.controllers.CourseController.listCourses(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /courses/create                                                            @org.iatoki.judgels.jerahmeel.controllers.CourseController.createCourse()
+POST        /courses/create                                                            @org.iatoki.judgels.jerahmeel.controllers.CourseController.postCreateCourse()
+GET         /courses/$cId<[0-9]{1,18}>/update/general                                  @org.iatoki.judgels.jerahmeel.controllers.CourseController.updateCourseGeneral(cId: Long)
+POST        /courses/$cId<[0-9]{1,18}>/update/general                                  @org.iatoki.judgels.jerahmeel.controllers.CourseController.postUpdateCourseGeneral(cId: Long)
+GET         /courses/$cId<[0-9]{1,18}>/view                                            @org.iatoki.judgels.jerahmeel.controllers.CourseController.viewCourse(cId: Long)
+
+GET         /courses/$cId<[0-9]{1,18}>/update/sessions                                 @org.iatoki.judgels.jerahmeel.controllers.CourseSessionController.viewSessions(cId: Long)
+GET         /courses/$cId<[0-9]{1,18}>/update/sessions/                                @org.iatoki.judgels.jerahmeel.controllers.CourseSessionController.listCreateSessions(cId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+POST        /courses/$cId<[0-9]{1,18}>/update/sessions/create                          @org.iatoki.judgels.jerahmeel.controllers.CourseSessionController.postCreateSession(cId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /courses/$cId<[0-9]{1,18}>/$sId<[0-9]{1,18}>/delete                        @org.iatoki.judgels.jerahmeel.controllers.CourseSessionController.deleteSession(cId: Long, sId: Long)
+
+GET         /sessions                                                                  @org.iatoki.judgels.jerahmeel.controllers.SessionController.viewSessions()
+GET         /sessions/                                                                 @org.iatoki.judgels.jerahmeel.controllers.SessionController.listSessions(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/create                                                           @org.iatoki.judgels.jerahmeel.controllers.SessionController.createSession()
+POST        /sessions/create                                                           @org.iatoki.judgels.jerahmeel.controllers.SessionController.postCreateSession()
+GET         /sessions/$sId<[0-9]{1,18}>/update/general                                 @org.iatoki.judgels.jerahmeel.controllers.SessionController.updateSessionGeneral(sId: Long)
+POST        /sessions/$sId<[0-9]{1,18}>/update/general                                 @org.iatoki.judgels.jerahmeel.controllers.SessionController.postUpdateSessionGeneral(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/view                                           @org.iatoki.judgels.jerahmeel.controllers.SessionController.viewSession(sId: Long)
+
+GET         /sessions/$sId<[0-9]{1,18}>/update/dependencies                            @org.iatoki.judgels.jerahmeel.controllers.SessionSessionController.viewDependencies(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/update/dependencies/                           @org.iatoki.judgels.jerahmeel.controllers.SessionSessionController.listCreateDependencies(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+POST        /sessions/$sId<[0-9]{1,18}>/update/dependencies/create                     @org.iatoki.judgels.jerahmeel.controllers.SessionSessionController.postCreateDependency(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/$sId<[0-9]{1,18}>/$s2Id<[0-9]{1,18}>/delete                      @org.iatoki.judgels.jerahmeel.controllers.SessionSessionController.deleteDependency(sId: Long, s2Id: Long)
+
+GET         /sessions/$sId<[0-9]{1,18}>/update/lessons                                 @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.viewLessons(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/update/lessons/                                @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.listLessons(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/$sId<[0-9]{1,18}>/update/lessons/create                          @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.createLesson(sId: Long)
+POST        /sessions/$sId<[0-9]{1,18}>/update/lessons/create                          @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.postCreateLesson(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/$lId<[0-9]{1,18}>/delete                       @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.deleteLesson(sId: Long, lId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/lessons                                        @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.viewVisibleLessons(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/lessons/                                       @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.listVisibleLessons(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/$sId<[0-9]{1,18}>/lessons/$lId<[0-9]{1,18}>/view                 @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.viewLesson(sId: Long, lId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/lessons/$lId<[0-9]{1,18}>/render/:name         @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.renderImage(sId: Long, lId: Long, name: String)
+POST        /sessions/lessons/switchLanguage                                           @org.iatoki.judgels.jerahmeel.controllers.SessionLessonController.switchLanguage()
+
+
+GET         /sessions/$sId<[0-9]{1,18}>/update/problems                                @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.viewProblems(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/update/problems/                               @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.listProblems(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/$sId<[0-9]{1,18}>/update/problems/create                         @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.createProblem(sId: Long)
+POST        /sessions/$sId<[0-9]{1,18}>/update/problems/create                         @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.postCreateProblem(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/$pId<[0-9]{1,18}>/delete                       @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.deleteProblem(sId: Long, pId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/problems                                       @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.viewVisibleProblems(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/problems/                                      @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.listVisibleProblems(sId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /sessions/$sId<[0-9]{1,18}>/problems/$pId<[0-9]{1,18}>/view                @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.viewProblem(sId: Long, pId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/problems/$pId<[0-9]{1,18}>/render/:name        @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.renderImage(sId: Long, pId: Long, name: String)
+POST        /sessions/problems/switchLanguage                                          @org.iatoki.judgels.jerahmeel.controllers.SessionProblemController.switchLanguage()
+
+
+GET         /courses/autoComplete                                                      @org.iatoki.judgels.jerahmeel.controllers.apis.CourseAPIController.courseAutoCompleteList()
+GET         /sessions/autoComplete                                                     @org.iatoki.judgels.jerahmeel.controllers.apis.SessionAPIController.sessionAutoCompleteList()
+
+GET         /users                                                                     @org.iatoki.judgels.jerahmeel.controllers.UserController.index()
+GET         /users/                                                                    @org.iatoki.judgels.jerahmeel.controllers.UserController.listUsers(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+
+GET         /users/$uId<[0-9]{1,18}>/update                                            @org.iatoki.judgels.jerahmeel.controllers.UserController.updateUser(uId: Long)
+POST        /users/$uId<[0-9]{1,18}>/update                                            @org.iatoki.judgels.jerahmeel.controllers.UserController.postUpdateUser(uId: Long)
+
+GET         /users/$uId<[0-9]{1,18}>/delete                                            @org.iatoki.judgels.jerahmeel.controllers.UserController.deleteUser(uId: Long)

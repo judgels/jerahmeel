@@ -1,0 +1,65 @@
+package org.iatoki.judgels.jerahmeel;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import org.iatoki.judgels.commons.IdentityUtils;
+import org.iatoki.judgels.commons.Page;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumDao;
+import org.iatoki.judgels.jerahmeel.models.domains.CurriculumModel;
+
+import java.util.List;
+
+public final class CurriculumServiceImpl implements CurriculumService {
+
+    private final CurriculumDao curriculumDao;
+
+    public CurriculumServiceImpl(CurriculumDao curriculumDao) {
+        this.curriculumDao = curriculumDao;
+    }
+
+    @Override
+    public Page<Curriculum> pageCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+        long totalPages = curriculumDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
+        List<CurriculumModel> curriculumModels = curriculumDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+
+        List<Curriculum> curriculums = Lists.transform(curriculumModels, m -> createCurriculumFromModel(m));
+
+        return new Page<>(curriculums, totalPages, pageIndex, pageSize);
+    }
+
+    @Override
+    public Curriculum findByCurriculumId(long curriculumId) throws CurriculumNotFoundException {
+        CurriculumModel curriculumModel = curriculumDao.findById(curriculumId);
+        if (curriculumModel != null) {
+            return createCurriculumFromModel(curriculumModel);
+        } else {
+            throw new CurriculumNotFoundException("Curriculum not found.");
+        }
+    }
+
+    @Override
+    public void createCurriculum(String name, String description) {
+        CurriculumModel curriculumModel = new CurriculumModel();
+        curriculumModel.name = name;
+        curriculumModel.description = description;
+
+        curriculumDao.persist(curriculumModel, "michael", IdentityUtils.getIpAddress());
+    }
+
+    @Override
+    public void updateCurriculum(long curriculumId, String name, String description) throws CurriculumNotFoundException {
+        CurriculumModel curriculumModel = curriculumDao.findById(curriculumId);
+        if (curriculumModel != null) {
+            curriculumModel.name = name;
+            curriculumModel.description = description;
+
+            curriculumDao.edit(curriculumModel, "michael", IdentityUtils.getIpAddress());
+        } else {
+            throw new CurriculumNotFoundException("Curriculum not found.");
+        }
+    }
+
+    private Curriculum createCurriculumFromModel(CurriculumModel curriculumModel) {
+        return new Curriculum(curriculumModel.id, curriculumModel.jid, curriculumModel.name, curriculumModel.description);
+    }
+}

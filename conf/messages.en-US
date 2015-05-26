@@ -1,0 +1,70 @@
+status.contestant=Contestant
+status.supervisor=Supervisor
+
+curriculum.curriculum=Curriculum
+curriculum.curriculums=Curriculums
+curriculum.name=Name
+curriculum.description=Description
+curriculum.courses=Courses
+
+curriculum.list=Curriculums
+curriculum.create=Create Curriculum
+curriculum.update=Update Curriculum
+
+course.course=Course
+course.courses=Courses
+course.name=Name
+course.description=Description
+course.sessions=Sessions
+course.jid=Course Jid
+
+course.list=Courses
+course.create=Create Course
+course.update=Update Course
+
+error.course.invalidJid=Invalid Course
+
+session.session=Session
+session.sessions=Sessions
+session.name=Name
+session.description=Description
+session.dependencies=Dependencies
+session.jid=Session Jid
+
+session.list=Sessions
+session.create=Create Session
+session.update=Update Session
+
+error.session.invalidJid=Invalid Session
+
+session.lesson=Lesson
+session.lessons=Lessons
+session.lesson.alias=Alias
+session.lesson.name=Name
+session.lesson.status=Status
+session.lesson.jid=Lesson Jid
+session.lesson.secret=Lesson Secret
+
+session.lesson.create=Create
+
+error.session.lessonExist=Lesson Already Existed.
+
+session.problem=Problem
+session.problems=Problems
+session.problem.alias=Alias
+session.problem.name=Name
+session.problem.type=Type
+session.problem.status=Status
+session.problem.jid=Problem Jid
+session.problem.secret=Problem Secret
+
+session.problem.create=Create
+
+error.session.problemExist=Problem Already Existed.
+
+user.users=Users
+user.list=Users
+user.update=Update User
+
+user.name=Name
+user.roles=Roles

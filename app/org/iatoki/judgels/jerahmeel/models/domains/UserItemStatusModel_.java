@@ -1,0 +1,18 @@
+package org.iatoki.judgels.jerahmeel.models.domains;
+
+import org.iatoki.judgels.commons.models.domains.AbstractModel_;
+
+import javax.annotation.Generated;
+import javax.persistence.metamodel.SingularAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
+
+@Generated(value = "org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor")
+@StaticMetamodel(UserItemStatusModel.class)
+public abstract class UserItemStatusModel_ extends AbstractModel_ {
+
+	public static volatile SingularAttribute<UserItemStatusModel, Long> id;
+	public static volatile SingularAttribute<UserItemStatusModel, String> userJid;
+	public static volatile SingularAttribute<UserItemStatusModel, String> itemJid;
+
+}
+

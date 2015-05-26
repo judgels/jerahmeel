@@ -1,0 +1,33 @@
+@(page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.Course], orderBy: String, orderDir: String, filterString: String)
+
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.commons.views.html.table.tableView
+@import org.iatoki.judgels.commons.views.html.table.tableHeadersView
+@import org.iatoki.judgels.commons.views.html.table.searchView
+@import org.iatoki.judgels.commons.views.html.table.paginationView
+
+@searchView(page.getPageIndex, orderBy, orderDir, filterString, routes.CourseController.listCourses)
+
+<div class="clearfix"></div>
+
+@for(course <- page.getData) {
+    <div class="panel panel-default">
+        <div class="panel-heading clearfix">
+            <a href="@routes.CourseController.viewCourse(course.getId)" class="panel-title">@course.getName</a>
+            <div class="pull-right">
+                <a href="@routes.CourseController.viewCourse(course.getId)" class="btn btn-primary">@Messages.get("commons.view")</a>
+                @if(JerahmeelUtils.hasRole("admin")) {
+                    <a href="@routes.CourseController.updateCourseGeneral(course.getId)" class="btn btn-primary">@Messages.get("commons.update")</a>
+                }
+            </div>
+        </div>
+        <div class="panel-body">
+            @course.getDescription
+        </div>
+    </div>
+}
+
+@paginationView(page, orderBy, orderDir, filterString, routes.CourseController.listCourses)
