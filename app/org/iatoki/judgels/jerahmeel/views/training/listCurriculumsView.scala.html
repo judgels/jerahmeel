@@ -1,0 +1,27 @@
+@(page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.Curriculum], orderBy: String, orderDir: String, filterString: String)
+
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.commons.views.html.table.tableView
+@import org.iatoki.judgels.commons.views.html.table.tableHeadersView
+@import org.iatoki.judgels.commons.views.html.table.searchView
+@import org.iatoki.judgels.commons.views.html.table.paginationView
+
+@searchView(page.getPageIndex, orderBy, orderDir, filterString, routes.TrainingCurriculumController.listCurriculums)
+
+<div class="clearfix"></div>
+
+@for(curriculum <- page.getData) {
+    <div class="panel panel-default">
+        <div class="panel-body clearfix">
+            <a href="@routes.TrainingController.jumpToCourses(curriculum.getId)" class="panel-title">@curriculum.getName</a>
+            <div class="pull-right">
+                <a href="@routes.TrainingController.jumpToCourses(curriculum.getId)" class="btn btn-primary">@Messages.get("commons.enter")</a>
+            </div>
+        </div>
+    </div>
+}
+
+@paginationView(page, orderBy, orderDir, filterString, routes.TrainingCurriculumController.listCurriculums)

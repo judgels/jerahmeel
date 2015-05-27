@@ -1,5 +1,7 @@
-status.contestant=Contestant
-status.supervisor=Supervisor
+training.training=Training
+training.curriculums=Curriculums
+training.courses=Courses
+training.sessions=Sessions
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums

@@ -8,6 +8,8 @@ import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel_;
+import org.iatoki.judgels.jerahmeel.models.domains.SessionModel;
+import org.iatoki.judgels.jerahmeel.models.domains.SessionModel_;
 
 import java.util.List;
 import java.util.stream.Collectors;

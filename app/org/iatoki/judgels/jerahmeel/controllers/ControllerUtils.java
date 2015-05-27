@@ -26,8 +26,9 @@ public final class ControllerUtils extends AbstractControllerUtils {
     @Override
     public void appendSidebarLayout(LazyHtml content) {
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
-        internalLinkBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()));
+        internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.jumpToCurriculums()));
         if (isAdmin()) {
+            internalLinkBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()));
             internalLinkBuilder.add(new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()));
             internalLinkBuilder.add(new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()));
             internalLinkBuilder.add(new InternalLink(Messages.get("user.users"), routes.UserController.index()));

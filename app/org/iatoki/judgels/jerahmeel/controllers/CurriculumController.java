@@ -11,6 +11,7 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumService;
 import org.iatoki.judgels.jerahmeel.CurriculumUpsertForm;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
@@ -27,6 +28,7 @@ import play.mvc.Result;
 
 @Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
+@Authorized(value = "admin")
 public final class CurriculumController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
@@ -55,20 +57,8 @@ public final class CurriculumController extends BaseController {
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
-    public Result viewCurriculum(long curriculumId) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-
-//        LazyHtml content = new LazyHtml(viewCurriculumView.render(curriculum));
-//        content.appendLayout(c -> headingWithActionLayout.render(Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(), new InternalLink(Messages.get("commons.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())), c));
-//        ControllerUtils.getInstance().appendSidebarLayout(content);
-//        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-//              new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.index()),
-//              new InternalLink(Messages.get("curriculum.view"), routes.CurriculumController.viewCurriculum(curriculum.getId()))
-//        ));
-//        ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - View");
-//
-//        return ControllerUtils.getInstance().lazyOk(content);
-        return TODO;
+    public Result jumpToCourses(long curriculumId) {
+        return redirect(routes.CurriculumCourseController.viewCourses(curriculumId));
     }
 
     @AddCSRFToken
@@ -133,7 +123,7 @@ public final class CurriculumController extends BaseController {
 
     private Result showUpdateCurriculumGeneral(Form<CurriculumUpsertForm> form, Curriculum curriculum) {
         LazyHtml content = new LazyHtml(updateCurriculumGeneralView.render(form, curriculum.getId()));
-        CurriculumControllerUtils.appendUpdateTabLayout(content, curriculum);
+        CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()),

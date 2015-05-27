@@ -12,6 +12,8 @@ public interface SessionService {
 
     Page<Session> pageSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
+    Session findBySessionJid(String sessionJid);
+
     Session findBySessionId(long sessionId) throws SessionNotFoundException;
 
     void createSession(String name, String description);

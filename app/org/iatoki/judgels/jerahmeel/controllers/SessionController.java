@@ -7,7 +7,7 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.headingLayout;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.commons.views.html.layouts.tabLayout;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionService;
@@ -57,8 +57,12 @@ public final class SessionController extends BaseController {
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
-    public Result viewSession(long sessionId) {
-        return redirect(routes.SessionLessonController.viewVisibleLessons(sessionId));
+    public Result jumpToLessons(long sessionId) {
+        return redirect(routes.SessionLessonController.viewSessionLessons(sessionId));
+    }
+
+    public Result jumpToProblems(long sessionId) {
+        return redirect(routes.SessionProblemController.viewSessionProblems(sessionId));
     }
 
     @AddCSRFToken
@@ -123,7 +127,7 @@ public final class SessionController extends BaseController {
 
     private Result showUpdateSessionGeneral(Form<SessionUpsertForm> form, Session session) {
         LazyHtml content = new LazyHtml(updateSessionGeneralView.render(form, session.getId()));
-        SessionControllerUtils.appendUpdateTabLayout(content, session);
+        SessionControllerUtils.appendUpdateLayout(content, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),

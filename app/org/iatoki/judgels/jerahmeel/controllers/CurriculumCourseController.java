@@ -5,6 +5,7 @@ import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
+import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumService;
@@ -57,6 +58,19 @@ public final class CurriculumCourseController extends BaseController {
         return showListCreateCourses(curriculum, form, curriculumPage, orderBy, orderDir, filterString);
     }
 
+    public Result jumpToCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
+        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+
+        if (curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
+            Course course = courseService.findByCourseJid(curriculumCourse.getCourseJid());
+
+            return redirect(routes.CourseController.updateCourseGeneral(course.getId()));
+        } else {
+            return notFound();
+        }
+    }
+
     @RequireCSRFCheck
     public Result postCreateCourse(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
@@ -103,11 +117,12 @@ public final class CurriculumCourseController extends BaseController {
 
     private Result showListCreateCourses(Curriculum curriculum, Form<CurriculumCourseCreateForm> form, Page<CurriculumCourse> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCreateCurriculumCoursesView.render(curriculum.getId(), currentPage, orderBy, orderDir, filterString, form));
-        CurriculumControllerUtils.appendUpdateTabLayout(content, curriculum);
+        CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()),
-              new InternalLink(Messages.get("curriculum.courses"), routes.CurriculumCourseController.viewCourses(curriculum.getId()))
+              new InternalLink(Messages.get("curriculum.courses"), routes.CurriculumController.jumpToCourses(curriculum.getId())),
+              new InternalLink(Messages.get("commons.view"), routes.CurriculumCourseController.viewCourses(curriculum.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
 

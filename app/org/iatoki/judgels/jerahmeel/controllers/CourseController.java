@@ -56,20 +56,8 @@ public final class CourseController extends BaseController {
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
-    public Result viewCourse(long courseId) throws CourseNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
-
-//        LazyHtml content = new LazyHtml(viewCourseView.render(course));
-//        content.appendLayout(c -> headingWithActionLayout.render(Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(), new InternalLink(Messages.get("commons.update"), routes.CourseController.updateCourseGeneral(course.getId())), c));
-//        ControllerUtils.getInstance().appendSidebarLayout(content);
-//        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-//              new InternalLink(Messages.get("course.courses"), routes.CourseController.index()),
-//              new InternalLink(Messages.get("course.view"), routes.CourseController.viewCourse(course.getId()))
-//        ));
-//        ControllerUtils.getInstance().appendTemplateLayout(content, "Course - View");
-//
-//        return ControllerUtils.getInstance().lazyOk(content);
-        return TODO;
+    public Result jumpToSessions(long courseId) {
+        return redirect(routes.CourseSessionController.viewSessions(courseId));
     }
 
     @AddCSRFToken
@@ -134,7 +122,7 @@ public final class CourseController extends BaseController {
 
     private Result showUpdateCourseGeneral(Form<CourseUpsertForm> form, Course course) {
         LazyHtml content = new LazyHtml(updateCourseGeneralView.render(form, course.getId()));
-        CourseControllerUtils.appendUpdateTabLayout(content, course);
+        CourseControllerUtils.appendUpdateLayout(content, course);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),

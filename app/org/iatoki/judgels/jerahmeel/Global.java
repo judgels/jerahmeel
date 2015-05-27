@@ -22,6 +22,12 @@ import org.iatoki.judgels.jerahmeel.controllers.SessionLessonController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionProblemController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionSessionController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionSubmissionController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingCurriculumController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingLessonController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingProblemController;
+import org.iatoki.judgels.jerahmeel.controllers.TrainingSessionController;
 import org.iatoki.judgels.jerahmeel.controllers.apis.CourseAPIController;
 import org.iatoki.judgels.jerahmeel.controllers.apis.SessionAPIController;
 import org.iatoki.judgels.jerahmeel.models.daos.hibernate.BundleGradingHibernateDao;
@@ -208,6 +214,12 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(SessionProblemController.class, new SessionProblemController(sessionService, sessionProblemService, sandalphon))
                 .put(SessionSessionController.class, new SessionSessionController(sessionService, sessionSessionService))
                 .put(SessionSubmissionController.class, new SessionSubmissionController())
+                .put(TrainingController.class, new TrainingController())
+                .put(TrainingCurriculumController.class, new TrainingCurriculumController(curriculumService))
+                .put(TrainingCourseController.class, new TrainingCourseController(curriculumService, curriculumCourseService))
+                .put(TrainingSessionController.class, new TrainingSessionController(curriculumService, curriculumCourseService, courseService, courseSessionService))
+                .put(TrainingLessonController.class, new TrainingLessonController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionLessonService))
+                .put(TrainingProblemController.class, new TrainingProblemController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionProblemService))
                 .put(JophielClientController.class, new JophielClientController(userService))
                 .put(UserController.class, new UserController(userService))
                 .put(CourseAPIController.class, new CourseAPIController(courseService))

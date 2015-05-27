@@ -100,7 +100,7 @@ public final class SessionSessionController extends BaseController {
 
     private Result showListCreateDependencies(Session session, Form<SessionDependencyCreateForm> form, Page<SessionSession> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCreateDependenciesView.render(session.getId(), currentPage, orderBy, orderDir, filterString, form));
-        SessionControllerUtils.appendUpdateTabLayout(content, session);
+        SessionControllerUtils.appendUpdateLayout(content, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),

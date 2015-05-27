@@ -3,9 +3,9 @@ package org.iatoki.judgels.jerahmeel;
 import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.Page;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumDao;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumCourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumCourseDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumDao;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel_;
 

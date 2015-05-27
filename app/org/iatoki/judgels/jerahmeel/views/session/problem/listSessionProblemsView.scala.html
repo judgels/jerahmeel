@@ -10,7 +10,7 @@
 
 @import org.iatoki.judgels.jerahmeel.JidCacheService
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionProblemController.listProblems(sessionId, newPageIndex, newOrderBy, newOrderDir)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionProblemController.listSessionProblems(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
 @searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
@@ -33,6 +33,7 @@
             <td>@JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid)</td>
             <td>@sessionProblem.getStatus.name()</td>
             <td class="text-center">
+                <a href="@routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                 <a href="@routes.SessionProblemController.deleteProblem(sessionId, sessionProblem.getId)" onclick="confirmLink ( event, this.href )"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
             </td>
         </tr>
