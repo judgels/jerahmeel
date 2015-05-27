@@ -56,7 +56,7 @@ public class JerahmeelUtils {
         putInSession("realEmail", getFromSession("email"));
     }
 
-    public static void setUserSession(org.iatoki.judgels.jophiel.User user, User urielUser) {
+    public static void setUserSession(org.iatoki.judgels.jophiel.commons.User user, User urielUser) {
         putInSession("userJid", user.getJid());
         putInSession("name", user.getName());
         putInSession("username", user.getUsername());
