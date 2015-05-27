@@ -5,8 +5,8 @@ import sbtbuildinfo.Plugin._
 lazy val jerahmeel = (project in file("."))
     .enablePlugins(PlayJava, SbtWeb)
     .disablePlugins(sbt.plugins.JUnitXmlReportPlugin)
-    .dependsOn(frontendcommons)
-    .aggregate(frontendcommons)
+    .dependsOn(sandalphoncommons, jophielcommons)
+    .aggregate(sandalphoncommons, jophielcommons)
     .settings(
         name := "jerahmeel",
         version := IO.read(file("version.properties")).trim,
@@ -44,4 +44,5 @@ lazy val jerahmeel = (project in file("."))
         buildInfoPackage := "org.iatoki.judgels.jerahmeel"
     )
 
-lazy val frontendcommons = RootProject(file("../judgels-frontend-commons"))
+lazy val sandalphoncommons = RootProject(file("../judgels-sandalphon-commons"))
+lazy val jophielcommons = RootProject(file("../judgels-jophiel-commons"))
