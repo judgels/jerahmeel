@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-import org.iatoki.judgels.gabriel.commons.AbstractSubmissionServiceImpl;
+import org.iatoki.judgels.sandalphon.commons.AbstractSubmissionServiceImpl;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.GradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.domains.GradingModel;
