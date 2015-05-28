@@ -1,4 +1,6 @@
-#Judgels Jerahmeel 
+#Judgels Jerahmeel
+
+[![Build Status](https://travis-ci.org/ia-toki/judgels-jerahmeel.svg?branch=master)](https://travis-ci.org/ia-toki/judgels-jerahmeel)
 
 ##Description
 Jerahmeel is an application built using [Play Framework](https://www.playframework.com/) to provide programming training.
@@ -15,13 +17,13 @@ To set up Jerahmeel, you need to:
         - judgels-play-commons
         - judgels-jerahmeel
 
-2. Copy conf/application_default.conf into conf/application.conf and change the configuration accordingly. **Refer to the default configuration file for explanation of the configuration keys.** In the application configuration, Uriel need to connect to running Sandalphon (to render programming problems), Jophiel (for authentication and authorization) and Sealtiel (to grade programming problems) application. In order to connect Uriel to running Sandalphon, Jophiel and Sealtiel, Uriel must be registered as Sandalphon, Jophiel and Sealtiel clients. 
+2. Copy conf/application_default.conf into conf/application.conf and change the configuration accordingly. **Refer to the default configuration file for explanation of the configuration keys.** In the application configuration, Uriel need to connect to running Sandalphon (to render programming problems), Jophiel (for authentication and authorization) and Sealtiel (to grade programming problems) application. In order to connect Uriel to running Sandalphon, Jophiel and Sealtiel, Uriel must be registered as Sandalphon, Jophiel and Sealtiel clients.
 
-3. Copy conf/db_default.conf into conf/db.conf and change the configuration accordingly. **Refer to the default configuration file for explanation of the configuration keys.** 
+3. Copy conf/db_default.conf into conf/db.conf and change the configuration accordingly. **Refer to the default configuration file for explanation of the configuration keys.**
 
 To run Uriel, just run "activator" then it will check and download all dependencies and enter Play Console.
 In Play Console use "run" command to run Sandalphon. By default it will listen on port 9000. For more information of Play Console, please read the [documentation](https://www.playframework.com/documentation/2.3.x/PlayConsole).
 
-After login on Uriel using user on Jophiel, add "admin" value to role column of your user record on table "jerahmeel\_user\_role" then relogin (logout and login again) to access full feature. 
+After login on Uriel using user on Jophiel, add "admin" value to role column of your user record on table "jerahmeel\_user\_role" then relogin (logout and login again) to access full feature.
 
 The version that is recommended for public use is [v0.5.0](https://github.com/ia-toki/judgels-jerahmeel/tree/v0.5.0).
