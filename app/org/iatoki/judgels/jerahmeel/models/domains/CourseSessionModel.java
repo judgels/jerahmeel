@@ -1,6 +1,5 @@
 package org.iatoki.judgels.jerahmeel.models.domains;
 
-import org.iatoki.judgels.commons.models.domains.AbstractJudgelsModel;
 import org.iatoki.judgels.commons.models.domains.AbstractModel;
 
 import javax.persistence.Entity;

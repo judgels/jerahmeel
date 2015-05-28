@@ -11,7 +11,6 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumService;
 import org.iatoki.judgels.jerahmeel.CurriculumUpsertForm;
-import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;

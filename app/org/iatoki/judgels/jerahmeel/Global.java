@@ -10,6 +10,8 @@ import org.iatoki.judgels.commons.AWSFileSystemProvider;
 import org.iatoki.judgels.commons.FileSystemProvider;
 import org.iatoki.judgels.commons.JudgelsProperties;
 import org.iatoki.judgels.commons.LocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.controllers.ControllerUtils;
+import org.iatoki.judgels.jophiel.commons.DefaultUserActivityServiceImpl;
 import org.iatoki.judgels.sandalphon.commons.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.commons.SubmissionService;
 import org.iatoki.judgels.jerahmeel.controllers.CourseController;
@@ -52,6 +54,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionLessonDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemStatusDao;
+import org.iatoki.judgels.jophiel.commons.Jophiel;
 import org.iatoki.judgels.jophiel.commons.UserActivityPusher;
 import org.iatoki.judgels.jophiel.commons.controllers.JophielClientController;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
@@ -94,6 +97,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     private SubmissionDao submissionDao;
     private UserDao userDao;
     private UserItemStatusDao userItemStatusDao;
+    private Jophiel jophiel;
     private Sandalphon sandalphon;
 
     private JerahmeelProperties jerahmeelProps;
@@ -121,7 +125,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     public void onStart(Application application) {
         buildProperties();
         buildDaos();
-        buildSealtiel();
+        buildCommons();
         buildFileProviders();
         buildServices();
         buildUtils();
@@ -151,7 +155,6 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         submissionDao = new SubmissionHibernateDao();
         userDao = new UserHibernateDao();
         userItemStatusDao = new UserItemStatusHibernateDao();
-        sandalphon = new Sandalphon(JerahmeelProperties.getInstance().getSandalphonClientJid(), JerahmeelProperties.getInstance().getSandalphonClientSecret(), JerahmeelProperties.getInstance().getSandalphonBaseUrl());
     }
 
     private void buildProperties() {
@@ -164,7 +167,9 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         jerahmeelProps = JerahmeelProperties.getInstance();
     }
 
-    private void buildSealtiel() {
+    private void buildCommons() {
+        jophiel = new Jophiel(jerahmeelProps.getJophielClientJid(), jerahmeelProps.getJophielClientSecret(), jerahmeelProps.getJophielBaseUrl());
+        sandalphon = new Sandalphon(jerahmeelProps.getSandalphonClientJid(), jerahmeelProps.getSandalphonClientSecret(), jerahmeelProps.getSandalphonBaseUrl());
         sealtiel = new Sealtiel(jerahmeelProps.getSealtielClientJid(), jerahmeelProps.getSealtielClientSecret(), jerahmeelProps.getSealtielBaseUrl());
     }
 
@@ -191,11 +196,13 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         sessionService = new SessionServiceImpl(sessionDao);
         sessionSessionService = new SessionSessionServiceImpl(sessionDao, sessionSessionDao);
         submissionService = new SubmissionServiceImpl(submissionDao, gradingDao, sealtiel, jerahmeelProps.getSealtielGabrielClientJid());
-        userService = new UserServiceImpl(userDao);
+        userService = new UserServiceImpl(jophiel, userDao);
         userItemStatusService = new UserItemStatusServiceImpl();
 
-        JidCacheService.getInstance().setDao(jidCacheDao);
-        AvatarCacheService.getInstance().setDao(avatarCacheDao);
+        JidCacheService.buildInstance(jidCacheDao);
+        AvatarCacheService.buildInstance(jophiel, avatarCacheDao);
+        ControllerUtils.buildInstance(jophiel);
+        DefaultUserActivityServiceImpl.buildInstance(jophiel);
     }
 
     private void buildUtils() {
@@ -203,7 +210,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
 
     private void buildControllers() {
         controllersRegistry = ImmutableMap.<Class<?>, Controller> builder()
-                .put(ApplicationController.class, new ApplicationController(userService))
+                .put(ApplicationController.class, new ApplicationController(jophiel, userService))
                 .put(CourseController.class, new CourseController(courseService))
                 .put(CourseSessionController.class, new CourseSessionController(courseService, courseSessionService, sessionService))
                 .put(CurriculumController.class, new CurriculumController(curriculumService))
@@ -220,7 +227,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(TrainingSessionController.class, new TrainingSessionController(curriculumService, curriculumCourseService, courseService, courseSessionService))
                 .put(TrainingLessonController.class, new TrainingLessonController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionLessonService))
                 .put(TrainingProblemController.class, new TrainingProblemController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionProblemService))
-                .put(JophielClientController.class, new JophielClientController(userService))
+                .put(JophielClientController.class, new JophielClientController(jophiel, userService))
                 .put(UserController.class, new UserController(userService))
                 .put(CourseAPIController.class, new CourseAPIController(courseService))
                 .put(SessionAPIController.class, new SessionAPIController(sessionService))
@@ -232,7 +239,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         ExecutionContextExecutor context = Akka.system().dispatcher();
 
         GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, submissionService, sealtiel, TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
-        UserActivityPusher userActivityPusher = new UserActivityPusher(userService, UserActivityServiceImpl.getInstance());
+        UserActivityPusher userActivityPusher = new UserActivityPusher(jophiel, userService, UserActivityServiceImpl.getInstance());
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityPusher, context);

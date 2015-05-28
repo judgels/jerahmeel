@@ -1,14 +1,14 @@
 package org.iatoki.judgels.jerahmeel;
 
-import org.iatoki.judgels.sandalphon.commons.AbstractSubmissionServiceImpl;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.GradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.domains.GradingModel;
-import org.iatoki.judgels.jerahmeel.models.domains.SubmissionModel;
-import org.iatoki.judgels.sealtiel.client.Sealtiel;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.BundleGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.domains.BundleGradingModel;
+import org.iatoki.judgels.jerahmeel.models.domains.BundleSubmissionModel;
+import org.iatoki.judgels.sandalphon.commons.AbstractBundleSubmissionServiceImpl;
+import org.iatoki.judgels.sandalphon.commons.BundleProblemGrader;
 
-public final class BundleSubmissionServiceImpl extends AbstractSubmissionServiceImpl<SubmissionModel, GradingModel> {
-    public BundleSubmissionServiceImpl(SubmissionDao submissionDao, GradingDao gradingDao, Sealtiel sealtiel, String gabrielClientJid) {
-        super(submissionDao, gradingDao, sealtiel, gabrielClientJid);
+public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionServiceImpl<BundleSubmissionModel, BundleGradingModel> {
+    public BundleSubmissionServiceImpl(BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, BundleProblemGrader bundleProblemGrader) {
+        super(submissionDao, gradingDao, bundleProblemGrader);
     }
 }
