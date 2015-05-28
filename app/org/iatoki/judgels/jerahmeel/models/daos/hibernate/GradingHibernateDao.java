@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
-import org.iatoki.judgels.gabriel.commons.models.daos.hibernate.AbstractGradingHibernateDao;
+import org.iatoki.judgels.sandalphon.commons.models.daos.hibernate.AbstractGradingHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.GradingDao;
 import org.iatoki.judgels.jerahmeel.models.domains.GradingModel;
 
