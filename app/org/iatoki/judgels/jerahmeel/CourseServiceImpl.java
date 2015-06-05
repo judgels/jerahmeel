@@ -46,13 +46,13 @@ public final class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course findByCourseJid(String courseJid) {
+    public Course findCourseByCourseJid(String courseJid) {
         CourseModel courseModel = courseDao.findByJid(courseJid);
         return createCourseFromModel(courseModel);
     }
 
     @Override
-    public Course findByCourseId(long courseId) throws CourseNotFoundException {
+    public Course findCourseByCourseId(long courseId) throws CourseNotFoundException {
         CourseModel courseModel = courseDao.findById(courseId);
         if (courseModel != null) {
             return createCourseFromModel(courseModel);

@@ -50,7 +50,7 @@ public final class CurriculumCourseController extends BaseController {
 
     @AddCSRFToken
     public Result listCreateCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
 
         Page<CurriculumCourse> curriculumPage = curriculumCourseService.findCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         Form<CurriculumCourseCreateForm> form = Form.form(CurriculumCourseCreateForm.class);
@@ -59,11 +59,11 @@ public final class CurriculumCourseController extends BaseController {
     }
 
     public Result jumpToCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
         if (curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
-            Course course = courseService.findByCourseJid(curriculumCourse.getCourseJid());
+            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
 
             return redirect(routes.CourseController.updateCourseGeneral(course.getId()));
         } else {
@@ -73,7 +73,7 @@ public final class CurriculumCourseController extends BaseController {
 
     @RequireCSRFCheck
     public Result postCreateCourse(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         Form<CurriculumCourseCreateForm> form = Form.form(CurriculumCourseCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
@@ -103,8 +103,8 @@ public final class CurriculumCourseController extends BaseController {
     }
 
     public Result deleteCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
         if (curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
             curriculumCourseService.removeCurriculumCourse(curriculumCourseId);

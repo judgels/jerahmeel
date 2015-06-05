@@ -83,7 +83,7 @@ public final class CourseController extends BaseController {
 
     @AddCSRFToken
     public Result updateCourseGeneral(long courseId) throws CourseNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
         CourseUpsertForm courseUpsertForm = new CourseUpsertForm();
         courseUpsertForm.name = course.getName();
         courseUpsertForm.description = course.getDescription();
@@ -95,7 +95,7 @@ public final class CourseController extends BaseController {
 
     @RequireCSRFCheck
     public Result postUpdateCourseGeneral(long courseId) throws CourseNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
         Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class).bindFromRequest();
 
         if (form.hasErrors()) {

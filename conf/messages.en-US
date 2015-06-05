@@ -64,6 +64,22 @@ session.problem.create=Create
 
 error.session.problemExist=Problem Already Existed.
 
+session.submissions.bundle=Bundle Submissions
+session.submissions.programming=Programming Submissions
+
+submission.submissions=Submissions
+submission.author=Author
+submission.time=Time
+submission.gradingLanguage=Language
+submission.verdict=Verdict
+submission.pts=Pts
+submission.prob=Prob
+submission.lang=Lang
+submission.score=Score
+
+problem.problem=Problem
+
+user.user=User
 user.users=Users
 user.list=Users
 user.update=Update User

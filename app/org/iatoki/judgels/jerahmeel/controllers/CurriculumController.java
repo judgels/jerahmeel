@@ -83,7 +83,7 @@ public final class CurriculumController extends BaseController {
 
     @AddCSRFToken
     public Result updateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumUpsertForm curriculumUpsertForm = new CurriculumUpsertForm();
         curriculumUpsertForm.name = curriculum.getName();
         curriculumUpsertForm.description = curriculum.getDescription();
@@ -95,7 +95,7 @@ public final class CurriculumController extends BaseController {
 
     @RequireCSRFCheck
     public Result postUpdateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class).bindFromRequest();
 
         if (form.hasErrors()) {

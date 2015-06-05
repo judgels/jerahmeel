@@ -24,7 +24,7 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public SessionLesson findBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException {
+    public SessionLesson findSessionLessonBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
         if (sessionLessonModel != null) {
             return new SessionLesson(sessionLessonModel.id, sessionLessonModel.sessionJid, sessionLessonModel.lessonJid, sessionLessonModel.lessonSecret, sessionLessonModel.alias, SessionLessonStatus.valueOf(sessionLessonModel.status));

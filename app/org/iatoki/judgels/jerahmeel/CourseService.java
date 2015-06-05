@@ -12,9 +12,9 @@ public interface CourseService {
 
     Page<Course> pageCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Course findByCourseJid(String courseJid);
+    Course findCourseByCourseJid(String courseJid);
 
-    Course findByCourseId(long courseId) throws CourseNotFoundException;
+    Course findCourseByCourseId(long courseId) throws CourseNotFoundException;
 
     void createCourse(String name, String description);
 

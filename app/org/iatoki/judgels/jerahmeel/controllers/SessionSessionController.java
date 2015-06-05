@@ -46,7 +46,7 @@ public final class SessionSessionController extends BaseController {
 
     @AddCSRFToken
     public Result listCreateDependencies(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
 
         Page<SessionSession> sessionPage = sessionSessionService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         Form<SessionDependencyCreateForm> form = Form.form(SessionDependencyCreateForm.class);
@@ -56,7 +56,7 @@ public final class SessionSessionController extends BaseController {
 
     @RequireCSRFCheck
     public Result postCreateDependency(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionDependencyCreateForm> form = Form.form(SessionDependencyCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
@@ -86,8 +86,8 @@ public final class SessionSessionController extends BaseController {
     }
 
     public Result deleteDependency(long sessionId, long sessionSessionId) throws SessionNotFoundException, SessionSessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionSession sessionSession = sessionSessionService.findBySessionSessionId(sessionSessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionSession sessionSession = sessionSessionService.findSessionSessionBySessionSessionId(sessionSessionId);
 
         if (session.getJid().equals(sessionSession.getSessionJid())) {
             sessionSessionService.removeSessionDependency(sessionSessionId);

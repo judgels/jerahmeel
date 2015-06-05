@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "jerahmeel_user_item_status")
-public final class UserItemStatusModel extends AbstractModel {
+@Table(name = "jerahmeel_user_item")
+public final class UserItemModel extends AbstractModel {
 
     @Id
     @GeneratedValue
@@ -18,5 +18,7 @@ public final class UserItemStatusModel extends AbstractModel {
     public String userJid;
 
     public String itemJid;
+
+    public String status;
 
 }

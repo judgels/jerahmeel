@@ -64,6 +64,15 @@ public final class SessionController extends BaseController {
         return redirect(routes.SessionProblemController.viewSessionProblems(sessionId));
     }
 
+    public Result jumpToBundleSubmissions(long sessionId) {
+        return TODO;
+//        return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
+    }
+
+    public Result jumpToProgrammingSubmissions(long sessionId) {
+        return redirect(routes.SessionSubmissionController.viewSubmissions(sessionId));
+    }
+
     @AddCSRFToken
     public Result createSession() {
         Form<SessionUpsertForm> form = Form.form(SessionUpsertForm.class);
@@ -87,7 +96,7 @@ public final class SessionController extends BaseController {
 
     @AddCSRFToken
     public Result updateSessionGeneral(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         SessionUpsertForm sessionUpsertForm = new SessionUpsertForm();
         sessionUpsertForm.name = session.getName();
         sessionUpsertForm.description = session.getDescription();
@@ -99,7 +108,7 @@ public final class SessionController extends BaseController {
 
     @RequireCSRFCheck
     public Result postUpdateSessionGeneral(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionUpsertForm> form = Form.form(SessionUpsertForm.class).bindFromRequest();
 
         if (form.hasErrors()) {

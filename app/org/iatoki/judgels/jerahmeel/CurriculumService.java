@@ -6,7 +6,7 @@ public interface CurriculumService {
 
     Page<Curriculum> pageCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Curriculum findByCurriculumId(long curriculumId) throws CurriculumNotFoundException;
+    Curriculum findCurriculumByCurriculumId(long curriculumId) throws CurriculumNotFoundException;
 
     void createCurriculum(String name, String description);
 

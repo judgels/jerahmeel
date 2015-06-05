@@ -6,7 +6,7 @@ public interface SessionLessonService {
 
     boolean isInSessionByLessonJidAndAlias(String sessionJid, String lessonJid, String alias);
 
-    SessionLesson findBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException;
+    SessionLesson findSessionLessonBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException;
 
     Page<SessionLesson> findSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 

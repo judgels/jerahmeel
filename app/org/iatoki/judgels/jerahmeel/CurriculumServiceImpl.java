@@ -28,7 +28,7 @@ public final class CurriculumServiceImpl implements CurriculumService {
     }
 
     @Override
-    public Curriculum findByCurriculumId(long curriculumId) throws CurriculumNotFoundException {
+    public Curriculum findCurriculumByCurriculumId(long curriculumId) throws CurriculumNotFoundException {
         CurriculumModel curriculumModel = curriculumDao.findById(curriculumId);
         if (curriculumModel != null) {
             return createCurriculumFromModel(curriculumModel);

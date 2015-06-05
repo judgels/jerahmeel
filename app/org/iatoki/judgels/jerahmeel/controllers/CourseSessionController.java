@@ -50,7 +50,7 @@ public final class CourseSessionController extends BaseController {
 
     @AddCSRFToken
     public Result listCreateSessions(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
 
         Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         Form<CourseSessionCreateForm> form = Form.form(CourseSessionCreateForm.class);
@@ -60,7 +60,7 @@ public final class CourseSessionController extends BaseController {
 
     @RequireCSRFCheck
     public Result postCreateSession(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
         Form<CourseSessionCreateForm> form = Form.form(CourseSessionCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
@@ -90,11 +90,11 @@ public final class CourseSessionController extends BaseController {
     }
 
     public Result jumpToSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
         if (course.getJid().equals(courseSession.getCourseJid())) {
-            Session session = sessionService.findBySessionJid(courseSession.getSessionJid());
+            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
             return redirect(routes.SessionController.updateSessionGeneral(session.getId()));
         } else {
@@ -103,7 +103,7 @@ public final class CourseSessionController extends BaseController {
     }
 
     public Result deleteSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
-        Course course = courseService.findByCourseId(courseId);
+        Course course = courseService.findCourseByCourseId(courseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
         if (course.getJid().equals(courseSession.getCourseJid())) {

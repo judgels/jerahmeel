@@ -6,7 +6,7 @@ public interface SessionSessionService {
 
     boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
 
-    SessionSession findBySessionSessionId(long sessionSessionId) throws SessionSessionNotFoundException;
+    SessionSession findSessionSessionBySessionSessionId(long sessionSessionId) throws SessionSessionNotFoundException;
 
     Page<SessionSession> findSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 

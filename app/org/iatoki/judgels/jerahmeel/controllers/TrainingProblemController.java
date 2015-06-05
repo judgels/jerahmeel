@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
@@ -23,6 +24,8 @@ import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.SessionService;
+import org.iatoki.judgels.jerahmeel.UserItemService;
+import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
@@ -47,8 +50,9 @@ public final class TrainingProblemController extends BaseController {
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
     private final SessionProblemService sessionProblemService;
+    private final UserItemService userItemService;
 
-    public TrainingProblemController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionProblemService sessionProblemService) {
+    public TrainingProblemController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionProblemService sessionProblemService, UserItemService userItemService) {
         this.sandalphon = sandalphon;
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
@@ -56,6 +60,7 @@ public final class TrainingProblemController extends BaseController {
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
         this.sessionProblemService = sessionProblemService;
+        this.userItemService = userItemService;
     }
 
     public Result viewProblems(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
@@ -63,13 +68,13 @@ public final class TrainingProblemController extends BaseController {
     }
 
     public Result listProblems(long curriculumId, long curriculumCourseId, long courseSessionId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) {
-            Course course = courseService.findByCourseJid(curriculumCourse.getCourseJid());
-            Session session = sessionService.findBySessionJid(courseSession.getSessionJid());
+            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
+            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
             Page<SessionProblem> sessionProblemPage = sessionProblemService.findSessionProblems(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
             return showListProblems(curriculum, curriculumCourse, course, courseSession, session, sessionProblemPage, orderBy, orderDir, filterString);
@@ -79,14 +84,14 @@ public final class TrainingProblemController extends BaseController {
     }
 
     public Result viewProblem(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionProblemId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
-        SessionProblem sessionProblem = sessionProblemService.findBySessionProblemId(sessionProblemId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) && (sessionProblem.getSessionJid().equals(courseSession.getSessionJid()))) {
-            Course course = courseService.findByCourseJid(curriculumCourse.getCourseJid());
-            Session session = sessionService.findBySessionJid(courseSession.getSessionJid());
+            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
+            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
             int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
             String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
@@ -103,6 +108,10 @@ public final class TrainingProblemController extends BaseController {
                   new InternalLink(sessionProblem.getAlias(), routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()))
             ));
 
+            if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED)) {
+                userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED);
+            }
+
             ControllerUtils.getInstance().appendTemplateLayout(content, "Training");
 
             return ControllerUtils.getInstance().lazyOk(content);
@@ -112,14 +121,14 @@ public final class TrainingProblemController extends BaseController {
     }
 
     public Result renderProblemMedia(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionProblemId, String filename) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException {
-        Curriculum curriculum = curriculumService.findByCurriculumId(curriculumId);
-        CurriculumCourse curriculumCourse = curriculumCourseService.findByCurriculumCourseId(curriculumCourseId);
+        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
-        SessionProblem sessionProblem = sessionProblemService.findBySessionProblemId(sessionProblemId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) && (sessionProblem.getSessionJid().equals(courseSession.getSessionJid()))) {
-            Course course = courseService.findByCourseJid(curriculumCourse.getCourseJid());
-            Session session = sessionService.findBySessionJid(courseSession.getSessionJid());
+            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
+            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
             URI uri = sandalphon.getProblemRenderUri(sessionProblem.getProblemJid(), filename);
 

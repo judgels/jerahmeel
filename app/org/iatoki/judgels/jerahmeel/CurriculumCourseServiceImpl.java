@@ -6,6 +6,7 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumCourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel_;
 
@@ -17,11 +18,13 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     private final CurriculumDao curriculumDao;
     private final CurriculumCourseDao curriculumCourseDao;
     private final CourseDao courseDao;
+    private final UserItemDao userItemDao;
 
-    public CurriculumCourseServiceImpl(CurriculumDao curriculumDao, CurriculumCourseDao curriculumCourseDao, CourseDao courseDao) {
+    public CurriculumCourseServiceImpl(CurriculumDao curriculumDao, CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, UserItemDao userItemDao) {
         this.curriculumDao = curriculumDao;
         this.curriculumCourseDao = curriculumCourseDao;
         this.courseDao = courseDao;
+        this.userItemDao = userItemDao;
     }
 
     @Override
@@ -30,7 +33,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     }
 
     @Override
-    public CurriculumCourse findByCurriculumCourseId(long curriculumCourseId) throws CurriculumCourseNotFoundException {
+    public CurriculumCourse findCurriculumCourseByCurriculumCourseId(long curriculumCourseId) throws CurriculumCourseNotFoundException {
         CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
         if (curriculumCourseModel != null) {
             return new CurriculumCourse(curriculumCourseModel.id, curriculumCourseModel.curriculumJid, curriculumCourseModel.courseJid, null);

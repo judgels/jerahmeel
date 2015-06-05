@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.Gson;
 import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
@@ -25,6 +26,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.problem.createProblemView
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
+import org.iatoki.judgels.sandalphon.commons.programming.LanguageRestriction;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -57,7 +59,7 @@ public final class SessionProblemController extends BaseController {
     }
 
     public Result listSessionProblems(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
 
         Page<SessionProblem> sessionPage = sessionProblemService.findSessionProblems(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
@@ -65,13 +67,13 @@ public final class SessionProblemController extends BaseController {
     }
 
     public Result viewProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionProblem sessionProblem = sessionProblemService.findBySessionProblemId(sessionProblemId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
             int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
-            String requestBody = "";
+            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
+            String requestBody = new Gson().toJson(LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendUpdateLayout(content, session);
@@ -92,8 +94,8 @@ public final class SessionProblemController extends BaseController {
     }
     
     public Result renderImage(long sessionId, long sessionProblemId, String imageFilename) throws SessionNotFoundException, SessionProblemNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionProblem sessionProblem = sessionProblemService.findBySessionProblemId(sessionProblemId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
             URI imageUri = sandalphon.getProblemRenderUri(sessionProblem.getProblemJid(), imageFilename);
@@ -113,7 +115,7 @@ public final class SessionProblemController extends BaseController {
     
     @AddCSRFToken
     public Result createProblem(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionProblemCreateForm> form = Form.form(SessionProblemCreateForm.class);
 
         return showCreateProblem(session, form);
@@ -121,7 +123,7 @@ public final class SessionProblemController extends BaseController {
 
     @RequireCSRFCheck
     public Result postCreateProblem(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionProblemCreateForm> form = Form.form(SessionProblemCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
@@ -149,8 +151,8 @@ public final class SessionProblemController extends BaseController {
     }
 
     public Result deleteProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionProblem sessionProblem = sessionProblemService.findBySessionProblemId(sessionProblemId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
             sessionProblemService.removeSessionProblem(sessionProblemId);

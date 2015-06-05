@@ -56,7 +56,7 @@ public final class SessionLessonController extends BaseController {
     }
 
     public Result listSessionLessons(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
 
         Page<SessionLesson> sessionPage = sessionLessonService.findSessionLessons(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
@@ -64,8 +64,8 @@ public final class SessionLessonController extends BaseController {
     }
 
     public Result viewLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
 
         if (session.getJid().equals(sessionLesson.getSessionJid())) {
             int tOTPCode = sandalphon.calculateTOTPCode(sessionLesson.getLessonSecret(), System.currentTimeMillis());
@@ -91,8 +91,8 @@ public final class SessionLessonController extends BaseController {
     }
 
     public Result renderImage(long sessionId, long sessionLessonId, String imageFilename) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
 
         if (session.getJid().equals(sessionLesson.getSessionJid())) {
             URI imageUri = sandalphon.getLessonRenderUri(sessionLesson.getLessonJid(), imageFilename);
@@ -112,7 +112,7 @@ public final class SessionLessonController extends BaseController {
 
     @AddCSRFToken
     public Result createLesson(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionLessonCreateForm> form = Form.form(SessionLessonCreateForm.class);
 
         return showCreateLesson(session, form);
@@ -120,7 +120,7 @@ public final class SessionLessonController extends BaseController {
 
     @RequireCSRFCheck
     public Result postCreateLesson(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
         Form<SessionLessonCreateForm> form = Form.form(SessionLessonCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
@@ -148,8 +148,8 @@ public final class SessionLessonController extends BaseController {
     }
 
     public Result deleteLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
 
         if (session.getJid().equals(sessionLesson.getSessionJid())) {
             sessionLessonService.removeSessionLesson(sessionLessonId);

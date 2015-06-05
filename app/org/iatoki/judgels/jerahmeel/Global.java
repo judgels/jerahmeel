@@ -42,7 +42,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.hibernate.SessionHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.hibernate.SessionLessonHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.hibernate.SessionProblemHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.hibernate.SessionSessionHibernateDao;
-import org.iatoki.judgels.jerahmeel.models.daos.hibernate.UserItemStatusHibernateDao;
+import org.iatoki.judgels.jerahmeel.models.daos.hibernate.UserItemHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseDao;
@@ -53,7 +53,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionLessonDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionSessionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemStatusDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jophiel.commons.Jophiel;
 import org.iatoki.judgels.jophiel.commons.UserActivityPusher;
 import org.iatoki.judgels.jophiel.commons.controllers.JophielClientController;
@@ -96,7 +96,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     private SessionSessionDao sessionSessionDao;
     private SubmissionDao submissionDao;
     private UserDao userDao;
-    private UserItemStatusDao userItemStatusDao;
+    private UserItemDao userItemDao;
     private Jophiel jophiel;
     private Sandalphon sandalphon;
 
@@ -116,7 +116,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     private SessionService sessionService;
     private SessionSessionService sessionSessionService;
     private SubmissionService submissionService;
-    private UserItemStatusService userItemStatusService;
+    private UserItemService userItemService;
     private UserService userService;
 
     private Map<Class<?>, Controller> controllersRegistry;
@@ -154,7 +154,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         sessionSessionDao = new SessionSessionHibernateDao();
         submissionDao = new SubmissionHibernateDao();
         userDao = new UserHibernateDao();
-        userItemStatusDao = new UserItemStatusHibernateDao();
+        userItemDao = new UserItemHibernateDao();
     }
 
     private void buildProperties() {
@@ -168,8 +168,8 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     }
 
     private void buildCommons() {
-        jophiel = new Jophiel(jerahmeelProps.getJophielBaseUrl(), jerahmeelProps.getJophielClientJid(), jerahmeelProps.getJophielClientSecret());
-        sandalphon = new Sandalphon(jerahmeelProps.getSandalphonClientJid(), jerahmeelProps.getSandalphonClientSecret(), jerahmeelProps.getSandalphonBaseUrl());
+        jophiel = new Jophiel(jerahmeelProps.getJophielClientJid(), jerahmeelProps.getJophielClientSecret(), jerahmeelProps.getJophielBaseUrl());
+        sandalphon = new Sandalphon(jerahmeelProps.getSandalphonBaseUrl(), jerahmeelProps.getSandalphonClientJid(), jerahmeelProps.getSandalphonClientSecret());
         sealtiel = new Sealtiel(jerahmeelProps.getSealtielClientJid(), jerahmeelProps.getSealtielClientSecret(), jerahmeelProps.getSealtielBaseUrl());
     }
 
@@ -189,7 +189,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     private void buildServices() {
         courseService = new CourseServiceImpl(courseDao);
         courseSessionService = new CourseSessionServiceImpl(courseDao, courseSessionDao, sessionDao);
-        curriculumCourseService = new CurriculumCourseServiceImpl(curriculumDao, curriculumCourseDao, courseDao);
+        curriculumCourseService = new CurriculumCourseServiceImpl(curriculumDao, curriculumCourseDao, courseDao, userItemDao);
         curriculumService = new CurriculumServiceImpl(curriculumDao);
         sessionLessonService = new SessionLessonServiceImpl(sessionLessonDao);
         sessionProblemService = new SessionProblemServiceImpl(sessionProblemDao);
@@ -197,7 +197,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         sessionSessionService = new SessionSessionServiceImpl(sessionDao, sessionSessionDao);
         submissionService = new SubmissionServiceImpl(submissionDao, gradingDao, sealtiel, jerahmeelProps.getSealtielGabrielClientJid());
         userService = new UserServiceImpl(jophiel, userDao);
-        userItemStatusService = new UserItemStatusServiceImpl();
+        userItemService = new UserItemServiceImpl(userItemDao);
 
         JidCacheService.buildInstance(jidCacheDao);
         AvatarCacheService.buildInstance(jophiel, avatarCacheDao);
@@ -220,13 +220,13 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(SessionLessonController.class, new SessionLessonController(sessionService, sessionLessonService, sandalphon))
                 .put(SessionProblemController.class, new SessionProblemController(sessionService, sessionProblemService, sandalphon))
                 .put(SessionSessionController.class, new SessionSessionController(sessionService, sessionSessionService))
-                .put(SessionSubmissionController.class, new SessionSubmissionController())
+                .put(SessionSubmissionController.class, new SessionSubmissionController(sessionService, submissionService, sessionProblemService, submissionLocalFileProvider, submissionRemoteFileProvider, userItemService))
                 .put(TrainingController.class, new TrainingController())
                 .put(TrainingCurriculumController.class, new TrainingCurriculumController(curriculumService))
-                .put(TrainingCourseController.class, new TrainingCourseController(curriculumService, curriculumCourseService))
-                .put(TrainingSessionController.class, new TrainingSessionController(curriculumService, curriculumCourseService, courseService, courseSessionService))
-                .put(TrainingLessonController.class, new TrainingLessonController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionLessonService))
-                .put(TrainingProblemController.class, new TrainingProblemController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionProblemService))
+                .put(TrainingCourseController.class, new TrainingCourseController(curriculumService, curriculumCourseService, courseSessionService, userItemService))
+                .put(TrainingSessionController.class, new TrainingSessionController(curriculumService, curriculumCourseService, courseService, courseSessionService, userItemService))
+                .put(TrainingLessonController.class, new TrainingLessonController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionLessonService, userItemService))
+                .put(TrainingProblemController.class, new TrainingProblemController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionProblemService, userItemService))
                 .put(JophielClientController.class, new JophielClientController(jophiel, userService))
                 .put(UserController.class, new UserController(userService))
                 .put(CourseAPIController.class, new CourseAPIController(courseService))

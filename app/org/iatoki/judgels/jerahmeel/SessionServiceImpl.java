@@ -46,14 +46,14 @@ public final class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Session findBySessionJid(String sessionJid) {
+    public Session findSessionBySessionJid(String sessionJid) {
         SessionModel sessionModel = sessionDao.findByJid(sessionJid);
 
         return new Session(sessionModel.id, sessionModel.jid, sessionModel.name, sessionModel.description);
     }
 
     @Override
-    public Session findBySessionId(long sessionId) throws SessionNotFoundException {
+    public Session findSessionBySessionId(long sessionId) throws SessionNotFoundException {
         SessionModel sessionModel = sessionDao.findById(sessionId);
         if (sessionModel != null) {
             return createSessionFromModel(sessionModel);
