@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
@@ -11,6 +12,8 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionService;
 import org.iatoki.judgels.jerahmeel.SessionUpsertForm;
+import org.iatoki.judgels.jerahmeel.UserItemService;
+import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
@@ -33,9 +36,11 @@ public final class SessionController extends BaseController {
     private static final long PAGE_SIZE = 20;
 
     private final SessionService sessionService;
+    private final UserItemService userItemService;
 
-    public SessionController(SessionService sessionService) {
+    public SessionController(SessionService sessionService, UserItemService userItemService) {
         this.sessionService = sessionService;
+        this.userItemService = userItemService;
     }
 
     public Result viewSessions() {
@@ -62,6 +67,10 @@ public final class SessionController extends BaseController {
 
     public Result jumpToProblems(long sessionId) {
         return redirect(routes.SessionProblemController.viewSessionProblems(sessionId));
+    }
+
+    public Result jumpToSubmissions(long sessionId) {
+        return redirect(routes.SessionController.jumpToBundleSubmissions(sessionId));
     }
 
     public Result jumpToBundleSubmissions(long sessionId) {
@@ -101,6 +110,10 @@ public final class SessionController extends BaseController {
         sessionUpsertForm.description = session.getDescription();
 
         Form<SessionUpsertForm> form = Form.form(SessionUpsertForm.class).fill(sessionUpsertForm);
+
+        if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) {
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
+        }
 
         return showUpdateSessionGeneral(form, session);
     }

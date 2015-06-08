@@ -218,7 +218,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(CurriculumController.class, new CurriculumController(curriculumService))
                 .put(CurriculumCourseController.class, new CurriculumCourseController(curriculumService, curriculumCourseService, courseService))
                 .put(SessionBundleSubmissionController.class, new SessionBundleSubmissionController(sessionService, bundleSubmissionService, sessionProblemService, submissionLocalFileProvider, submissionRemoteFileProvider, userItemService))
-                .put(SessionController.class, new SessionController(sessionService))
+                .put(SessionController.class, new SessionController(sessionService, userItemService))
                 .put(SessionLessonController.class, new SessionLessonController(sessionService, sessionLessonService, sandalphon))
                 .put(SessionProblemController.class, new SessionProblemController(sessionService, sessionProblemService, sandalphon))
                 .put(SessionSessionController.class, new SessionSessionController(sessionService, sessionSessionService))

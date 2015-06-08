@@ -42,10 +42,10 @@ public final class SessionControllerUtils {
                     new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
                     new InternalLink(Messages.get("session.problems"), routes.SessionController.jumpToProblems(session.getId())),
                     new InternalLink(Messages.get("session.dependencies"), routes.SessionSessionController.viewDependencies(session.getId())),
-                    new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
-                    new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId()))
+                    new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId()))
               ), c)
         );
+
         content.appendLayout(c -> headingLayout.render(Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(), c));
     }
 

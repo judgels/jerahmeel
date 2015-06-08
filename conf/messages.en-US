@@ -64,6 +64,7 @@ session.problem.create=Create
 
 error.session.problemExist=Problem Already Existed.
 
+session.submissions=Submissions
 session.submissions.bundle=Bundle Submissions
 session.submissions.programming=Programming Submissions
 

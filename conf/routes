@@ -63,6 +63,7 @@ POST        /sessions/$sId<[0-9]{1,18}>/update/general                          
 
 GET         /sessions/$sId<[0-9]{1,18}>/lessons                                                                                                     @org.iatoki.judgels.jerahmeel.controllers.SessionController.jumpToLessons(sId: Long)
 GET         /sessions/$sId<[0-9]{1,18}>/problems                                                                                                    @org.iatoki.judgels.jerahmeel.controllers.SessionController.jumpToProblems(sId: Long)
+GET         /sessions/$sId<[0-9]{1,18}>/submissions                                                                                                 @org.iatoki.judgels.jerahmeel.controllers.SessionController.jumpToSubmissions(sId: Long)
 GET         /sessions/$sId<[0-9]{1,18}>/submissions/bundle                                                                                          @org.iatoki.judgels.jerahmeel.controllers.SessionController.jumpToBundleSubmissions(sId: Long)
 GET         /sessions/$sId<[0-9]{1,18}>/submissions/programming                                                                                     @org.iatoki.judgels.jerahmeel.controllers.SessionController.jumpToProgrammingSubmissions(sId: Long)
 

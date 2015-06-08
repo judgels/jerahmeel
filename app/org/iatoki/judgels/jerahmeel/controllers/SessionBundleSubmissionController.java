@@ -11,6 +11,7 @@ import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.ListTableSelectionForm;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
+import org.iatoki.judgels.commons.views.html.layouts.accessTypesLayout;
 import org.iatoki.judgels.commons.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.jerahmeel.JidCacheService;
 import org.iatoki.judgels.jerahmeel.Session;
@@ -93,10 +94,16 @@ public final class SessionBundleSubmissionController extends BaseController {
 
         LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), bundleSubmissions, userJids, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
+        content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+                    new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
+                    new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId()))
+              ), c)
+        );
         SessionControllerUtils.appendUpdateLayout(content, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
+              new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
               new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
               new InternalLink(Messages.get("commons.view"), routes.SessionBundleSubmissionController.viewSubmissions(session.getId()))
         ));
@@ -115,11 +122,16 @@ public final class SessionBundleSubmissionController extends BaseController {
             String sessionProblemName = JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid());
 
             LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, Double>>() {}.getType()), answer, JidCacheService.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
-
+            content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
+                        new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId()))
+                  ), c)
+            );
             SessionControllerUtils.appendUpdateLayout(content, session);
             ControllerUtils.getInstance().appendSidebarLayout(content);
             ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
                   new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
+                  new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
                   new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
                   new InternalLink(Messages.get("commons.view"), routes.SessionBundleSubmissionController.viewSubmissions(session.getId())),
                   new InternalLink(sessionProblemAlias, routes.SessionBundleSubmissionController.viewSubmission(session.getId(), bundleSubmission.getId()))
