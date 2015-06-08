@@ -65,12 +65,11 @@ public final class SessionController extends BaseController {
     }
 
     public Result jumpToBundleSubmissions(long sessionId) {
-        return TODO;
-//        return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
+        return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
     }
 
     public Result jumpToProgrammingSubmissions(long sessionId) {
-        return redirect(routes.SessionSubmissionController.viewSubmissions(sessionId));
+        return redirect(routes.SessionProgrammingSubmissionController.viewSubmissions(sessionId));
     }
 
     @AddCSRFToken

@@ -23,7 +23,7 @@ import org.iatoki.judgels.jerahmeel.controllers.SessionController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionLessonController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionProblemController;
 import org.iatoki.judgels.jerahmeel.controllers.SessionSessionController;
-import org.iatoki.judgels.jerahmeel.controllers.SessionSubmissionController;
+import org.iatoki.judgels.jerahmeel.controllers.SessionProgrammingSubmissionController;
 import org.iatoki.judgels.jerahmeel.controllers.TrainingController;
 import org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController;
 import org.iatoki.judgels.jerahmeel.controllers.TrainingCurriculumController;
@@ -107,6 +107,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     private FileSystemProvider submissionLocalFileProvider;
     private FileSystemProvider submissionRemoteFileProvider;
 
+    private BundleSubmissionServiceImpl bundleSubmissionService;
     private CourseService courseService;
     private CourseSessionService courseSessionService;
     private CurriculumCourseService curriculumCourseService;
@@ -187,6 +188,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
     }
 
     private void buildServices() {
+        bundleSubmissionService = new BundleSubmissionServiceImpl(bundleSubmissionDao, bundleGradingDao, sandalphon);
         courseService = new CourseServiceImpl(courseDao);
         courseSessionService = new CourseSessionServiceImpl(courseDao, courseSessionDao, sessionDao);
         curriculumCourseService = new CurriculumCourseServiceImpl(curriculumDao, curriculumCourseDao, courseDao, userItemDao);
@@ -215,12 +217,12 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(CourseSessionController.class, new CourseSessionController(courseService, courseSessionService, sessionService))
                 .put(CurriculumController.class, new CurriculumController(curriculumService))
                 .put(CurriculumCourseController.class, new CurriculumCourseController(curriculumService, curriculumCourseService, courseService))
-                .put(SessionBundleSubmissionController.class, new SessionBundleSubmissionController())
+                .put(SessionBundleSubmissionController.class, new SessionBundleSubmissionController(sessionService, bundleSubmissionService, sessionProblemService, submissionLocalFileProvider, submissionRemoteFileProvider, userItemService))
                 .put(SessionController.class, new SessionController(sessionService))
                 .put(SessionLessonController.class, new SessionLessonController(sessionService, sessionLessonService, sandalphon))
                 .put(SessionProblemController.class, new SessionProblemController(sessionService, sessionProblemService, sandalphon))
                 .put(SessionSessionController.class, new SessionSessionController(sessionService, sessionSessionService))
-                .put(SessionSubmissionController.class, new SessionSubmissionController(sessionService, submissionService, sessionProblemService, submissionLocalFileProvider, submissionRemoteFileProvider, userItemService))
+                .put(SessionProgrammingSubmissionController.class, new SessionProgrammingSubmissionController(sessionService, submissionService, sessionProblemService, submissionLocalFileProvider, submissionRemoteFileProvider, userItemService))
                 .put(TrainingController.class, new TrainingController())
                 .put(TrainingCurriculumController.class, new TrainingCurriculumController(curriculumService))
                 .put(TrainingCourseController.class, new TrainingCourseController(curriculumService, curriculumCourseService, courseSessionService, userItemService))

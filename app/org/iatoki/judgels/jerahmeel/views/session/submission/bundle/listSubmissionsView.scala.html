@@ -1,4 +1,4 @@
-@(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.sandalphon.commons.Submission], userJids: List[String], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
+@(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.sandalphon.commons.BundleSubmission], userJids: List[String], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
 
 @import play.i18n.Messages
 @import org.iatoki.judgels.commons.views.html.table.tableView
@@ -12,7 +12,7 @@
 
 <script type="text/javascript" src="@controllers.routes.Assets.at("lib/jquery/jquery.min.js")"></script>
 
-<form class="form-inline pull-right" method="GET" action="@routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, null, null)">
+<form class="form-inline pull-right" method="GET" action="@routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, null, null)">
     <div class="form-group">
         <label for="userJid">@Messages.get("user.user")</label>
         <select name="userJid" class="form-control selectpicker col-md-3">
@@ -39,7 +39,7 @@
     <button type="submit" class="btn btn-primary">Filter</button>
 </form>
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, newPageIndex, newOrderBy, newOrderDir, userJid, problemJid)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionBundleSubmissionController.listSubmissions(sessionId, newPageIndex, newOrderBy, newOrderDir, userJid, problemJid)}
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -51,7 +51,7 @@
     });
 </script>
 
-<form class="form-inline" method="POST" action="@routes.SessionProgrammingSubmissionController.regradeSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid)">
+<form class="form-inline" method="POST" action="@routes.SessionBundleSubmissionController.regradeSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid)">
 
 <button type="submit" id="regradeButton" class="btn btn-primary">Regrade selected</button>
 
@@ -64,8 +64,6 @@
         "id" -> Messages.get("commons.id"),
         "userCreate" -> Messages.get("user.user"),
         "" -> Messages.get("submission.prob"),
-        "gradingLanguage" -> Messages.get("submission.lang"),
-        "" -> Messages.get("submission.verdict"),
         "" -> Messages.get("submission.pts"),
         "timeCreate" -> Messages.get("submission.time")
     )
@@ -79,13 +77,11 @@
                 <td><small>@submission.getId</small></td>
                 <td>@Html(JudgelsUtils.prettifyUserDisplayName(displayNamesMap.get(submission.getAuthorJid)))</td>
                 <td><small>@problemJidToAliasMap.get(submission.getProblemJid)</small></td>
-                <td><small>@gradingLanguageToNameMap.get(submission.getGradingLanguage)</small></td>
-                <td><small>@submission.getLatestVerdict.getName</small></td>
                 <td><small>@submission.getLatestScore</small></td>
                 <td><small><time class="display-time" datetime="@JudgelsUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
                 <td class="text-center">
-                    <a href="@routes.SessionProgrammingSubmissionController.viewSubmission(sessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
-                    <a href="@routes.SessionProgrammingSubmissionController.regradeSubmission(sessionId, submission.getId, pageIndex, orderBy, orderDir, userJid, problemJid)" onclick="return confirm('Are you sure you want to regrade?');"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a>
+                    <a href="@routes.SessionBundleSubmissionController.viewSubmission(sessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                    <a href="@routes.SessionBundleSubmissionController.regradeSubmission(sessionId, submission.getId, pageIndex, orderBy, orderDir, userJid, problemJid)" onclick="return confirm('Are you sure you want to regrade?');"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span></a>
                 </td>
             </tr>
         }

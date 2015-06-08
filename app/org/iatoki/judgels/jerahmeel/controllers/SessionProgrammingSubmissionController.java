@@ -42,7 +42,7 @@ import java.util.Map;
 @Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
-public final class SessionSubmissionController extends BaseController {
+public final class SessionProgrammingSubmissionController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
 
@@ -53,7 +53,7 @@ public final class SessionSubmissionController extends BaseController {
     private final FileSystemProvider submissionRemoteFileProvider;
     private final UserItemService userItemService;
 
-    public SessionSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileProvider, FileSystemProvider submissionRemoteFileProvider, UserItemService userItemService) {
+    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileProvider, FileSystemProvider submissionRemoteFileProvider, UserItemService userItemService) {
         this.sessionService = sessionService;
         this.submissionService = submissionService;
         this.sessionProblemService = sessionProblemService;
@@ -84,7 +84,7 @@ public final class SessionSubmissionController extends BaseController {
             return redirect(routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId()));
         }
 
-        return redirect(routes.SessionSubmissionController.viewSubmissions(sessionId));
+        return redirect(routes.SessionProgrammingSubmissionController.viewSubmissions(sessionId));
     }
     
     public Result viewSubmissions(long sessionId) throws SessionNotFoundException {
@@ -110,7 +110,7 @@ public final class SessionSubmissionController extends BaseController {
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
               new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionSubmissionController.viewSubmissions(session.getId()))
+              new InternalLink(Messages.get("commons.view"), routes.SessionProgrammingSubmissionController.viewSubmissions(session.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
 
@@ -135,8 +135,8 @@ public final class SessionSubmissionController extends BaseController {
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
               new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionSubmissionController.viewSubmissions(session.getId())),
-              new InternalLink(sessionProblemAlias, routes.SessionSubmissionController.viewSubmission(session.getId(), submission.getId()))
+              new InternalLink(Messages.get("commons.view"), routes.SessionProgrammingSubmissionController.viewSubmissions(session.getId())),
+              new InternalLink(sessionProblemAlias, routes.SessionProgrammingSubmissionController.viewSubmission(session.getId(), submission.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions - View");
 
@@ -150,7 +150,7 @@ public final class SessionSubmissionController extends BaseController {
         GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileProvider, submissionRemoteFileProvider, submission.getJid());
         submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        return redirect(routes.SessionSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+        return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
     public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, SubmissionNotFoundException {
@@ -165,7 +165,7 @@ public final class SessionSubmissionController extends BaseController {
         } else if (data.selectJids != null) {
             submissions = submissionService.findSubmissionsWithoutGradingsByJids(data.selectJids);
         } else {
-            return redirect(routes.SessionSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+            return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
         }
 
         for (Submission submission : submissions) {
@@ -173,6 +173,6 @@ public final class SessionSubmissionController extends BaseController {
             submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
-        return redirect(routes.SessionSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+        return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 }

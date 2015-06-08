@@ -84,6 +84,21 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
+    public Map<String, String> findBundleProblemJidToAliasMapBySessionJid(String sessionJid) {
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
+
+        Map<String, String> map = Maps.newLinkedHashMap();
+
+        for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
+            if (SessionProblemType.BUNDLE.name().equals(sessionProblemModel.type)) {
+                map.put(sessionProblemModel.problemJid, sessionProblemModel.alias);
+            }
+        }
+
+        return map;
+    }
+
+    @Override
     public SessionProblem findSessionProblemBySessionJidAndProblemJid(String sessionJid, String problemJid) {
         return createFromModel(sessionProblemDao.findBySesssionJidAndProblemJid(sessionJid, problemJid));
     }

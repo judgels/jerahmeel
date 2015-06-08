@@ -72,7 +72,14 @@ public final class SessionProblemController extends BaseController {
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
             int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
+            String submitUrl = "";
+            if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
+                submitUrl = routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
+                submitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            }
+
+            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
             String requestBody = new Gson().toJson(LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));

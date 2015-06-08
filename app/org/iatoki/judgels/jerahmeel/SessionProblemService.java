@@ -18,5 +18,7 @@ public interface SessionProblemService {
 
     Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid);
 
+    Map<String, String> findBundleProblemJidToAliasMapBySessionJid(String sessionJid);
+
     SessionProblem findSessionProblemBySessionJidAndProblemJid(String sessionJid, String problemJid);
 }
