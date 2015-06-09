@@ -230,7 +230,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
                 .put(TrainingLessonController.class, new TrainingLessonController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionLessonService, userItemService))
                 .put(TrainingProblemController.class, new TrainingProblemController(sandalphon, curriculumService, curriculumCourseService, courseService, courseSessionService, sessionService, sessionProblemService, userItemService))
                 .put(JophielClientController.class, new JophielClientController(jophiel, userService))
-                .put(UserController.class, new UserController(userService))
+                .put(UserController.class, new UserController(jophiel, userService))
                 .put(CourseAPIController.class, new CourseAPIController(courseService))
                 .put(SessionAPIController.class, new SessionAPIController(sessionService))
                 .build();

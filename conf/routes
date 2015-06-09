@@ -108,6 +108,9 @@ GET         /sessions/autoComplete                                              
 
 GET         /users                                                                                                                                  @org.iatoki.judgels.jerahmeel.controllers.UserController.index()
 GET         /users/                                                                                                                                 @org.iatoki.judgels.jerahmeel.controllers.UserController.listUsers(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
+GET         /users/create                                                                                                                           @org.iatoki.judgels.jerahmeel.controllers.UserController.createUser()
+POST        /users/create                                                                                                                           @org.iatoki.judgels.jerahmeel.controllers.UserController.postCreateUser()
+GET         /users/$cId<[0-9]{1,18}>                                                                                                                @org.iatoki.judgels.jerahmeel.controllers.UserController.viewUser(cId: Long)
 GET         /users/$uId<[0-9]{1,18}>/update                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.UserController.updateUser(uId: Long)
 POST        /users/$uId<[0-9]{1,18}>/update                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.UserController.postUpdateUser(uId: Long)
 GET         /users/$uId<[0-9]{1,18}>/delete                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.UserController.deleteUser(uId: Long)
