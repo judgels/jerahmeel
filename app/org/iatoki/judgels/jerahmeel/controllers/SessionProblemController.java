@@ -1,7 +1,6 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
 import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
@@ -79,8 +78,8 @@ public final class SessionProblemController extends BaseController {
                 submitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
             }
 
-            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
-            String requestBody = new Gson().toJson(LanguageRestriction.defaultRestriction());
+            String requestUrl = sandalphon.getProblemTOTPEndpoint().toString();
+            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendUpdateLayout(content, session);

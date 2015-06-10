@@ -98,8 +98,8 @@ public final class TrainingLessonController extends BaseController {
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
             int tOTPCode = sandalphon.calculateTOTPCode(sessionLesson.getLessonSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getLessonTOTPEndpoint(sessionLesson.getLessonJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure())).toString();
-            String requestBody = "";
+            String requestUrl = sandalphon.getLessonTOTPEndpoint().toString();
+            String requestBody = sandalphon.getLessonTOTPRequestBody(sessionLesson.getLessonJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
 
             LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);

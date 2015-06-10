@@ -32,6 +32,7 @@ import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
+import org.iatoki.judgels.sandalphon.commons.programming.LanguageRestriction;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
@@ -94,8 +95,8 @@ public final class TrainingProblemController extends BaseController {
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
             int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getProblemTOTPEndpoint(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure())).toString();
-            String requestBody = "";
+            String requestUrl = sandalphon.getProblemTOTPEndpoint().toString();
+            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
