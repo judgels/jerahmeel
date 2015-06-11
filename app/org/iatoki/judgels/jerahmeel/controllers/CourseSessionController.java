@@ -70,8 +70,8 @@ public final class CourseSessionController extends BaseController {
         } else {
             CourseSessionCreateForm data = form.get();
             if (sessionService.existBySessionJid(data.sessionJid)) {
-                if (courseSessionService.existByCourseJidAndSessionJid(course.getJid(), data.sessionJid)) {
-                    courseSessionService.addCourseSession(course.getJid(), data.sessionJid);
+                if (!courseSessionService.existByCourseJidAndSessionJid(course.getJid(), data.sessionJid)) {
+                    courseSessionService.addCourseSession(course.getJid(), data.sessionJid, data.completeable);
 
                     return redirect(routes.CourseSessionController.viewSessions(course.getId()));
                 } else {

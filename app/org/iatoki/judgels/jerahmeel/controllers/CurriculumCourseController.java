@@ -83,8 +83,8 @@ public final class CurriculumCourseController extends BaseController {
         } else {
             CurriculumCourseCreateForm data = form.get();
             if (courseService.existByCourseJid(data.courseJid)) {
-                if (curriculumCourseService.existByCurriculumJidAndCourseJid(curriculum.getJid(), data.courseJid)) {
-                    curriculumCourseService.addCurriculumCourse(curriculum.getJid(), data.courseJid);
+                if (!curriculumCourseService.existByCurriculumJidAndCourseJid(curriculum.getJid(), data.courseJid)) {
+                    curriculumCourseService.addCurriculumCourse(curriculum.getJid(), data.courseJid, data.completeable);
 
                     return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
                 } else {

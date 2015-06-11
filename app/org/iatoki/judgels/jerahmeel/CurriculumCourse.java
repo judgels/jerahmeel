@@ -6,12 +6,14 @@ public final class CurriculumCourse {
     private final String curriculumJid;
     private final String courseJid;
     private final String courseName;
+    private final boolean completeable;
 
-    public CurriculumCourse(long id, String curriculumJid, String courseJid, String courseName) {
+    public CurriculumCourse(long id, String curriculumJid, String courseJid, String courseName, boolean completeable) {
         this.id = id;
         this.curriculumJid = curriculumJid;
         this.courseJid = courseJid;
         this.courseName = courseName;
+        this.completeable = completeable;
     }
 
     public long getId() {
@@ -28,5 +30,9 @@ public final class CurriculumCourse {
 
     public String getCourseName() {
         return courseName;
+    }
+
+    public boolean isCompleteable() {
+        return completeable;
     }
 }

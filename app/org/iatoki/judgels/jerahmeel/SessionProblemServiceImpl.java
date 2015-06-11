@@ -1,22 +1,28 @@
 package org.iatoki.judgels.jerahmeel;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.domains.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.domains.SessionProblemModel_;
+import org.iatoki.judgels.jerahmeel.models.domains.UserItemModel;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SessionProblemServiceImpl implements SessionProblemService {
-    private final SessionProblemDao sessionProblemDao;
 
-    public SessionProblemServiceImpl(SessionProblemDao sessionProblemDao) {
+    private final SessionProblemDao sessionProblemDao;
+    private final UserItemDao userItemDao;
+
+    public SessionProblemServiceImpl(SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         this.sessionProblemDao = sessionProblemDao;
+        this.userItemDao = userItemDao;
     }
 
     @Override
@@ -39,10 +45,33 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<SessionProblem> sessionProblems = sessionProblemModels.stream().map(s -> createFromModel(s)).collect(Collectors.toList());
+        List<SessionProblem> sessionProblems = sessionProblemModels.stream().map(m -> createFromModel(m)).collect(Collectors.toList());
 
         return new Page<>(sessionProblems, totalPages, pageIndex, pageSize);
 
+    }
+
+    @Override
+    public Page<SessionProblemProgress> findSessionProblems(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+        long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+
+        ImmutableList.Builder<SessionProblemProgress> sessionProblemProgressBuilder = ImmutableList.builder();
+        for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
+            ProblemProgress progress = ProblemProgress.NOT_VIEWED;
+            if (userItemDao.existByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid)) {
+                UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid);
+                if (UserItemStatus.VIEWED.name().equals(userItemModel.status)) {
+                    progress = ProblemProgress.VIEWED;
+                } else if (UserItemStatus.COMPLETED.name().equals(userItemModel.status)) {
+                    progress = ProblemProgress.COMPLETED;
+                }
+            }
+
+            sessionProblemProgressBuilder.add(new SessionProblemProgress(createFromModel(sessionProblemModel), progress));
+        }
+
+        return new Page<>(sessionProblemProgressBuilder.build(), totalPages, pageIndex, pageSize);
     }
 
     @Override
@@ -103,7 +132,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         return createFromModel(sessionProblemDao.findBySesssionJidAndProblemJid(sessionJid, problemJid));
     }
 
-    private SessionProblem createFromModel(SessionProblemModel s) {
-        return new SessionProblem(s.id, s.sessionJid, s.problemJid, s.problemSecret, s.alias, SessionProblemType.valueOf(s.type), SessionProblemStatus.valueOf(s.status));
+    private SessionProblem createFromModel(SessionProblemModel model) {
+        return new SessionProblem(model.id, model.sessionJid, model.problemJid, model.problemSecret, model.alias, SessionProblemType.valueOf(model.type), SessionProblemStatus.valueOf(model.status));
     }
 }

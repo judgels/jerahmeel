@@ -9,8 +9,8 @@ import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseService;
-import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
@@ -56,7 +56,7 @@ public final class TrainingSessionController extends BaseController {
 
         if (curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
-            Page<CourseSession> courseSessionPage = courseSessionService.findCourseSessions(curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            Page<CourseSessionProgress> courseSessionPage = courseSessionService.findCourseSessions(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
             if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
                 userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED);
@@ -68,7 +68,7 @@ public final class TrainingSessionController extends BaseController {
         }
     }
 
-    private Result showListSessions(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, Page<CourseSession> currentPage, String orderBy, String orderDir, String filterString) {
+    private Result showListSessions(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, Page<CourseSessionProgress> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), currentPage, orderBy, orderDir, filterString));
         CourseControllerUtils.appendViewLayout(content, course);
         ControllerUtils.getInstance().appendSidebarLayout(content);

@@ -2,6 +2,9 @@ training.training=Training
 training.curriculums=Curriculums
 training.courses=Courses
 training.sessions=Sessions
+training.submissions.bundle=Bundle Submissions
+training.submissions.programming=Programming Submissions
+training.session.isLocked=Session is still Locked
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums
@@ -13,17 +16,21 @@ curriculum.list=Curriculums
 curriculum.create=Create Curriculum
 curriculum.update=Update Curriculum
 
+error.curriculum.courseExist=Course already Existed
+
 course.course=Course
 course.courses=Courses
 course.name=Name
 course.description=Description
 course.sessions=Sessions
 course.jid=Course Jid
+course.completeable=Completeable?
 
 course.list=Courses
 course.create=Create Course
 course.update=Update Course
 
+error.course.sessionExist=Session already Existed
 error.course.invalidJid=Invalid Course
 
 session.session=Session
@@ -32,6 +39,7 @@ session.name=Name
 session.description=Description
 session.dependencies=Dependencies
 session.jid=Session Jid
+session.completeable=Completeable?
 
 session.list=Sessions
 session.create=Create Session
@@ -95,3 +103,20 @@ user.delete.confirmation=Are you sure you want to delete?
 user.username=Username
 user.name=Name
 user.roles=Roles
+
+training.course.completed=Completed
+training.course.onProgress=On Progress
+training.course.available=Available
+training.course.locked=Locked
+
+training.session.completed=Completed
+training.session.onProgress=On Progress
+training.session.available=Available
+training.session.locked=Locked
+
+training.lesson.viewed=Viewed
+training.lesson.notViewed=Not Viewed
+
+training.problem.viewed=Viewed
+training.problem.notViewed=Not Viewed
+training.problem.completed=Completed

@@ -15,4 +15,6 @@ public interface UserItemDao extends Dao<Long, UserItemModel> {
     List<UserItemModel> findByUserJid(String userJid);
 
     List<UserItemModel> findByItemJid(String itemJid);
+
+    List<UserItemModel> findByStatus(String status);
 }

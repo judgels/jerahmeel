@@ -1,14 +1,15 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.jerahmeel.CourseSessionService;
 import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseService;
+import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumService;
 import org.iatoki.judgels.jerahmeel.UserItemService;
@@ -44,12 +45,12 @@ public final class TrainingCourseController extends BaseController {
     public Result listCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
 
-        Page<CurriculumCourse> curriculumPage = curriculumCourseService.findCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<CurriculumCourseProgress> curriculumPage = curriculumCourseService.findCurriculumCourses(IdentityUtils.getUserJid(), curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
         return showListCourses(curriculum, curriculumPage, orderBy, orderDir, filterString);
     }
 
-    private Result showListCourses(Curriculum curriculum, Page<CurriculumCourse> currentPage, String orderBy, String orderDir, String filterString) {
+    private Result showListCourses(Curriculum curriculum, Page<CurriculumCourseProgress> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCurriculumCoursesView.render(curriculum.getId(), currentPage, orderBy, orderDir, filterString));
         CurriculumControllerUtils.appendViewLayout(content, curriculum);
         ControllerUtils.getInstance().appendSidebarLayout(content);

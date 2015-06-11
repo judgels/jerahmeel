@@ -7,4 +7,7 @@ public final class CourseSessionCreateForm {
     @Constraints.Required
     public String sessionJid;
 
+    @Constraints.Required
+    public boolean completeable;
+
 }

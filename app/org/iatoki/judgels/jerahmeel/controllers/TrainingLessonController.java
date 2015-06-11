@@ -21,9 +21,11 @@ import org.iatoki.judgels.jerahmeel.CurriculumService;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonService;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionService;
+import org.iatoki.judgels.jerahmeel.SessionSessionService;
 import org.iatoki.judgels.jerahmeel.UserItemService;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
@@ -49,16 +51,18 @@ public final class TrainingLessonController extends BaseController {
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
+    private final SessionSessionService sessionSessionService;
     private final SessionLessonService sessionLessonService;
     private final UserItemService userItemService;
 
-    public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionLessonService sessionLessonService, UserItemService userItemService) {
+    public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionSessionService sessionSessionService, SessionLessonService sessionLessonService, UserItemService userItemService) {
         this.sandalphon = sandalphon;
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
+        this.sessionSessionService = sessionSessionService;
         this.sessionLessonService = sessionLessonService;
         this.userItemService = userItemService;
     }
@@ -75,9 +79,9 @@ public final class TrainingLessonController extends BaseController {
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
-            Page<SessionLesson> sessionLessonPage = sessionLessonService.findSessionLessons(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            Page<SessionLessonProgress> sessionLessonPage = sessionLessonService.findSessionLessons(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) {
+            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) && (sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
                 userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
             }
 
@@ -142,7 +146,7 @@ public final class TrainingLessonController extends BaseController {
         }
     }
 
-    private Result showListLessons(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionLesson> currentPage, String orderBy, String orderDir, String filterString) {
+    private Result showListLessons(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionLessonProgress> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listSessionLessonsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), currentPage, orderBy, orderDir, filterString));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);

@@ -33,4 +33,16 @@ public final class TrainingController extends BaseController {
     public Result jumpToProblems(long curriculumId, long curriculumCourseId, long courseSessionId) {
         return redirect(routes.TrainingProblemController.viewProblems(curriculumId, curriculumCourseId, courseSessionId));
     }
+
+    public Result jumpToSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
+        return redirect(routes.TrainingController.jumpToBundleSubmissions(curriculumId, curriculumCourseId, courseSessionId));
+    }
+
+    public Result jumpToBundleSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
+        return redirect(routes.TrainingBundleSubmissionController.viewSubmissions(curriculumId, curriculumCourseId, courseSessionId));
+    }
+
+    public Result jumpToProgrammingSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
+        return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculumId, curriculumCourseId, courseSessionId));
+    }
 }

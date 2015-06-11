@@ -1,8 +1,8 @@
-@(curriculumId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.CurriculumCourse], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.CurriculumCourseProgress], orderBy: String, orderDir: String, filterString: String)
 
 @import play.i18n.Messages
 @import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
+@import org.iatoki.judgels.jerahmeel.CourseProgress
 
 @import org.iatoki.judgels.commons.views.html.table.searchView
 @import org.iatoki.judgels.commons.views.html.table.paginationView
@@ -15,12 +15,30 @@
 
 <div class="clearfix"></div>
 
-@for(curriculumCourse <- page.getData()) {
+@for(curriculumCourseProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourse.getId)" class="panel-title">@curriculumCourse.getCourseName</a>
+            <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">@curriculumCourseProgress.getCurriculumCourse.getCourseName</a>
             <div class="pull-right">
-                <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourse.getId)" class="btn btn-primary">@Messages.get("commons.enter")</a>
+                @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
+                    <button class="btn btn-danger">
+                        @Messages.get("training.course.locked")
+                } else {
+                    @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
+                        <button class="btn btn-success">
+                            @Messages.get("training.course.completed")
+                    } else {
+                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.ON_PROGRESS)) {
+                            <button class="btn btn-info">
+                                @Messages.get("training.course.onProgress")
+                        } else {
+                            <button class="btn btn-warning">
+                                @Messages.get("training.course.available")
+                        }
+                    }
+                }
+                </button>
+                <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="btn btn-primary">@Messages.get("commons.enter")</a>
             </div>
         </div>
     </div>

@@ -71,4 +71,15 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
 
         return JPA.em().createQuery(query).getResultList();
     }
+
+    @Override
+    public List<UserItemModel> findByStatus(String status) {
+        CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+        CriteriaQuery<UserItemModel> query = cb.createQuery(UserItemModel.class);
+        Root<UserItemModel> root = query.from(UserItemModel.class);
+
+        query.where(cb.equal(root.get(UserItemModel_.status), status));
+
+        return JPA.em().createQuery(query).getResultList();
+    }
 }

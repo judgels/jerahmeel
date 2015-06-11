@@ -18,4 +18,6 @@ public final class CurriculumCourseModel extends AbstractModel {
     public String curriculumJid;
 
     public String courseJid;
+
+    public boolean completeable;
 }

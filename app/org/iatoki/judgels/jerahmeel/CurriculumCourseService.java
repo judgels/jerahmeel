@@ -10,7 +10,9 @@ public interface CurriculumCourseService {
 
     Page<CurriculumCourse> findCurriculumCourses(String curriculumJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addCurriculumCourse(String curriculumJid, String courseJid);
+    Page<CurriculumCourseProgress> findCurriculumCourses(String userJid, String curriculumJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+
+    void addCurriculumCourse(String curriculumJid, String courseJid, boolean completeable);
 
     void removeCurriculumCourse(long curriculumCourseId) throws CurriculumCourseNotFoundException;
 }

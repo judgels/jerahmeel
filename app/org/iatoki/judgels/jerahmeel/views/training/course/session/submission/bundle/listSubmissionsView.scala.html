@@ -1,0 +1,59 @@
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.sandalphon.commons.BundleSubmission], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.commons.views.html.table.tableView
+@import org.iatoki.judgels.commons.views.html.table.tableHeadersView
+@import org.iatoki.judgels.commons.views.html.table.paginationView
+
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+@import org.iatoki.judgels.commons.JudgelsUtils
+@import org.iatoki.judgels.jerahmeel.JidCacheService
+@import scala.collection.JavaConversions
+
+<form class="form-inline pull-right" method="GET" action="@routes.TrainingBundleSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
+    <div class="form-group">
+        <label for="problemJid">@Messages.get("problem.problem")</label>
+        <select name="problemJid" class="form-control selectpicker col-md-3">
+            <option value="(none)" @if(problemJid == null) {selected="selected"}>&#8211;</option>
+            @for((pJid, pAlias) <- problemJidToAliasMap) {
+                <option value="@pJid" @if(pJid.equals(problemJid)){selected="selected"}>@pAlias</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>
+
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingBundleSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir, problemJid)}
+
+<div class="clearfix"></div>
+
+<br />
+
+@tableView() {
+    @tableHeadersView(page.getPageIndex, orderBy, orderDir, "", listFunc)(
+        "id" -> Messages.get("commons.id"),
+        "" -> Messages.get("submission.prob"),
+        "" -> Messages.get("submission.pts"),
+        "timeCreate" -> Messages.get("submission.time")
+    )
+
+    <tbody>
+
+    @defining(JidCacheService.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(page.getData.map(s => s.getAuthorJid).toSeq))) { displayNamesMap =>
+        @for(submission <- page.getData) {
+            <tr>
+                <td><small>@submission.getId</small></td>
+                <td><small>@problemJidToAliasMap.get(submission.getProblemJid)</small></td>
+                <td><small>@submission.getLatestScore</small></td>
+                <td><small><time class="display-time" datetime="@JudgelsUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
+                <td class="text-center">
+                    <a href="@routes.TrainingBundleSubmissionController.viewSubmission(curriculumId, curriculumCourseId, courseSessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+}
+
+@paginationView(page, orderBy, orderDir, "", listFunc)

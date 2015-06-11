@@ -5,20 +5,37 @@ import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionSessionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.domains.SessionSessionModel;
 import org.iatoki.judgels.jerahmeel.models.domains.SessionSessionModel_;
+import org.iatoki.judgels.jerahmeel.models.domains.UserItemModel;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class SessionSessionServiceImpl implements SessionSessionService {
 
     private final SessionDao sessionDao;
     private final SessionSessionDao sessionSessionDao;
+    private final UserItemDao userItemDao;
 
-    public SessionSessionServiceImpl(SessionDao sessionDao, SessionSessionDao sessionSessionDao) {
+    public SessionSessionServiceImpl(SessionDao sessionDao, SessionSessionDao sessionSessionDao, UserItemDao userItemDao) {
         this.sessionDao = sessionDao;
         this.sessionSessionDao = sessionSessionDao;
+        this.userItemDao = userItemDao;
+    }
+
+    @Override
+    public boolean isDependenciesFulfilled(String userJid, String sessionJid) {
+        List<UserItemModel> completedUserItemModel = userItemDao.findByStatus(UserItemStatus.COMPLETED.name());
+        Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
+
+        List<SessionSessionModel> sessionSessionModels = sessionSessionDao.findBySessionJid(sessionJid);
+        Set<String> dependencyJids = sessionSessionModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
+
+        dependencyJids.removeAll(completedJids);
+        return dependencyJids.isEmpty();
     }
 
     @Override

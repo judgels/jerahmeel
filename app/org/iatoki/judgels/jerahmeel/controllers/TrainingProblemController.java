@@ -22,8 +22,11 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblemService;
+import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.jerahmeel.SessionService;
+import org.iatoki.judgels.jerahmeel.SessionSessionService;
 import org.iatoki.judgels.jerahmeel.UserItemService;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
@@ -33,6 +36,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
 import org.iatoki.judgels.sandalphon.commons.programming.LanguageRestriction;
+import play.data.DynamicForm;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
@@ -50,16 +54,18 @@ public final class TrainingProblemController extends BaseController {
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
+    private final SessionSessionService sessionSessionService;
     private final SessionProblemService sessionProblemService;
     private final UserItemService userItemService;
 
-    public TrainingProblemController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionProblemService sessionProblemService, UserItemService userItemService) {
+    public TrainingProblemController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionSessionService sessionSessionService, SessionProblemService sessionProblemService, UserItemService userItemService) {
         this.sandalphon = sandalphon;
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
+        this.sessionSessionService = sessionSessionService;
         this.sessionProblemService = sessionProblemService;
         this.userItemService = userItemService;
     }
@@ -76,7 +82,11 @@ public final class TrainingProblemController extends BaseController {
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
-            Page<SessionProblem> sessionProblemPage = sessionProblemService.findSessionProblems(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            Page<SessionProblemProgress> sessionProblemPage = sessionProblemService.findSessionProblems(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) && (sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
+                userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
+            }
 
             return showListProblems(curriculum, curriculumCourse, course, courseSession, session, sessionProblemPage, orderBy, orderDir, filterString);
         } else {
@@ -94,9 +104,20 @@ public final class TrainingProblemController extends BaseController {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
+            String reasonNotAllowedToSubmit = null;
+            if (!sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
+                reasonNotAllowedToSubmit = Messages.get("training.session.isLocked");
+            }
+            String postSubmitUri = null;
+            if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
+                postSubmitUri = routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
+                postSubmitUri = routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            }
+
             int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
             String requestUrl = sandalphon.getProblemTOTPEndpoint().toString();
-            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
+            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), postSubmitUri, routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()), reasonNotAllowedToSubmit, LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -121,6 +142,13 @@ public final class TrainingProblemController extends BaseController {
         }
     }
 
+    public Result switchLanguage() {
+        String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
+        SessionControllerUtils.setCurrentStatementLanguage(languageCode);
+
+        return redirect(request().getHeader("Referer"));
+    }
+
     public Result renderProblemMedia(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionProblemId, String filename) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -139,7 +167,7 @@ public final class TrainingProblemController extends BaseController {
         }
     }
 
-    private Result showListProblems(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionProblem> currentPage, String orderBy, String orderDir, String filterString) {
+    private Result showListProblems(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionProblemProgress> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listSessionProblemsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), currentPage, orderBy, orderDir, filterString));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);

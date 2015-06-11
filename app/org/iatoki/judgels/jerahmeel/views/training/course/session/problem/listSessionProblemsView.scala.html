@@ -1,5 +1,6 @@
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionProblem], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionProblemProgress], orderBy: String, orderDir: String, filterString: String)
 
+@import org.iatoki.judgels.jerahmeel.ProblemProgress
 @import play.i18n.Messages
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
@@ -16,10 +17,25 @@
 
 <div class="clearfix"></div>
 
-@for(sessionProblem <- page.getData()) {
+@for(sessionProblemProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblem.getId)" class="panel-title">@sessionProblem.getAlias. @JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid)</a>
+            <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @JidCacheService.getInstance().getDisplayName(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
+            <div class="pull-right">
+                @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
+                    <button class="btn btn-success">
+                        @Messages.get("training.problem.completed")
+                } else {
+                    @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
+                        <button class="btn btn-info">
+                            @Messages.get("training.problem.viewed")
+                    } else {
+                        <button class="btn btn-warning">
+                            @Messages.get("training.problem.notViewed")
+                    }
+                }
+                </button>
+            </div>
         </div>
     </div>
 }

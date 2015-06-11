@@ -10,6 +10,8 @@ public interface SessionLessonService {
 
     Page<SessionLesson> findSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
+    Page<SessionLessonProgress> findSessionLessons(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+
     void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status);
 
     void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException;

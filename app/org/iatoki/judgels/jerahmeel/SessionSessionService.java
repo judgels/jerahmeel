@@ -4,6 +4,8 @@ import org.iatoki.judgels.commons.Page;
 
 public interface SessionSessionService {
 
+    boolean isDependenciesFulfilled(String userJid, String sessionJid);
+
     boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
 
     SessionSession findSessionSessionBySessionSessionId(long sessionSessionId) throws SessionSessionNotFoundException;

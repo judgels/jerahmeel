@@ -10,7 +10,9 @@ public interface CourseSessionService {
 
     Page<CourseSession> findCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addCourseSession(String courseJid, String sessionJid);
+    Page<CourseSessionProgress> findCourseSessions(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+
+    void addCourseSession(String courseJid, String sessionJid, boolean completeable);
 
     void removeCourseSession(long courseSessionId) throws CourseSessionNotFoundException;
 }

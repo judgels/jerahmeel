@@ -1,5 +1,6 @@
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionLesson], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionLessonProgress], orderBy: String, orderDir: String, filterString: String)
 
+@import org.iatoki.judgels.jerahmeel.LessonProgress
 @import play.i18n.Messages
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
@@ -16,10 +17,20 @@
 
 <div class="clearfix"></div>
 
-@for(sessionLesson <- page.getData()) {
+@for(sessionLessonProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLesson.getId)" class="panel-title">@sessionLesson.getAlias. @JidCacheService.getInstance().getDisplayName(sessionLesson.getLessonJid)</a>
+            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @JidCacheService.getInstance().getDisplayName(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
+            <div class="pull-right">
+                @if(sessionLessonProgress.getLessonProgress.equals(LessonProgress.VIEWED)) {
+                    <button class="btn btn-success">
+                        @Messages.get("training.lesson.viewed")
+                } else {
+                    <button class="btn btn-warning">
+                        @Messages.get("training.lesson.notViewed")
+                }
+                </button>
+            </div>
         </div>
     </div>
 }

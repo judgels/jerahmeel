@@ -18,4 +18,6 @@ public final class CourseSessionModel extends AbstractModel {
     public String courseJid;
 
     public String sessionJid;
+
+    public boolean completeable;
 }
