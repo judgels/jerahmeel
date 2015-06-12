@@ -32,6 +32,7 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Transactional
@@ -127,7 +128,15 @@ public final class SessionLessonController extends BaseController {
             return showCreateLesson(session, form);
         } else {
             SessionLessonCreateForm data = form.get();
-            String lessonName = sandalphon.verifyLessonJid(data.lessonJid);
+            String lessonName = null;
+            try {
+                lessonName = sandalphon.verifyLessonJid(data.lessonJid);
+            } catch (IOException e) {
+                form.reject(Messages.get("error.system.sandalphon.connection"));
+
+                return showCreateLesson(session, form);
+            }
+
             if (lessonName != null) {
                 if (!sessionLessonService.isInSessionByLessonJidAndAlias(session.getJid(), data.lessonJid, data.alias)) {
                     sessionLessonService.addSessionLesson(session.getJid(), data.lessonJid, data.lessonSecret, data.alias, SessionLessonStatus.valueOf(data.status));

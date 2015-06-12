@@ -120,3 +120,5 @@ training.lesson.notViewed=Not Viewed
 training.problem.viewed=Viewed
 training.problem.notViewed=Not Viewed
 training.problem.completed=Completed
+
+error.system.sandalphon.connection=Sandalphon Connection has problem.

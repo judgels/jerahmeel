@@ -34,6 +34,7 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import java.io.IOException;
 import java.net.URI;
 
 @Transactional
@@ -136,7 +137,14 @@ public final class SessionProblemController extends BaseController {
             return showCreateProblem(session, form);
         } else {
             SessionProblemCreateForm data = form.get();
-            String problemName = sandalphon.verifyProblemJid(data.problemJid);
+            String problemName = null;
+            try {
+                problemName = sandalphon.verifyProblemJid(data.problemJid);
+            } catch (IOException e) {
+                form.reject(Messages.get("error.system.sandalphon.connection"));
+
+                return showCreateProblem(session, form);
+            }
             if (problemName != null) {
                 if (!sessionProblemService.isInSessionByProblemJidAndAlias(session.getJid(), data.problemJid, data.alias)) {
                     sessionProblemService.addSessionProblem(session.getJid(), data.problemJid, data.problemSecret, data.alias, SessionProblemType.valueOf(data.type), SessionProblemStatus.valueOf(data.status));
