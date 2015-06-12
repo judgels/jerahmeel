@@ -101,9 +101,8 @@ public final class TrainingLessonController extends BaseController {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
-            int tOTPCode = sandalphon.calculateTOTPCode(sessionLesson.getLessonSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getLessonTOTPEndpoint().toString();
-            String requestBody = sandalphon.getLessonTOTPRequestBody(sessionLesson.getLessonJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+            String requestUrl = sandalphon.getLessonStatementRenderUri().toString();
+            String requestBody = sandalphon.getLessonStatementRenderRequestBody(sessionLesson.getLessonJid(), sessionLesson.getLessonSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
 
             LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -138,7 +137,7 @@ public final class TrainingLessonController extends BaseController {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
-            URI uri = sandalphon.getLessonRenderUri(sessionLesson.getLessonJid(), filename);
+            URI uri = sandalphon.getLessonMediaRenderUri(sessionLesson.getLessonJid(), filename);
 
             return redirect(uri.toString());
         } else {

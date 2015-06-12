@@ -115,9 +115,8 @@ public final class TrainingProblemController extends BaseController {
                 postSubmitUri = routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
             }
 
-            int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
-            String requestUrl = sandalphon.getProblemTOTPEndpoint().toString();
-            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), postSubmitUri, routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()), reasonNotAllowedToSubmit, LanguageRestriction.defaultRestriction());
+            String requestUrl = sandalphon.getProblemStatementRenderUri().toString();
+            String requestBody = sandalphon.getProblemStatementRenderRequestBody(sessionProblem.getProblemJid(), sessionProblem.getProblemSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), postSubmitUri, routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()), reasonNotAllowedToSubmit, LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -159,7 +158,7 @@ public final class TrainingProblemController extends BaseController {
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
-            URI uri = sandalphon.getProblemRenderUri(sessionProblem.getProblemJid(), filename);
+            URI uri = sandalphon.getProblemMediaRenderUri(sessionProblem.getProblemJid(), filename);
 
             return redirect(uri.toString());
         } else {

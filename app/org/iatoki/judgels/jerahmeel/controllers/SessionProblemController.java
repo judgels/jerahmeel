@@ -71,7 +71,6 @@ public final class SessionProblemController extends BaseController {
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
-            int tOTPCode = sandalphon.calculateTOTPCode(sessionProblem.getProblemSecret(), System.currentTimeMillis());
             String submitUrl = "";
             if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
                 submitUrl = routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
@@ -79,8 +78,8 @@ public final class SessionProblemController extends BaseController {
                 submitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
             }
 
-            String requestUrl = sandalphon.getProblemTOTPEndpoint().toString();
-            String requestBody = sandalphon.getProblemTOTPRequestBody(sessionProblem.getProblemJid(), tOTPCode, SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
+            String requestUrl = sandalphon.getProblemStatementRenderUri().toString();
+            String requestBody = sandalphon.getProblemStatementRenderRequestBody(sessionProblem.getProblemJid(), sessionProblem.getProblemSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
 
             LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
             SessionControllerUtils.appendUpdateLayout(content, session);
@@ -105,7 +104,7 @@ public final class SessionProblemController extends BaseController {
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
 
         if (session.getJid().equals(sessionProblem.getSessionJid())) {
-            URI imageUri = sandalphon.getProblemRenderUri(sessionProblem.getProblemJid(), imageFilename);
+            URI imageUri = sandalphon.getProblemMediaRenderUri(sessionProblem.getProblemJid(), imageFilename);
 
             return redirect(imageUri.toString());
         } else {
