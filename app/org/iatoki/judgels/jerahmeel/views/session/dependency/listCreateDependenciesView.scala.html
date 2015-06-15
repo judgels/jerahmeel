@@ -1,4 +1,4 @@
-@(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionSession], orderBy: String, orderDir: String, filterString: String, form: Form[org.iatoki.judgels.jerahmeel.SessionDependencyCreateForm])
+@(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionDependency], orderBy: String, orderDir: String, filterString: String, form: Form[org.iatoki.judgels.jerahmeel.SessionDependencyCreateForm])
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
@@ -13,11 +13,11 @@
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionSessionController.listCreateDependencies(sessionId, newPageIndex, newOrderBy, newOrderDir)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionDependencyController.listCreateDependencies(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
 @formErrorView(form)
 
-@b3.form(routes.SessionSessionController.postCreateDependency(sessionId, page.getPageIndex, orderBy, orderDir, filterString)) {
+@b3.form(routes.SessionDependencyController.postCreateDependency(sessionId, page.getPageIndex, orderBy, orderDir, filterString)) {
 
     @helper.CSRF.formField
 
@@ -44,12 +44,12 @@
 
 
     <tbody>
-    @for(sessionSession <- page.getData()) {
+    @for(sessionDependency <- page.getData()) {
         <tr>
-            <td>@sessionSession.getId</td>
-            <td>@sessionSession.getDependedSessionName</td>
+            <td>@sessionDependency.getId</td>
+            <td>@sessionDependency.getDependedSessionName</td>
             <td class="text-center">
-                <a href="@routes.SessionSessionController.deleteDependency(sessionId, sessionSession.getId)" onclick="confirmLink ( event, this.href )"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+                <a href="@routes.SessionDependencyController.deleteDependency(sessionId, sessionDependency.getId)" onclick="confirmLink ( event, this.href )"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
             </td>
         </tr>
     }

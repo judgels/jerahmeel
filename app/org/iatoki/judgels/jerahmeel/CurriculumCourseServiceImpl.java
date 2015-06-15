@@ -7,13 +7,13 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CurriculumCourseDao;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionSessionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel_;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CurriculumCourseModel_;
-import org.iatoki.judgels.jerahmeel.models.domains.SessionSessionModel;
+import org.iatoki.judgels.jerahmeel.models.domains.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.domains.UserItemModel;
 
 import java.util.List;
@@ -25,14 +25,14 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     private final CurriculumCourseDao curriculumCourseDao;
     private final CourseDao courseDao;
     private final CourseSessionDao courseSessionDao;
-    private final SessionSessionDao sessionSessionDao;
+    private final SessionDependencyDao sessionDependencyDao;
     private final UserItemDao userItemDao;
 
-    public CurriculumCourseServiceImpl(CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, CourseSessionDao courseSessionDao, SessionSessionDao sessionSessionDao, UserItemDao userItemDao) {
+    public CurriculumCourseServiceImpl(CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, CourseSessionDao courseSessionDao, SessionDependencyDao sessionDependencyDao, UserItemDao userItemDao) {
         this.curriculumCourseDao = curriculumCourseDao;
         this.courseDao = courseDao;
         this.courseSessionDao = courseSessionDao;
-        this.sessionSessionDao = sessionSessionDao;
+        this.sessionDependencyDao = sessionDependencyDao;
         this.userItemDao = userItemDao;
     }
 
@@ -82,8 +82,8 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
                     progress = CourseProgress.ON_PROGRESS;
                     break;
                 } else {
-                    List<SessionSessionModel> sessionSessionModels = sessionSessionDao.findBySessionJid(courseSessionModel.sessionJid);
-                    Set<String> dependencyJids = sessionSessionModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
+                    List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(courseSessionModel.sessionJid);
+                    Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
                     dependencyJids.removeAll(completedJids);
                     if (dependencyJids.isEmpty()) {
                         progress = CourseProgress.AVAILABLE;

@@ -6,11 +6,11 @@ import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionSessionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.domains.CourseSessionModel_;
-import org.iatoki.judgels.jerahmeel.models.domains.SessionSessionModel;
+import org.iatoki.judgels.jerahmeel.models.domains.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.domains.UserItemModel;
 
 import java.util.List;
@@ -21,13 +21,13 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
     private final CourseSessionDao courseSessionDao;
     private final SessionDao sessionDao;
-    private final SessionSessionDao sessionSessionDao;
+    private final SessionDependencyDao sessionDependencyDao;
     private final UserItemDao userItemDao;
 
-    public CourseSessionServiceImpl(CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionSessionDao sessionSessionDao, UserItemDao userItemDao) {
+    public CourseSessionServiceImpl(CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, UserItemDao userItemDao) {
         this.courseSessionDao = courseSessionDao;
         this.sessionDao = sessionDao;
-        this.sessionSessionDao = sessionSessionDao;
+        this.sessionDependencyDao = sessionDependencyDao;
         this.userItemDao = userItemDao;
     }
 
@@ -73,8 +73,8 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
             } else if ((onProgressJids.contains(courseSessionModel.sessionJid)) && (courseSessionModel.completeable)) {
                 progress = SessionProgress.ON_PROGRESS;
             } else {
-                List<SessionSessionModel> sessionSessionModels = sessionSessionDao.findBySessionJid(courseSessionModel.sessionJid);
-                Set<String> dependencyJids = sessionSessionModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
+                List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(courseSessionModel.sessionJid);
+                Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
                 dependencyJids.removeAll(completedJids);
                 if (dependencyJids.isEmpty()) {
                     progress = SessionProgress.AVAILABLE;

@@ -9,9 +9,9 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionDependencyCreateForm;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionService;
-import org.iatoki.judgels.jerahmeel.SessionSession;
-import org.iatoki.judgels.jerahmeel.SessionSessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionSessionService;
+import org.iatoki.judgels.jerahmeel.SessionDependency;
+import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionDependencyService;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
@@ -27,16 +27,16 @@ import play.mvc.Result;
 @Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
-public final class SessionSessionController extends BaseController {
+public final class SessionDependencyController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
 
     private final SessionService sessionService;
-    private final SessionSessionService sessionSessionService;
+    private final SessionDependencyService sessionDependencyService;
 
-    public SessionSessionController(SessionService sessionService, SessionSessionService sessionSessionService) {
+    public SessionDependencyController(SessionService sessionService, SessionDependencyService sessionDependencyService) {
         this.sessionService = sessionService;
-        this.sessionSessionService = sessionSessionService;
+        this.sessionDependencyService = sessionDependencyService;
     }
 
     @AddCSRFToken
@@ -48,7 +48,7 @@ public final class SessionSessionController extends BaseController {
     public Result listCreateDependencies(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
-        Page<SessionSession> sessionPage = sessionSessionService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<SessionDependency> sessionPage = sessionDependencyService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         Form<SessionDependencyCreateForm> form = Form.form(SessionDependencyCreateForm.class);
 
         return showListCreateDependencies(session, form, sessionPage, orderBy, orderDir, filterString);
@@ -60,51 +60,51 @@ public final class SessionSessionController extends BaseController {
         Form<SessionDependencyCreateForm> form = Form.form(SessionDependencyCreateForm.class).bindFromRequest();
 
         if (form.hasErrors() || form.hasGlobalErrors()) {
-            Page<SessionSession> sessionPage = sessionSessionService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            Page<SessionDependency> sessionPage = sessionDependencyService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
             return showListCreateDependencies(session, form, sessionPage, orderBy, orderDir, filterString);
         } else {
             SessionDependencyCreateForm data = form.get();
             if (sessionService.existBySessionJid(data.sessionJid)) {
-                if (sessionSessionService.existBySessionJidAndDependencyJid(session.getJid(), data.sessionJid)) {
-                    sessionSessionService.addSessionDependency(session.getJid(), data.sessionJid);
+                if (sessionDependencyService.existBySessionJidAndDependencyJid(session.getJid(), data.sessionJid)) {
+                    sessionDependencyService.addSessionDependency(session.getJid(), data.sessionJid);
 
-                    return redirect(routes.SessionSessionController.viewDependencies(session.getId()));
+                    return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
                 } else {
                     form.reject(Messages.get("error.session.existSession"));
-                    Page<SessionSession> sessionPage = sessionSessionService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+                    Page<SessionDependency> sessionPage = sessionDependencyService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
                     return showListCreateDependencies(session, form, sessionPage, orderBy, orderDir, filterString);
                 }
             } else {
                 form.reject(Messages.get("error.session.invalidJid"));
-                Page<SessionSession> sessionPage = sessionSessionService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+                Page<SessionDependency> sessionPage = sessionDependencyService.findSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
                 return showListCreateDependencies(session, form, sessionPage, orderBy, orderDir, filterString);
             }
         }
     }
 
-    public Result deleteDependency(long sessionId, long sessionSessionId) throws SessionNotFoundException, SessionSessionNotFoundException {
+    public Result deleteDependency(long sessionId, long sessionDependencyId) throws SessionNotFoundException, SessionDependencyNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionSession sessionSession = sessionSessionService.findSessionSessionBySessionSessionId(sessionSessionId);
+        SessionDependency sessionDependency = sessionDependencyService.findSessionDependencyBySessionDependencyId(sessionDependencyId);
 
-        if (session.getJid().equals(sessionSession.getSessionJid())) {
-            sessionSessionService.removeSessionDependency(sessionSessionId);
+        if (session.getJid().equals(sessionDependency.getSessionJid())) {
+            sessionDependencyService.removeSessionDependency(sessionDependencyId);
 
-            return redirect(routes.SessionSessionController.viewDependencies(session.getId()));
+            return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
         } else {
             return forbidden();
         }
     }
 
-    private Result showListCreateDependencies(Session session, Form<SessionDependencyCreateForm> form, Page<SessionSession> currentPage, String orderBy, String orderDir, String filterString) {
+    private Result showListCreateDependencies(Session session, Form<SessionDependencyCreateForm> form, Page<SessionDependency> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCreateDependenciesView.render(session.getId(), currentPage, orderBy, orderDir, filterString, form));
         SessionControllerUtils.appendUpdateLayout(content, session);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.dependencies"), routes.SessionSessionController.viewDependencies(session.getId()))
+              new InternalLink(Messages.get("session.dependencies"), routes.SessionDependencyController.viewDependencies(session.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
 

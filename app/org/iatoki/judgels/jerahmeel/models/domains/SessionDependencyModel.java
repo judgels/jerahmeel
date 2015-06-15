@@ -8,8 +8,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "jerahmeel_session_session")
-public final class SessionSessionModel extends AbstractModel {
+@Table(name = "jerahmeel_session_dependency")
+public final class SessionDependencyModel extends AbstractModel {
 
     @Id
     @GeneratedValue

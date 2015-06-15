@@ -25,7 +25,7 @@ import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonService;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionService;
-import org.iatoki.judgels.jerahmeel.SessionSessionService;
+import org.iatoki.judgels.jerahmeel.SessionDependencyService;
 import org.iatoki.judgels.jerahmeel.UserItemService;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
@@ -51,18 +51,18 @@ public final class TrainingLessonController extends BaseController {
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
-    private final SessionSessionService sessionSessionService;
+    private final SessionDependencyService sessionDependencyService;
     private final SessionLessonService sessionLessonService;
     private final UserItemService userItemService;
 
-    public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionSessionService sessionSessionService, SessionLessonService sessionLessonService, UserItemService userItemService) {
+    public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, SessionLessonService sessionLessonService, UserItemService userItemService) {
         this.sandalphon = sandalphon;
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
-        this.sessionSessionService = sessionSessionService;
+        this.sessionDependencyService = sessionDependencyService;
         this.sessionLessonService = sessionLessonService;
         this.userItemService = userItemService;
     }
@@ -81,7 +81,7 @@ public final class TrainingLessonController extends BaseController {
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
             Page<SessionLessonProgress> sessionLessonPage = sessionLessonService.findSessionLessons(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) && (sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
+            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
                 userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
             }
 

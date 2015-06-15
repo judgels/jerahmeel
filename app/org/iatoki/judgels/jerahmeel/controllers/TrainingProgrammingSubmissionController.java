@@ -30,7 +30,7 @@ import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.SessionService;
-import org.iatoki.judgels.jerahmeel.SessionSessionService;
+import org.iatoki.judgels.jerahmeel.SessionDependencyService;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
@@ -58,19 +58,19 @@ public final class TrainingProgrammingSubmissionController extends BaseControlle
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
-    private final SessionSessionService sessionSessionService;
+    private final SessionDependencyService sessionDependencyService;
     private final SubmissionService submissionService;
     private final SessionProblemService sessionProblemService;
     private final FileSystemProvider submissionLocalFileProvider;
     private final FileSystemProvider submissionRemoteFileProvider;
 
-    public TrainingProgrammingSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionSessionService sessionSessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileProvider, FileSystemProvider submissionRemoteFileProvider) {
+    public TrainingProgrammingSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileProvider, FileSystemProvider submissionRemoteFileProvider) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
-        this.sessionSessionService = sessionSessionService;
+        this.sessionDependencyService = sessionDependencyService;
         this.submissionService = submissionService;
         this.sessionProblemService = sessionProblemService;
         this.submissionLocalFileProvider = submissionLocalFileProvider;
@@ -82,7 +82,7 @@ public final class TrainingProgrammingSubmissionController extends BaseControlle
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
-        if (((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) && (sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid()))) {
+        if (((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid()))) {
             SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
 
             Http.MultipartFormData body = request().body().asMultipartFormData();

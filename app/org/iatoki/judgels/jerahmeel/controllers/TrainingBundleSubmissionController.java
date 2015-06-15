@@ -30,7 +30,7 @@ import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.SessionService;
-import org.iatoki.judgels.jerahmeel.SessionSessionService;
+import org.iatoki.judgels.jerahmeel.SessionDependencyService;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
@@ -59,19 +59,19 @@ public final class TrainingBundleSubmissionController extends BaseController {
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
-    private final SessionSessionService sessionSessionService;
+    private final SessionDependencyService sessionDependencyService;
     private final BundleSubmissionService bundleSubmissionService;
     private final SessionProblemService sessionProblemService;
     private final FileSystemProvider bundleSubmissionLocalFileProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileProvider;
 
-    public TrainingBundleSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionSessionService sessionSessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileProvider, FileSystemProvider bundleSubmissionRemoteFileProvider) {
+    public TrainingBundleSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileProvider, FileSystemProvider bundleSubmissionRemoteFileProvider) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.sessionService = sessionService;
-        this.sessionSessionService = sessionSessionService;
+        this.sessionDependencyService = sessionDependencyService;
         this.bundleSubmissionService = bundleSubmissionService;
         this.sessionProblemService = sessionProblemService;
         this.bundleSubmissionLocalFileProvider = bundleSubmissionLocalFileProvider;
@@ -83,7 +83,7 @@ public final class TrainingBundleSubmissionController extends BaseController {
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
-        if (((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) && (sessionSessionService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid()))) {
+        if (((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid()))) {
             SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
 
             DynamicForm dynamicForm = DynamicForm.form().bindFromRequest();

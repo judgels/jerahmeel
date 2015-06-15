@@ -1,13 +1,13 @@
 package org.iatoki.judgels.jerahmeel;
 
-public final class SessionSession {
+public final class SessionDependency {
 
     private final long id;
     private final String sessionJid;
     private final String dependedSessionJid;
     private final String dependedSessionName;
 
-    public SessionSession(long id, String sessionJid, String dependedSessionJid, String dependedSessionName) {
+    public SessionDependency(long id, String sessionJid, String dependedSessionJid, String dependedSessionName) {
         this.id = id;
         this.sessionJid = sessionJid;
         this.dependedSessionJid = dependedSessionJid;
