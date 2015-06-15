@@ -66,7 +66,7 @@ public final class SessionDependencyController extends BaseController {
         } else {
             SessionDependencyCreateForm data = form.get();
             if (sessionService.existBySessionJid(data.sessionJid)) {
-                if (sessionDependencyService.existBySessionJidAndDependencyJid(session.getJid(), data.sessionJid)) {
+                if (!sessionDependencyService.existBySessionJidAndDependencyJid(session.getJid(), data.sessionJid)) {
                     sessionDependencyService.addSessionDependency(session.getJid(), data.sessionJid);
 
                     return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
