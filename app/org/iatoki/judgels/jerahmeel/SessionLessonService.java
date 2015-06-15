@@ -4,7 +4,7 @@ import org.iatoki.judgels.commons.Page;
 
 public interface SessionLessonService {
 
-    boolean isInSessionByLessonJidAndAlias(String sessionJid, String lessonJid, String alias);
+    boolean isInSessionByAlias(String sessionJid, String alias);
 
     SessionLesson findSessionLessonBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException;
 

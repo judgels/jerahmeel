@@ -18,12 +18,12 @@ public final class SessionProblemHibernateDao extends AbstractHibernateDao<Long,
     }
 
     @Override
-    public boolean existBySessionJidProblemJidAndAlias(String sessionJid, String problemJid, String alias) {
+    public boolean existBySessionJidAndAlias(String sessionJid, String alias) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<SessionProblemModel> root = query.from(SessionProblemModel.class);
 
-        query.select(cb.count(root)).where(cb.and(cb.equal(root.get(SessionProblemModel_.sessionJid), sessionJid), cb.equal(root.get(SessionProblemModel_.problemJid), problemJid), cb.equal(root.get(SessionProblemModel_.alias), alias)));
+        query.select(cb.count(root)).where(cb.and(cb.equal(root.get(SessionProblemModel_.sessionJid), sessionJid), cb.equal(root.get(SessionProblemModel_.alias), alias)));
 
         return (JPA.em().createQuery(query).getSingleResult() != 0);
     }

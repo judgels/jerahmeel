@@ -6,7 +6,7 @@ import java.util.Map;
 
 public interface SessionProblemService {
 
-    boolean isInSessionByProblemJidAndAlias(String sessionJid, String problemJid, String alias);
+    boolean isInSessionByAlias(String sessionJid, String alias);
 
     SessionProblem findSessionProblemBySessionProblemId(long sessionProblemId) throws SessionProblemNotFoundException;
 

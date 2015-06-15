@@ -137,7 +137,7 @@ public final class SessionLessonController extends BaseController {
             }
 
             if (lessonName != null) {
-                if (!sessionLessonService.isInSessionByLessonJidAndAlias(session.getJid(), data.lessonJid, data.alias)) {
+                if (!sessionLessonService.isInSessionByAlias(session.getJid(), data.alias)) {
                     sessionLessonService.addSessionLesson(session.getJid(), data.lessonJid, data.lessonSecret, data.alias, SessionLessonStatus.valueOf(data.status));
                     JidCacheService.getInstance().putDisplayName(data.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 

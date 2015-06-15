@@ -145,7 +145,7 @@ public final class SessionProblemController extends BaseController {
                 return showCreateProblem(session, form);
             }
             if (problemName != null) {
-                if (!sessionProblemService.isInSessionByProblemJidAndAlias(session.getJid(), data.problemJid, data.alias)) {
+                if (!sessionProblemService.isInSessionByAlias(session.getJid(), data.alias)) {
                     sessionProblemService.addSessionProblem(session.getJid(), data.problemJid, data.problemSecret, data.alias, SessionProblemType.valueOf(data.type), SessionProblemStatus.valueOf(data.status));
                     JidCacheService.getInstance().putDisplayName(data.problemJid, problemName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 

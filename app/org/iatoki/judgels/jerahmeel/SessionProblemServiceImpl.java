@@ -26,8 +26,8 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public boolean isInSessionByProblemJidAndAlias(String sessionJid, String problemJid, String alias) {
-        return sessionProblemDao.existBySessionJidProblemJidAndAlias(sessionJid, problemJid, alias);
+    public boolean isInSessionByAlias(String sessionJid, String alias) {
+        return sessionProblemDao.existBySessionJidAndAlias(sessionJid, alias);
     }
 
     @Override

@@ -23,8 +23,8 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public boolean isInSessionByLessonJidAndAlias(String sessionJid, String lessonJid, String alias) {
-        return sessionLessonDao.existBySessionJidLessonJidAndAlias(sessionJid, lessonJid, alias);
+    public boolean isInSessionByAlias(String sessionJid, String alias) {
+        return sessionLessonDao.existBySessionJidAndAlias(sessionJid, alias);
     }
 
     @Override
