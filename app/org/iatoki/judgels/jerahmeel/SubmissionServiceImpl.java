@@ -11,7 +11,7 @@ import org.iatoki.judgels.jerahmeel.models.domains.SubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.domains.UserItemModel;
 import org.iatoki.judgels.sandalphon.commons.AbstractSubmissionServiceImpl;
 import org.iatoki.judgels.sandalphon.commons.Submission;
-import org.iatoki.judgels.sealtiel.client.Sealtiel;
+import org.iatoki.judgels.sealtiel.Sealtiel;
 
 import java.util.List;
 

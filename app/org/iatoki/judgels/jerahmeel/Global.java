@@ -60,7 +60,7 @@ import org.iatoki.judgels.jophiel.commons.Jophiel;
 import org.iatoki.judgels.jophiel.commons.UserActivityPusher;
 import org.iatoki.judgels.jophiel.commons.controllers.JophielClientController;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
-import org.iatoki.judgels.sealtiel.client.Sealtiel;
+import org.iatoki.judgels.sealtiel.Sealtiel;
 import org.iatoki.judgels.jerahmeel.controllers.ApplicationController;
 import org.iatoki.judgels.jerahmeel.controllers.UserController;
 import org.iatoki.judgels.jerahmeel.models.daos.hibernate.AvatarCacheHibernateDao;
