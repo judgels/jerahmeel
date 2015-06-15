@@ -62,9 +62,9 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<CourseSessionProgress> courseSessionProgressBuilder = ImmutableList.builder();
-        List<UserItemModel> completedUserItemModel = userItemDao.findByStatus(UserItemStatus.COMPLETED.name());
+        List<UserItemModel> completedUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
         Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
-        List<UserItemModel> onProgressUserItemModel = userItemDao.findByStatus(UserItemStatus.VIEWED.name());
+        List<UserItemModel> onProgressUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.VIEWED.name());
         Set<String> onProgressJids = onProgressUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
         for (CourseSessionModel courseSessionModel : courseSessionModels) {
             SessionProgress progress = SessionProgress.LOCKED;

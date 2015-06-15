@@ -28,7 +28,7 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
 
     @Override
     public boolean isDependenciesFulfilled(String userJid, String sessionJid) {
-        List<UserItemModel> completedUserItemModel = userItemDao.findByStatus(UserItemStatus.COMPLETED.name());
+        List<UserItemModel> completedUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
         Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
 
         List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(sessionJid);
