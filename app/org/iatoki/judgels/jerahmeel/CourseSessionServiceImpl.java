@@ -32,6 +32,11 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
+    public boolean existByCourseJidAndAlias(String courseJid, String alias) {
+        return courseSessionDao.existByCourseJidAndAlias(courseJid, alias);
+    }
+
+    @Override
     public boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid) {
         return courseSessionDao.existByCourseJidAndSessionJid(courseJid, sessionJid);
     }
@@ -87,13 +92,27 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
-    public void addCourseSession(String courseJid, String sessionJid, boolean completeable) {
+    public void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable) {
         CourseSessionModel courseSessionModel = new CourseSessionModel();
         courseSessionModel.courseJid = courseJid;
         courseSessionModel.sessionJid = sessionJid;
+        courseSessionModel.alias = alias;
         courseSessionModel.completeable = completeable;
 
         courseSessionDao.persist(courseSessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+    }
+
+    @Override
+    public void updateCourseSession(long courseSessionId, String alias, boolean completeable) throws CourseSessionNotFoundException {
+        CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
+        if (courseSessionModel != null) {
+            courseSessionModel.alias = alias;
+            courseSessionModel.completeable = completeable;
+
+            courseSessionDao.edit(courseSessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        } else {
+            throw new CourseSessionNotFoundException("Course Session Not Found.");
+        }
     }
 
     @Override
@@ -107,6 +126,6 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     private CourseSession createFromModel(CourseSessionModel model) {
-        return new CourseSession(model.id, model.courseJid, model.sessionJid, sessionDao.findByJid(model.sessionJid).name, model.completeable);
+        return new CourseSession(model.id, model.courseJid, model.sessionJid, model.alias, sessionDao.findByJid(model.sessionJid).name, model.completeable);
     }
 }

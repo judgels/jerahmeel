@@ -13,6 +13,7 @@ public abstract class CourseSessionModel_ extends AbstractModel_ {
 	public static volatile SingularAttribute<CourseSessionModel, Long> id;
 	public static volatile SingularAttribute<CourseSessionModel, String> courseJid;
 	public static volatile SingularAttribute<CourseSessionModel, String> sessionJid;
+	public static volatile SingularAttribute<CourseSessionModel, String> alias;
 	public static volatile SingularAttribute<CourseSessionModel, Boolean> completeable;
 
 }

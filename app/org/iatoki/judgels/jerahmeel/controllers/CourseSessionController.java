@@ -12,13 +12,14 @@ import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionCreateForm;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSessionService;
-import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.CourseSessionUpdateForm;
 import org.iatoki.judgels.jerahmeel.SessionService;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.security.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.course.session.listCreateCourseSessionsView;
+import org.iatoki.judgels.jerahmeel.views.html.course.session.updateCourseSessionView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -70,8 +71,13 @@ public final class CourseSessionController extends BaseController {
         } else {
             CourseSessionCreateForm data = form.get();
             if (sessionService.existBySessionJid(data.sessionJid)) {
-                if (!courseSessionService.existByCourseJidAndSessionJid(course.getJid(), data.sessionJid)) {
-                    courseSessionService.addCourseSession(course.getJid(), data.sessionJid, data.completeable);
+                if (courseSessionService.existByCourseJidAndAlias(course.getJid(), data.alias)) {
+                    form.reject(Messages.get("error.course.session.duplicateAlias"));
+                    Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+                    return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
+                } else if (!courseSessionService.existByCourseJidAndSessionJid(course.getJid(), data.sessionJid)) {
+                    courseSessionService.addCourseSession(course.getJid(), data.sessionJid, data.alias, data.completeable);
 
                     return redirect(routes.CourseSessionController.viewSessions(course.getId()));
                 } else {
@@ -89,14 +95,43 @@ public final class CourseSessionController extends BaseController {
         }
     }
 
-    public Result jumpToSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
+    @AddCSRFToken
+    public Result updateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
 
-        if (course.getJid().equals(courseSession.getCourseJid())) {
-            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
+        if (courseSession.getCourseJid().equals(course.getJid())) {
+            CourseSessionUpdateForm courseSessionUpdateForm = new CourseSessionUpdateForm();
+            courseSessionUpdateForm.alias = courseSession.getAlias();
+            courseSessionUpdateForm.completeable = courseSession.isCompleteable();
+            Form<CourseSessionUpdateForm> form = Form.form(CourseSessionUpdateForm.class).fill(courseSessionUpdateForm);
 
-            return redirect(routes.SessionController.updateSessionGeneral(session.getId()));
+            return showUpdateSession(course, courseSession, form);
+        } else {
+            return notFound();
+        }
+    }
+
+    @RequireCSRFCheck
+    public Result postUpdateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
+        Course course = courseService.findCourseByCourseId(courseId);
+        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+
+        if (courseSession.getCourseJid().equals(course.getJid())) {
+            Form<CourseSessionUpdateForm> form = Form.form(CourseSessionUpdateForm.class).bindFromRequest();
+            if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
+                CourseSessionUpdateForm courseSessionUpdateForm = form.get();
+                if ((courseSessionUpdateForm.alias == courseSession.getAlias()) || (!courseSessionService.existByCourseJidAndAlias(course.getJid(), courseSessionUpdateForm.alias))) {
+                    courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateForm.alias, courseSessionUpdateForm.completeable);
+
+                    return redirect(routes.CourseSessionController.viewSessions(course.getId()));
+                } else {
+                    form.reject(Messages.get("error.course.session.duplicateAlias"));
+                    return showUpdateSession(course, courseSession, form);
+                }
+            } else {
+                return showUpdateSession(course, courseSession, form);
+            }
         } else {
             return notFound();
         }
@@ -122,7 +157,22 @@ public final class CourseSessionController extends BaseController {
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
               new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId())),
-              new InternalLink(Messages.get("commons.update"), routes.CourseSessionController.viewSessions(course.getId()))
+              new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId()))
+        ));
+        ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
+
+        return ControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private Result showUpdateSession(Course course, CourseSession courseSession, Form<CourseSessionUpdateForm> form) {
+        LazyHtml content = new LazyHtml(updateCourseSessionView.render(form, course.getId(), courseSession.getId()));
+        CourseControllerUtils.appendUpdateLayout(content, course);
+        ControllerUtils.getInstance().appendSidebarLayout(content);
+        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
+              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
+              new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId())),
+              new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId())),
+              new InternalLink(Messages.get("commons.update"), routes.CourseSessionController.updateSession(course.getId(), courseSession.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
 

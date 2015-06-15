@@ -39,7 +39,7 @@ public final class TrainingCourseController extends BaseController {
     }
 
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
-        return listCourses(curriculumId, 0, "id", "asc", "");
+        return listCourses(curriculumId, 0, "alias", "asc", "");
     }
 
     public Result listCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {

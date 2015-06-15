@@ -17,6 +17,7 @@ curriculum.create=Create Curriculum
 curriculum.update=Update Curriculum
 
 error.curriculum.courseExist=Course already Existed
+error.curriculum.course.duplicateAlias=Alias already Existed
 
 course.course=Course
 course.courses=Courses
@@ -24,6 +25,7 @@ course.name=Name
 course.description=Description
 course.sessions=Sessions
 course.jid=Course Jid
+course.alias=Alias
 course.completeable=Completeable?
 
 course.list=Courses
@@ -32,6 +34,7 @@ course.update=Update Course
 
 error.course.sessionExist=Session already Existed
 error.course.invalidJid=Invalid Course
+error.course.session.duplicateAlias=Alias already Existed
 
 session.session=Session
 session.sessions=Sessions
@@ -39,6 +42,7 @@ session.name=Name
 session.description=Description
 session.dependencies=Dependencies
 session.jid=Session Jid
+session.alias=Alias
 session.completeable=Completeable?
 
 session.list=Sessions

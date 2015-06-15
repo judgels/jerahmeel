@@ -17,6 +17,17 @@ public final class CourseSessionHibernateDao extends AbstractHibernateDao<Long, 
     }
 
     @Override
+    public boolean existByCourseJidAndAlias(String courseJid, String alias) {
+        CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
+        CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<CourseSessionModel> root = query.from(CourseSessionModel.class);
+
+        query.select(cb.count(root)).where(cb.and(cb.equal(root.get(CourseSessionModel_.courseJid), courseJid), cb.equal(root.get(CourseSessionModel_.alias), alias)));
+
+        return (JPA.em().createQuery(query).getSingleResult() != 0);
+    }
+
+    @Override
     public boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);

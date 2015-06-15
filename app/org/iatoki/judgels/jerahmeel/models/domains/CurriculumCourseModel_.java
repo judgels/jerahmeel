@@ -12,6 +12,7 @@ public abstract class CurriculumCourseModel_ extends AbstractModel_ {
 
 	public static volatile SingularAttribute<CurriculumCourseModel, Long> id;
 	public static volatile SingularAttribute<CurriculumCourseModel, String> curriculumJid;
+	public static volatile SingularAttribute<CurriculumCourseModel, String> alias;
 	public static volatile SingularAttribute<CurriculumCourseModel, String> courseJid;
 	public static volatile SingularAttribute<CurriculumCourseModel, Boolean> completeable;
 

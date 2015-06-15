@@ -4,6 +4,8 @@ import org.iatoki.judgels.commons.Page;
 
 public interface CourseSessionService {
 
+    boolean existByCourseJidAndAlias(String courseJid, String alias);
+
     boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid);
     
     CourseSession findByCourseSessionId(long courseSessionId) throws CourseSessionNotFoundException;
@@ -12,7 +14,9 @@ public interface CourseSessionService {
 
     Page<CourseSessionProgress> findCourseSessions(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addCourseSession(String courseJid, String sessionJid, boolean completeable);
+    void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable);
+
+    void updateCourseSession(long courseSessionId, String alias, boolean completeable) throws CourseSessionNotFoundException;
 
     void removeCourseSession(long courseSessionId) throws CourseSessionNotFoundException;
 }

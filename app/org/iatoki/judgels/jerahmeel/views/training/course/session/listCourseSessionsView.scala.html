@@ -18,7 +18,7 @@
 @for(courseSessionProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingController.jumpToLessons(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">@courseSessionProgress.getCourseSession.getSessionName</a>
+            <a href="@routes.TrainingController.jumpToLessons(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">@courseSessionProgress.getCourseSession.getAlias. @courseSessionProgress.getCourseSession.getSessionName</a>
             <div class="pull-right">
                 @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.LOCKED)) {
                     <button class="btn btn-danger">

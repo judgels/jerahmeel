@@ -8,6 +8,9 @@ public final class CurriculumCourseCreateForm {
     public String courseJid;
 
     @Constraints.Required
+    public String alias;
+
+    @Constraints.Required
     public boolean completeable;
 
 }

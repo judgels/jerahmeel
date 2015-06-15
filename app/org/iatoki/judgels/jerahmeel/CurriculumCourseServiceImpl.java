@@ -37,6 +37,11 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     }
 
     @Override
+    public boolean existByCurriculumJidAndAlias(String curriculumJid, String alias) {
+        return curriculumCourseDao.existByCurriculumJidAndAlias(curriculumJid, alias);
+    }
+
+    @Override
     public boolean existByCurriculumJidAndCourseJid(String curriculumJid, String courseJid) {
         return curriculumCourseDao.existByCurriculumJidAndCourseJid(curriculumJid, courseJid);
     }
@@ -101,13 +106,27 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     }
 
     @Override
-    public void addCurriculumCourse(String curriculumJid, String courseJid, boolean completeable) {
+    public void addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable) {
         CurriculumCourseModel curriculumCourseModel = new CurriculumCourseModel();
         curriculumCourseModel.curriculumJid = curriculumJid;
         curriculumCourseModel.courseJid = courseJid;
+        curriculumCourseModel.alias = alias;
         curriculumCourseModel.completeable = completeable;
 
         curriculumCourseDao.persist(curriculumCourseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+    }
+
+    @Override
+    public void updateCurriculumCourse(long curriculumCourseId, String alias, boolean completeable) throws CurriculumCourseNotFoundException {
+        CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
+        if (curriculumCourseModel != null) {
+            curriculumCourseModel.alias = alias;
+            curriculumCourseModel.completeable = completeable;
+
+            curriculumCourseDao.edit(curriculumCourseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        } else {
+            throw new CurriculumCourseNotFoundException("Curriculum Course Not Found.");
+        }
     }
 
     @Override
@@ -121,6 +140,6 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     }
 
     private CurriculumCourse createFromModel(CurriculumCourseModel model) {
-        return new CurriculumCourse(model.id, model.curriculumJid, model.courseJid, courseDao.findByJid(model.courseJid).name, model.completeable);
+        return new CurriculumCourse(model.id, model.curriculumJid, model.courseJid, model.alias, courseDao.findByJid(model.courseJid).name, model.completeable);
     }
 }

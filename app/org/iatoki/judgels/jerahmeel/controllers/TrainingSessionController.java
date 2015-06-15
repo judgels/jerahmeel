@@ -47,7 +47,7 @@ public final class TrainingSessionController extends BaseController {
     }
 
     public Result viewSessions(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException {
-        return listSessions(curriculumId, curriculumCourseId, 0, "id", "asc", "");
+        return listSessions(curriculumId, curriculumCourseId, 0, "alias", "asc", "");
     }
 
     public Result listSessions(long curriculumId, long curriculumCourseId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException {
