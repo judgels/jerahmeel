@@ -13,7 +13,8 @@ import org.iatoki.judgels.commons.LocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.ControllerUtils;
 import org.iatoki.judgels.jerahmeel.controllers.TrainingBundleSubmissionController;
 import org.iatoki.judgels.jerahmeel.controllers.TrainingProgrammingSubmissionController;
-import org.iatoki.judgels.jophiel.commons.DefaultUserActivityServiceImpl;
+import org.iatoki.judgels.jophiel.UserActivityMessagePusher;
+import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
 import org.iatoki.judgels.sandalphon.commons.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.commons.SubmissionService;
 import org.iatoki.judgels.jerahmeel.controllers.CourseController;
@@ -56,9 +57,9 @@ import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionLessonDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserItemDao;
-import org.iatoki.judgels.jophiel.commons.Jophiel;
-import org.iatoki.judgels.jophiel.commons.UserActivityPusher;
-import org.iatoki.judgels.jophiel.commons.controllers.JophielClientController;
+import org.iatoki.judgels.jophiel.Jophiel;
+import org.iatoki.judgels.jophiel.UserActivityMessagePusher;
+import org.iatoki.judgels.jophiel.controllers.JophielClientController;
 import org.iatoki.judgels.sandalphon.commons.Sandalphon;
 import org.iatoki.judgels.sealtiel.Sealtiel;
 import org.iatoki.judgels.jerahmeel.controllers.ApplicationController;
@@ -206,7 +207,7 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         JidCacheService.buildInstance(jidCacheDao);
         AvatarCacheService.buildInstance(jophiel, avatarCacheDao);
         ControllerUtils.buildInstance(jophiel);
-        DefaultUserActivityServiceImpl.buildInstance(jophiel);
+        DefaultUserActivityMessageServiceImpl.buildInstance(jophiel);
     }
 
     private void buildUtils() {
@@ -245,9 +246,9 @@ public final class Global extends org.iatoki.judgels.commons.Global {
         ExecutionContextExecutor context = Akka.system().dispatcher();
 
         GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, submissionService, sealtiel, TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
-        UserActivityPusher userActivityPusher = new UserActivityPusher(jophiel, userService, UserActivityServiceImpl.getInstance());
+        UserActivityMessagePusher userActivityMessagePusher = new UserActivityMessagePusher(jophiel, userService, UserActivityMessageServiceImpl.getInstance());
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
-        scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityPusher, context);
+        scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityMessagePusher, context);
     }
 }

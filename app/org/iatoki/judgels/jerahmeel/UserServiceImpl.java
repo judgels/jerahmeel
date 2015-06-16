@@ -8,8 +8,9 @@ import org.iatoki.judgels.commons.JudgelsUtils;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.models.daos.interfaces.UserDao;
 import org.iatoki.judgels.jerahmeel.models.domains.UserModel;
-import org.iatoki.judgels.jophiel.commons.Jophiel;
-import org.iatoki.judgels.jophiel.commons.UserTokens;
+import org.iatoki.judgels.jophiel.Jophiel;
+import org.iatoki.judgels.jophiel.UserInfo;
+import org.iatoki.judgels.jophiel.UserTokens;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -110,7 +111,7 @@ public final class UserServiceImpl implements UserService {
     @Override
     public void upsertUserFromJophielUserJid(String userJid, List<String> roles) {
         try {
-            org.iatoki.judgels.jophiel.commons.User user = jophiel.getUserByUserJid(userJid);
+            UserInfo user = jophiel.getUserByUserJid(userJid);
 
             if (!userDao.existsByUserJid(userJid))
                 createUser(user.getJid(), roles);
