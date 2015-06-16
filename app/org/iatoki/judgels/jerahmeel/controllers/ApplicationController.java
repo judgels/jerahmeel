@@ -32,7 +32,7 @@ public final class ApplicationController extends BaseController {
 
     public Result index() {
         if ((session().containsKey("username")) && (session().containsKey("role"))) {
-            return redirect(routes.CurriculumController.viewCurriculums());
+            return redirect(routes.TrainingController.jumpToCurriculums());
         } else if (session().containsKey("username")) {
             String returnUri = routes.CurriculumController.viewCurriculums().absoluteURL(request(), request().secure());
             return redirect(routes.ApplicationController.authRole(returnUri));
