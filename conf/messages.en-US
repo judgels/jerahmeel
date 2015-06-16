@@ -2,7 +2,7 @@ training.training=Training
 training.curriculums=Curriculums
 training.courses=Courses
 training.sessions=Sessions
-training.submissions.bundle=Bundle Submissions
+training.submissions.bundle=Non Programming Submissions
 training.submissions.programming=Programming Submissions
 training.session.isLocked=Session is still Locked
 
