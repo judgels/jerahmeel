@@ -60,7 +60,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             ProblemProgress progress = ProblemProgress.NOT_VIEWED;
             if (userItemDao.existByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid)) {
-                UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid);
+                UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, sessionProblemModel.problemJid);
                 if (UserItemStatus.VIEWED.name().equals(userItemModel.status)) {
                     progress = ProblemProgress.VIEWED;
                 } else if (UserItemStatus.COMPLETED.name().equals(userItemModel.status)) {

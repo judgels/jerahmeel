@@ -38,7 +38,7 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         String userJid = submissionModel.userCreate;
         String sessionJid = submissionModel.contestJid;
         String problemJid = submissionModel.problemJid;
-        List<BundleSubmission> submissionList = this.findAllSubmissionsByContestJid(sessionJid);
+        List<BundleSubmission> submissionList = this.findAllSubmissionsByContestJidAndProblemJid(sessionJid, problemJid);
         boolean completed = false;
         int i = 0;
         while ((!completed) && (i < submissionList.size())) {
