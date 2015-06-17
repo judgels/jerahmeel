@@ -14,7 +14,7 @@ import org.iatoki.judgels.commons.views.html.layouts.menusLayout;
 import org.iatoki.judgels.jophiel.views.html.viewas.viewAsLayout;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
-import org.iatoki.judgels.jerahmeel.UserActivityMessageServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.UserActivityMessageServiceImpl;
 import play.data.Form;
 import play.i18n.Messages;
 import play.mvc.Http;

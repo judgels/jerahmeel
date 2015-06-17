@@ -10,6 +10,7 @@ install:
   - git clone https://github.com/ia-toki/judgels-sealtiel-commons.git ../judgels-sealtiel-commons
   - git clone https://github.com/ia-toki/judgels-sandalphon-commons.git ../judgels-sandalphon-commons
   - git clone https://github.com/ia-toki/judgels-jophiel-commons.git ../judgels-jophiel-commons
+  - git clone https://github.com/ia-toki/judgels-jerahmeel-commons.git ../judgels-jerahmeel-commons
 
 
 script:

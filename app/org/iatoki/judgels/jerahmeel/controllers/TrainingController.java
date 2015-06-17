@@ -1,9 +1,9 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import org.iatoki.judgels.commons.controllers.BaseController;
-import org.iatoki.judgels.jerahmeel.controllers.security.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.security.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.security.LoggedIn;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 

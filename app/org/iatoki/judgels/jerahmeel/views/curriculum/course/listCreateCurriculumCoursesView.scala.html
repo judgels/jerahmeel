@@ -1,4 +1,5 @@
-@(curriculumId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.CurriculumCourse], orderBy: String, orderDir: String, filterString: String, form: Form[org.iatoki.judgels.jerahmeel.CurriculumCourseCreateForm])
+@(curriculumId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.CurriculumCourse], orderBy: String, orderDir: String, filterString: String, form: Form[org.iatoki.judgels.jerahmeel.controllers.forms.CurriculumCourseCreateForm])
+@import org.iatoki.judgels.jerahmeel.services.JidCacheService
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
@@ -8,8 +9,6 @@
 @import org.iatoki.judgels.commons.views.html.table.tableHeadersView
 @import org.iatoki.judgels.commons.views.html.table.searchView
 @import org.iatoki.judgels.commons.views.html.table.paginationView
-
-@import org.iatoki.judgels.jerahmeel.JidCacheService
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 

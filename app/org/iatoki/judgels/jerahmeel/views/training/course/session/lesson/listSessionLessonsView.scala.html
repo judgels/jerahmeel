@@ -1,10 +1,10 @@
 @(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionLessonProgress], orderBy: String, orderDir: String, filterString: String)
+@import org.iatoki.judgels.jerahmeel.services.JidCacheService
 
 @import org.iatoki.judgels.jerahmeel.LessonProgress
 @import play.i18n.Messages
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-@import org.iatoki.judgels.jerahmeel.JidCacheService
 
 @import org.iatoki.judgels.commons.views.html.table.searchView
 @import org.iatoki.judgels.commons.views.html.table.paginationView
