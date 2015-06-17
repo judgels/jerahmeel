@@ -1,5 +1,6 @@
 @(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.sandalphon.commons.Submission], userJids: List[String], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
 
+@import org.iatoki.judgels.jerahmeel.services.JidCacheService
 @import play.i18n.Messages
 @import org.iatoki.judgels.commons.views.html.table.tableView
 @import org.iatoki.judgels.commons.views.html.table.tableHeadersWithSelectionFormView
@@ -7,7 +8,6 @@
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.commons.JudgelsUtils
-@import org.iatoki.judgels.jerahmeel.JidCacheService
 @import scala.collection.JavaConversions
 
 <script type="text/javascript" src="@controllers.routes.Assets.at("lib/jquery/jquery.min.js")"></script>

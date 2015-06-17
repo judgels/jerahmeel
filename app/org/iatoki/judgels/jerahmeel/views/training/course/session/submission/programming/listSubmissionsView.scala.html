@@ -1,5 +1,6 @@
 @(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.sandalphon.commons.Submission], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
 
+@import org.iatoki.judgels.jerahmeel.services.JidCacheService
 @import play.i18n.Messages
 @import org.iatoki.judgels.commons.views.html.table.tableView
 @import org.iatoki.judgels.commons.views.html.table.tableHeadersView
@@ -7,7 +8,6 @@
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.commons.JudgelsUtils
-@import org.iatoki.judgels.jerahmeel.JidCacheService
 @import scala.collection.JavaConversions
 
 <form class="form-inline pull-right" method="GET" action="@routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
