@@ -104,22 +104,27 @@ public final class ApplicationController extends BaseController {
 
         if ((!(form.hasErrors() || form.hasGlobalErrors())) && (JerahmeelUtils.trullyHasRole("admin"))) {
             ViewpointForm viewpointForm = form.get();
-            String userJid = jophiel.verifyUsername(viewpointForm.username);
-            if (userJid != null) {
-                try {
-                    userService.upsertUserFromJophielUserJid(userJid);
-                    if (!JudgelsUtils.hasViewPoint()) {
-                        JerahmeelUtils.backupSession();
+            try {
+                String userJid = jophiel.verifyUsername(viewpointForm.username);
+                if (userJid != null) {
+                    try {
+                        userService.upsertUserFromJophielUserJid(userJid);
+                        if (!JudgelsUtils.hasViewPoint()) {
+                            JerahmeelUtils.backupSession();
+                        }
+                        JudgelsUtils.setViewPointInSession(userJid);
+                        JerahmeelUtils.setUserSession(jophiel.getUserByUserJid(userJid), userService.findUserByUserJid(userJid));
+
+                        ControllerUtils.getInstance().addActivityLog("View as user " + viewpointForm.username + ".");
+
+                    } catch (IOException e) {
+                        JudgelsUtils.removeViewPoint();
+                        JerahmeelUtils.restoreSession();
                     }
-                    JudgelsUtils.setViewPointInSession(userJid);
-                    JerahmeelUtils.setUserSession(jophiel.getUserByUserJid(userJid), userService.findUserByUserJid(userJid));
-
-                    ControllerUtils.getInstance().addActivityLog("View as user " + viewpointForm.username + ".");
-
-                } catch (IOException e) {
-                    JudgelsUtils.removeViewPoint();
-                    JerahmeelUtils.restoreSession();
                 }
+            } catch (IOException e) {
+                // do nothing
+                e.printStackTrace();
             }
         }
         return redirect(request().getHeader("Referer"));
