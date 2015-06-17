@@ -9,10 +9,10 @@ import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
-import org.iatoki.judgels.sandalphon.commons.AbstractBundleSubmissionServiceImpl;
-import org.iatoki.judgels.sandalphon.commons.BundleAnswer;
-import org.iatoki.judgels.sandalphon.commons.BundleProblemGrader;
-import org.iatoki.judgels.sandalphon.commons.BundleSubmission;
+import org.iatoki.judgels.sandalphon.services.impls.AbstractBundleSubmissionServiceImpl;
+import org.iatoki.judgels.sandalphon.BundleAnswer;
+import org.iatoki.judgels.sandalphon.BundleProblemGrader;
+import org.iatoki.judgels.sandalphon.BundleSubmission;
 
 import java.util.List;
 

@@ -33,7 +33,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.listSessionLessonsView;
-import org.iatoki.judgels.sandalphon.commons.Sandalphon;
+import org.iatoki.judgels.sandalphon.Sandalphon;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;

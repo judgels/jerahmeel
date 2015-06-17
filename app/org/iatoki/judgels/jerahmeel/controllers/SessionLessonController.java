@@ -23,7 +23,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.createLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
-import org.iatoki.judgels.sandalphon.commons.Sandalphon;
+import org.iatoki.judgels.sandalphon.Sandalphon;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;

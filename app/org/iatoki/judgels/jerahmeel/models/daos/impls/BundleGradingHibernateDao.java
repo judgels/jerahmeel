@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel.models.daos.impls;
 
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
-import org.iatoki.judgels.sandalphon.commons.models.daos.hibernate.AbstractBundleGradingHibernateDao;
+import org.iatoki.judgels.sandalphon.models.daos.impls.AbstractBundleGradingHibernateDao;
 
 public final class BundleGradingHibernateDao extends AbstractBundleGradingHibernateDao<BundleGradingModel> implements BundleGradingDao {
     public BundleGradingHibernateDao() {
