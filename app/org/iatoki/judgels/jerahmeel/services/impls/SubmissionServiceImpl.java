@@ -39,7 +39,7 @@ public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<S
         String userJid = submissionModel.userCreate;
         String sessionJid = submissionModel.contestJid;
         String problemJid = submissionModel.problemJid;
-        List<Submission> submissionList = this.findAllSubmissionsByContestJid(sessionJid);
+        List<Submission> submissionList = this.findAllSubmissionsByContestJidProblemJidAndUserJid(sessionJid, problemJid, userJid);
         boolean completed = false;
         int i = 0;
         while ((!completed) && (i < submissionList.size())) {

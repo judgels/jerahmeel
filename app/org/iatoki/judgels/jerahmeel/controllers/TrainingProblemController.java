@@ -129,7 +129,7 @@ public final class TrainingProblemController extends BaseController {
                   new InternalLink(sessionProblem.getAlias(), routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()))
             ));
 
-            if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED)) {
+            if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), sessionProblem.getProblemJid())) {
                 userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED);
             }
 

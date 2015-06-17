@@ -24,6 +24,11 @@ public final class UserItemServiceImpl implements UserItemService {
     }
 
     @Override
+    public boolean isUserItemExist(String userJid, String itemJid) {
+        return userItemDao.existByUserJidAndItemJid(userJid, itemJid);
+    }
+
+    @Override
     public boolean isUserItemExist(String userJid, String itemJid, UserItemStatus status) {
         return userItemDao.existByUserJidItemJidAndStatus(userJid, itemJid, status.name());
     }
