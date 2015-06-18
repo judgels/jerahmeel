@@ -23,18 +23,20 @@
             <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @JidCacheService.getInstance().getDisplayName(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
             <div class="pull-right">
                 @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
-                    <button class="btn btn-success">
+                    <span class="alert alert-success">
                         @Messages.get("training.problem.completed")
+                    </span>
                 } else {
                     @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
-                        <button class="btn btn-info">
+                        <span class="alert alert-info">
                             @Messages.get("training.problem.viewed")
+                        </span>
                     } else {
-                        <button class="btn btn-warning">
+                        <span class="alert alert-warning">
                             @Messages.get("training.problem.notViewed")
+                        </span>
                     }
                 }
-                </button>
             </div>
         </div>
     </div>

@@ -21,24 +21,26 @@
             <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">@curriculumCourseProgress.getCurriculumCourse.getAlias. @curriculumCourseProgress.getCurriculumCourse.getCourseName</a>
             <div class="pull-right">
                 @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
-                    <button class="btn btn-danger">
+                    <span class="alert alert-danger">
                         @Messages.get("training.course.locked")
+                    </span>
                 } else {
                     @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
-                        <button class="btn btn-success">
+                        <span class="alert alert-success">
                             @Messages.get("training.course.completed")
+                        </span>
                     } else {
                         @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
-                            <button class="btn btn-info">
+                            <span class="alert alert-info">
                                 @Messages.get("training.course.inProgress")
+                            </span>
                         } else {
-                            <button class="btn btn-warning">
+                            <span class="alert alert-warning">
                                 @Messages.get("training.course.available")
+                            </span>
                         }
                     }
                 }
-                </button>
-                <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="btn btn-primary">@Messages.get("commons.enter")</a>
             </div>
         </div>
     </div>

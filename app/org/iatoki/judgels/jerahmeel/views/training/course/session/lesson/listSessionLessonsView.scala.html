@@ -23,13 +23,14 @@
             <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @JidCacheService.getInstance().getDisplayName(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
             <div class="pull-right">
                 @if(sessionLessonProgress.getLessonProgress.equals(LessonProgress.VIEWED)) {
-                    <button class="btn btn-success">
+                    <span class="alert alert-success">
                         @Messages.get("training.lesson.viewed")
+                    </span>
                 } else {
-                    <button class="btn btn-warning">
+                    <span class="alert alert-warning">
                         @Messages.get("training.lesson.notViewed")
+                    </span>
                 }
-                </button>
             </div>
         </div>
     </div>
