@@ -82,7 +82,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
             if ((completedJids.contains(courseSessionModel.sessionJid)) && (courseSessionModel.completeable)) {
                 progress = SessionProgress.COMPLETED;
             } else if ((onProgressJids.contains(courseSessionModel.sessionJid)) && (courseSessionModel.completeable)) {
-                progress = SessionProgress.ON_PROGRESS;
+                progress = SessionProgress.IN_PROGRESS;
             } else {
                 List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(courseSessionModel.sessionJid);
                 Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());

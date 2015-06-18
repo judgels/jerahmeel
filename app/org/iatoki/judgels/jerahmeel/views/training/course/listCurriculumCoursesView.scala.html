@@ -28,9 +28,9 @@
                         <button class="btn btn-success">
                             @Messages.get("training.course.completed")
                     } else {
-                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.ON_PROGRESS)) {
+                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
                             <button class="btn btn-info">
-                                @Messages.get("training.course.onProgress")
+                                @Messages.get("training.course.inProgress")
                         } else {
                             <button class="btn btn-warning">
                                 @Messages.get("training.course.available")

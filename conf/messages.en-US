@@ -109,12 +109,12 @@ user.name=Name
 user.roles=Roles
 
 training.course.completed=Completed
-training.course.onProgress=On Progress
+training.course.inProgress=In Progress
 training.course.available=Available
 training.course.locked=Locked
 
 training.session.completed=Completed
-training.session.onProgress=On Progress
+training.session.inProgress=In Progress
 training.session.available=Available
 training.session.locked=Locked
 

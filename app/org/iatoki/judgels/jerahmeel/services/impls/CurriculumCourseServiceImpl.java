@@ -90,7 +90,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
                 if ((completedJids.contains(courseSessionModel.sessionJid)) && (curriculumCourseModel.completeable)) {
                     completed++;
                 } else if ((onProgressJids.contains(courseSessionModel.sessionJid)) && (curriculumCourseModel.completeable)) {
-                    progress = CourseProgress.ON_PROGRESS;
+                    progress = CourseProgress.IN_PROGRESS;
                     break;
                 } else {
                     List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(courseSessionModel.sessionJid);
