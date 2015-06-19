@@ -116,7 +116,7 @@ training.course.locked=Locked
 training.session.completed=Completed
 training.session.inProgress=In Progress
 training.session.available=Available
-training.session.locked=Locked
+training.session.locked=Submissions Locked
 
 training.lesson.viewed=Viewed
 training.lesson.notViewed=Not Viewed
