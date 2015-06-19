@@ -121,7 +121,7 @@ public final class CourseSessionController extends BaseController {
             Form<CourseSessionUpdateForm> form = Form.form(CourseSessionUpdateForm.class).bindFromRequest();
             if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
                 CourseSessionUpdateForm courseSessionUpdateForm = form.get();
-                if ((courseSessionUpdateForm.alias == courseSession.getAlias()) || (!courseSessionService.existByCourseJidAndAlias(course.getJid(), courseSessionUpdateForm.alias))) {
+                if ((courseSessionUpdateForm.alias.equals(courseSession.getAlias())) || (!courseSessionService.existByCourseJidAndAlias(course.getJid(), courseSessionUpdateForm.alias))) {
                     courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateForm.alias, courseSessionUpdateForm.completeable);
 
                     return redirect(routes.CourseSessionController.viewSessions(course.getId()));
