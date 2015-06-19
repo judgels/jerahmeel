@@ -22,7 +22,7 @@ public final class CurriculumControllerUtils {
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionLayout.render(Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(), new InternalLink(Messages.get("commons.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())), c));
         } else {
-            content.appendLayout(c -> headingLayout.render(Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(), c));
+            content.appendLayout(c -> headingLayout.render(curriculum.getName(), c));
         }
     }
 

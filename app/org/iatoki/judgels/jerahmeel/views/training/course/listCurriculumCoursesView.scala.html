@@ -18,7 +18,12 @@
 @for(curriculumCourseProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">@curriculumCourseProgress.getCurriculumCourse.getAlias. @curriculumCourseProgress.getCurriculumCourse.getCourseName</a>
+            <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">
+                @if(curriculumCourseProgress.getCurriculumCourse.isCompleteable) {
+                    @{curriculumCourseProgress.getCurriculumCourse.getAlias}.
+                }
+                @curriculumCourseProgress.getCurriculumCourse.getCourseName
+            </a>
             <div class="pull-right">
                 @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
                     <span class="alert alert-danger">

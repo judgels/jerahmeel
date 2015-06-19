@@ -8,6 +8,7 @@ import org.iatoki.judgels.commons.views.html.layouts.headingLayout;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.commons.views.html.layouts.tabLayout;
 import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import play.i18n.Messages;
 
@@ -17,12 +18,14 @@ public final class CourseControllerUtils {
         // prevent instantiation
     }
 
-    static void appendViewLayout(LazyHtml content, Course course) {
+    static void appendViewLayout(LazyHtml content, CurriculumCourse curriculumCourse, Course course) {
         content.appendLayout(c -> descriptionLayout.render(course.getDescription(), c));
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionLayout.render(Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(), new InternalLink(Messages.get("commons.update"), routes.CourseController.updateCourseGeneral(course.getId())), c));
+        } else if (curriculumCourse.isCompleteable()) {
+            content.appendLayout(c -> headingLayout.render(Messages.get("course.course") + " " + curriculumCourse.getAlias() + ": " + course.getName(), c));
         } else {
-            content.appendLayout(c -> headingLayout.render(Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(), c));
+            content.appendLayout(c -> headingLayout.render(course.getName(), c));
         }
     }
 

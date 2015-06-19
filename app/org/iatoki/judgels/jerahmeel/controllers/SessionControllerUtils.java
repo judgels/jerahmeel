@@ -32,8 +32,10 @@ public final class SessionControllerUtils {
         content.appendLayout(c -> descriptionLayout.render(session.getDescription(), c));
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(), new InternalLink(Messages.get("commons.update"), routes.SessionController.updateSessionGeneral(session.getId())), c));
+        } else if (courseSession.isCompleteable()){
+            content.appendLayout(c -> headingLayout.render(Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(), c));
         } else {
-            content.appendLayout(c -> headingLayout.render(Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(), c));
+            content.appendLayout(c -> headingLayout.render(session.getName(), c));
         }
     }
 
