@@ -62,6 +62,7 @@ session.lesson.secret=Lesson Secret
 session.lesson.create=Create
 
 error.session.lessonExist=Lesson Already Existed.
+error.lesson.invalidJid=Invalid Lesson Jid.
 
 session.problem=Problem
 session.problems=Problems
@@ -75,6 +76,7 @@ session.problem.secret=Problem Secret
 session.problem.create=Create
 
 error.session.problemExist=Problem Already Existed.
+error.problem.invalidJid=Invalid Problem Jid.
 
 session.submissions=Submissions
 session.submissions.bundle=Bundle Submissions

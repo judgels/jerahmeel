@@ -8,7 +8,7 @@ import play.mvc.Http;
 import java.util.Arrays;
 import java.util.List;
 
-public class JerahmeelUtils {
+public final class JerahmeelUtils {
 
     private JerahmeelUtils() {
         // prevent instantiation
@@ -36,7 +36,6 @@ public class JerahmeelUtils {
         putInSession("realUsername", getFromSession("username"));
         putInSession("realRole", getFromSession("role"));
         putInSession("realAvatar", getFromSession("avatar"));
-        putInSession("realEmail", getFromSession("email"));
     }
 
     public static void setUserSession(UserInfo user, User urielUser) {
@@ -45,7 +44,6 @@ public class JerahmeelUtils {
         putInSession("username", user.getUsername());
         saveRolesInSession(urielUser.getRoles());
         putInSession("avatar", user.getProfilePictureUrl().toString());
-        putInSession("email", user.getEmail());
     }
 
     public static void restoreSession() {
@@ -59,8 +57,6 @@ public class JerahmeelUtils {
         Http.Context.current().session().remove("realRole");
         putInSession("avatar", getFromSession("realAvatar"));
         Http.Context.current().session().remove("realAvatar");
-        putInSession("email", getFromSession("realEmail"));
-        Http.Context.current().session().remove("realEmail");
     }
 
     public static boolean trullyHasRole(String role) {
