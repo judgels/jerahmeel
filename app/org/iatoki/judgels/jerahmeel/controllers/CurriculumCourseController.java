@@ -27,7 +27,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class CurriculumCourseController extends BaseController {
@@ -44,11 +43,13 @@ public final class CurriculumCourseController extends BaseController {
         this.courseService = courseService;
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
         return listCreateCourses(curriculumId, 0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result listCreateCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -59,6 +60,7 @@ public final class CurriculumCourseController extends BaseController {
         return showListCreateCourses(curriculum, form, curriculumPage, orderBy, orderDir, filterString);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateCourse(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -95,6 +97,7 @@ public final class CurriculumCourseController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -113,6 +116,7 @@ public final class CurriculumCourseController extends BaseController {
         }
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postUpdateCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -139,6 +143,7 @@ public final class CurriculumCourseController extends BaseController {
         }
     }
 
+    @Transactional
     public Result deleteCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);

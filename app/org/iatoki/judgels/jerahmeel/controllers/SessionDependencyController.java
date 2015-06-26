@@ -24,7 +24,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class SessionDependencyController extends BaseController {
@@ -39,11 +38,13 @@ public final class SessionDependencyController extends BaseController {
         this.sessionDependencyService = sessionDependencyService;
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewDependencies(long sessionId) throws SessionNotFoundException {
         return listCreateDependencies(sessionId, 0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result listCreateDependencies(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -54,6 +55,7 @@ public final class SessionDependencyController extends BaseController {
         return showListCreateDependencies(session, form, sessionPage, orderBy, orderDir, filterString);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateDependency(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -85,6 +87,7 @@ public final class SessionDependencyController extends BaseController {
         }
     }
 
+    @Transactional
     public Result deleteDependency(long sessionId, long sessionDependencyId) throws SessionNotFoundException, SessionDependencyNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionDependency sessionDependency = sessionDependencyService.findSessionDependencyBySessionDependencyId(sessionDependencyId);

@@ -4,10 +4,8 @@ import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import play.db.jpa.Transactional;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 public final class TrainingController extends BaseController {
 

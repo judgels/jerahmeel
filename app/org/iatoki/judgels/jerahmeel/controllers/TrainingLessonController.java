@@ -40,7 +40,6 @@ import play.mvc.Result;
 
 import java.net.URI;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 public final class TrainingLessonController extends BaseController {
     private static final long PAGE_SIZE = 20;
@@ -67,10 +66,12 @@ public final class TrainingLessonController extends BaseController {
         this.userItemService = userItemService;
     }
 
+    @Transactional
     public Result viewLessons(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         return listLessons(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "asc", "");
     }
 
+    @Transactional
     public Result listLessons(long curriculumId, long curriculumCourseId, long courseSessionId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -91,6 +92,7 @@ public final class TrainingLessonController extends BaseController {
         }
     }
 
+    @Transactional
     public Result viewLesson(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionLessonId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionLessonNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -127,6 +129,7 @@ public final class TrainingLessonController extends BaseController {
         }    
     }
 
+    @Transactional(readOnly = true)
     public Result renderLessonMedia(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionLessonId, String filename) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionLessonNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);

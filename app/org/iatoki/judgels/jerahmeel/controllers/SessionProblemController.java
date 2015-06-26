@@ -37,7 +37,6 @@ import play.mvc.Result;
 import java.io.IOException;
 import java.net.URI;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class SessionProblemController extends BaseController {
@@ -54,10 +53,12 @@ public final class SessionProblemController extends BaseController {
         this.sandalphon = sandalphon;
     }
 
+    @Transactional(readOnly = true)
     public Result viewSessionProblems(long sessionId) throws SessionNotFoundException {
         return listSessionProblems(sessionId, 0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listSessionProblems(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -66,6 +67,7 @@ public final class SessionProblemController extends BaseController {
         return showListSessionProblems(session, sessionPage, orderBy, orderDir, filterString);
     }
 
+    @Transactional(readOnly = true)
     public Result viewProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
@@ -98,7 +100,8 @@ public final class SessionProblemController extends BaseController {
             return forbidden();
         }
     }
-    
+
+    @Transactional(readOnly = true)
     public Result renderImage(long sessionId, long sessionProblemId, String imageFilename) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
@@ -118,7 +121,8 @@ public final class SessionProblemController extends BaseController {
 
         return redirect(request().getHeader("Referer"));
     }
-    
+
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createProblem(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -127,6 +131,7 @@ public final class SessionProblemController extends BaseController {
         return showCreateProblem(session, form);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateProblem(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -163,6 +168,7 @@ public final class SessionProblemController extends BaseController {
         }
     }
 
+    @Transactional
     public Result deleteProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);

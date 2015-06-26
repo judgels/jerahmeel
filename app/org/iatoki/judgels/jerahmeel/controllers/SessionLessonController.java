@@ -35,7 +35,6 @@ import play.mvc.Result;
 import java.io.IOException;
 import java.net.URI;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class SessionLessonController extends BaseController {
@@ -52,10 +51,12 @@ public final class SessionLessonController extends BaseController {
         this.sandalphon = sandalphon;
     }
 
+    @Transactional(readOnly = true)
     public Result viewSessionLessons(long sessionId) throws SessionNotFoundException {
         return listSessionLessons(sessionId, 0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listSessionLessons(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -64,6 +65,7 @@ public final class SessionLessonController extends BaseController {
         return showListSessionLessons(session, sessionPage, orderBy, orderDir, filterString);
     }
 
+    @Transactional(readOnly = true)
     public Result viewLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
@@ -90,6 +92,7 @@ public final class SessionLessonController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     public Result renderImage(long sessionId, long sessionLessonId, String imageFilename) throws SessionNotFoundException, SessionLessonNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
@@ -110,6 +113,7 @@ public final class SessionLessonController extends BaseController {
         return redirect(request().getHeader("Referer"));
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createLesson(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -118,6 +122,7 @@ public final class SessionLessonController extends BaseController {
         return showCreateLesson(session, form);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateLesson(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -155,6 +160,7 @@ public final class SessionLessonController extends BaseController {
         }
     }
 
+    @Transactional
     public Result deleteLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
@@ -198,5 +204,4 @@ public final class SessionLessonController extends BaseController {
 
         return ControllerUtils.getInstance().lazyOk(content);
     }
-
 }

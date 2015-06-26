@@ -21,7 +21,6 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 public final class TrainingCourseController extends BaseController {
     private static final long PAGE_SIZE = 20;
@@ -38,10 +37,12 @@ public final class TrainingCourseController extends BaseController {
         this.userItemService = userItemService;
     }
 
+    @Transactional(readOnly = true)
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
         return listCourses(curriculumId, 0, "alias", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
 

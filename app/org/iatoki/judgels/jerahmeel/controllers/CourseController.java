@@ -25,7 +25,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
 public final class CourseController extends BaseController {
@@ -38,10 +37,12 @@ public final class CourseController extends BaseController {
         this.courseService = courseService;
     }
 
+    @Transactional(readOnly = true)
     public Result viewCourses() {
         return listCourses(0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listCourses(long page, String orderBy, String orderDir, String filterString) {
         Page<Course> currentPage = courseService.pageCourses(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
@@ -60,6 +61,7 @@ public final class CourseController extends BaseController {
         return redirect(routes.CourseSessionController.viewSessions(courseId));
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createCourse() {
         Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class);
@@ -67,6 +69,7 @@ public final class CourseController extends BaseController {
         return showCreateCourse(form);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateCourse() {
         Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class).bindFromRequest();
@@ -81,6 +84,7 @@ public final class CourseController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateCourseGeneral(long courseId) throws CourseNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
@@ -93,6 +97,7 @@ public final class CourseController extends BaseController {
         return showUpdateCourseGeneral(form, course);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postUpdateCourseGeneral(long courseId) throws CourseNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);

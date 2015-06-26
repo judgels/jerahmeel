@@ -28,7 +28,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
 public final class SessionController extends BaseController {
@@ -43,10 +42,12 @@ public final class SessionController extends BaseController {
         this.userItemService = userItemService;
     }
 
+    @Transactional(readOnly = true)
     public Result viewSessions() {
         return listSessions(0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listSessions(long page, String orderBy, String orderDir, String filterString) {
         Page<Session> currentPage = sessionService.pageSessions(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
@@ -81,6 +82,7 @@ public final class SessionController extends BaseController {
         return redirect(routes.SessionProgrammingSubmissionController.viewSubmissions(sessionId));
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createSession() {
         Form<SessionUpsertForm> form = Form.form(SessionUpsertForm.class);
@@ -88,6 +90,7 @@ public final class SessionController extends BaseController {
         return showCreateSession(form);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateSession() {
         Form<SessionUpsertForm> form = Form.form(SessionUpsertForm.class).bindFromRequest();
@@ -102,6 +105,7 @@ public final class SessionController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateSessionGeneral(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
@@ -118,6 +122,7 @@ public final class SessionController extends BaseController {
         return showUpdateSessionGeneral(form, session);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postUpdateSessionGeneral(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);

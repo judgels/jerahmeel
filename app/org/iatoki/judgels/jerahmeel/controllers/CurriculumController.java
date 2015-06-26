@@ -25,7 +25,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
 public final class CurriculumController extends BaseController {
@@ -38,10 +37,12 @@ public final class CurriculumController extends BaseController {
         this.curriculumService = curriculumService;
     }
 
+    @Transactional(readOnly = true)
     public Result viewCurriculums() {
         return listCurriculums(0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listCurriculums(long page, String orderBy, String orderDir, String filterString) {
         Page<Curriculum> currentPage = curriculumService.pageCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
@@ -60,6 +61,7 @@ public final class CurriculumController extends BaseController {
         return redirect(routes.CurriculumCourseController.viewCourses(curriculumId));
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createCurriculum() {
         Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class);
@@ -67,6 +69,7 @@ public final class CurriculumController extends BaseController {
         return showCreateCurriculum(form);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateCurriculum() {
         Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class).bindFromRequest();
@@ -81,6 +84,7 @@ public final class CurriculumController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -93,6 +97,7 @@ public final class CurriculumController extends BaseController {
         return showUpdateCurriculumGeneral(form, curriculum);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postUpdateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
@@ -130,4 +135,5 @@ public final class CurriculumController extends BaseController {
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Update");
         return ControllerUtils.getInstance().lazyOk(content);
-    }}
+    }
+}

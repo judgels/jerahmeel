@@ -16,7 +16,6 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 public final class TrainingCurriculumController extends BaseController {
     private static final long PAGE_SIZE = 20;
@@ -27,10 +26,12 @@ public final class TrainingCurriculumController extends BaseController {
         this.curriculumService = curriculumService;
     }
 
+    @Transactional(readOnly = true)
     public Result viewCurriculums() {
         return listCurriculums(0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     public Result listCurriculums(long page, String orderBy, String orderDir, String filterString) {
         Page<Curriculum> currentPage = curriculumService.pageCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
 

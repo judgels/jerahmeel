@@ -48,7 +48,6 @@ import play.mvc.Result;
 import java.io.IOException;
 import java.util.Map;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 public final class TrainingBundleSubmissionController extends BaseController {
 
@@ -78,6 +77,7 @@ public final class TrainingBundleSubmissionController extends BaseController {
         this.bundleSubmissionRemoteFileProvider = bundleSubmissionRemoteFileProvider;
     }
 
+    @Transactional
     public Result postSubmitProblem(long curriculumId, long curriculumCourseId, long courseSessionId, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseSessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -98,10 +98,12 @@ public final class TrainingBundleSubmissionController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     public Result viewSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         return listSubmissions(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "desc", null);
     }
 
+    @Transactional(readOnly = true)
     public Result listSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -140,6 +142,7 @@ public final class TrainingBundleSubmissionController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long bundleSubmissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException, BundleSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);

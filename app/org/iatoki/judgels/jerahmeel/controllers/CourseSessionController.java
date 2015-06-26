@@ -27,7 +27,6 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class CourseSessionController extends BaseController {
@@ -44,11 +43,13 @@ public final class CourseSessionController extends BaseController {
         this.sessionService = sessionService;
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewSessions(long courseId) throws CourseNotFoundException {
         return listCreateSessions(courseId, 0, "id", "asc", "");
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result listCreateSessions(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
@@ -59,6 +60,7 @@ public final class CourseSessionController extends BaseController {
         return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postCreateSession(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
@@ -95,6 +97,7 @@ public final class CourseSessionController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
@@ -112,6 +115,7 @@ public final class CourseSessionController extends BaseController {
         }
     }
 
+    @Transactional
     @RequireCSRFCheck
     public Result postUpdateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
@@ -137,6 +141,7 @@ public final class CourseSessionController extends BaseController {
         }
     }
 
+    @Transactional
     public Result deleteSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
         Course course = courseService.findCourseByCourseId(courseId);
         CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);

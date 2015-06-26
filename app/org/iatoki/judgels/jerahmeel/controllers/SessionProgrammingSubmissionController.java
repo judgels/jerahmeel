@@ -40,7 +40,6 @@ import play.mvc.Result;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class SessionProgrammingSubmissionController extends BaseController {
@@ -63,6 +62,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         this.userItemService = userItemService;
     }
 
+    @Transactional
     public Result postSubmitProblem(long sessionId, String problemJid) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), problemJid);
@@ -87,11 +87,13 @@ public final class SessionProgrammingSubmissionController extends BaseController
 
         return redirect(routes.SessionProgrammingSubmissionController.viewSubmissions(sessionId));
     }
-    
+
+    @Transactional(readOnly = true)
     public Result viewSubmissions(long sessionId) throws SessionNotFoundException {
         return listSubmissions(sessionId, 0, "id", "desc", null, null);
     }
 
+    @Transactional(readOnly = true)
     public Result listSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -124,6 +126,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Transactional(readOnly = true)
     public Result viewSubmission(long sessionId, long submissionId) throws SessionNotFoundException, SubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         Submission submission = submissionService.findSubmissionById(submissionId);
@@ -156,6 +159,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Transactional
     public Result regradeSubmission(long sessionId, long submissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, SubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -166,6 +170,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
+    @Transactional
     public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, SubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 

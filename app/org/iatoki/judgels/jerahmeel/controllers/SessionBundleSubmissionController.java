@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
 public final class SessionBundleSubmissionController extends BaseController {
@@ -64,6 +63,7 @@ public final class SessionBundleSubmissionController extends BaseController {
         this.userItemService = userItemService;
     }
 
+    @Transactional
     public Result postSubmitProblem(long sessionId, String problemJid) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), problemJid);
@@ -77,10 +77,12 @@ public final class SessionBundleSubmissionController extends BaseController {
         return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
     }
 
+    @Transactional(readOnly = true)
     public Result viewSubmissions(long sessionId) throws SessionNotFoundException {
         return listSubmissions(sessionId, 0, "id", "desc", null, null);
     }
 
+    @Transactional(readOnly = true)
     public Result listSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -112,6 +114,7 @@ public final class SessionBundleSubmissionController extends BaseController {
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Transactional(readOnly = true)
     public Result viewSubmission(long sessionId, long bundleSubmissionId) throws SessionNotFoundException, BundleSubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
         BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
@@ -144,6 +147,7 @@ public final class SessionBundleSubmissionController extends BaseController {
         }
     }
 
+    @Transactional
     public Result regradeSubmission(long sessionId, long bundleSubmissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, BundleSubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 
@@ -158,6 +162,7 @@ public final class SessionBundleSubmissionController extends BaseController {
         }
     }
 
+    @Transactional
     public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, BundleSubmissionNotFoundException {
         Session session = sessionService.findSessionBySessionId(sessionId);
 

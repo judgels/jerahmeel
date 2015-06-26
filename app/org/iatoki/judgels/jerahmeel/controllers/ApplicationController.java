@@ -19,7 +19,6 @@ import play.mvc.Result;
 
 import java.io.IOException;
 
-@Transactional
 public final class ApplicationController extends BaseController {
 
     private final Jophiel jophiel;
@@ -53,6 +52,7 @@ public final class ApplicationController extends BaseController {
         }
     }
 
+    @Transactional
     public Result authRole(String returnUri) {
         if ((session().containsKey("username")) && (session().containsKey("role"))) {
             return redirect(returnUri);
@@ -99,6 +99,7 @@ public final class ApplicationController extends BaseController {
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Transactional
     public Result postViewAs() {
         Form<ViewpointForm> form = Form.form(ViewpointForm.class).bindFromRequest();
 
