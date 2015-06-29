@@ -27,6 +27,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.bundle.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
+import org.iatoki.judgels.sandalphon.BundleDetailResult;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
@@ -124,7 +125,7 @@ public final class SessionBundleSubmissionController extends BaseController {
             String sessionProblemAlias = sessionProblem.getAlias();
             String sessionProblemName = JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid());
 
-            LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, Double>>() {}.getType()), answer, JidCacheService.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
+            LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() {}.getType()), answer, JidCacheService.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
             content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
                         new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
                         new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId()))
