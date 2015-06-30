@@ -38,9 +38,14 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.net.URI;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
+@Singleton
+@Named
 public final class TrainingLessonController extends BaseController {
     private static final long PAGE_SIZE = 20;
 
@@ -54,6 +59,7 @@ public final class TrainingLessonController extends BaseController {
     private final SessionLessonService sessionLessonService;
     private final UserItemService userItemService;
 
+    @Inject
     public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, SessionLessonService sessionLessonService, UserItemService userItemService) {
         this.sandalphon = sandalphon;
         this.curriculumService = curriculumService;

@@ -6,6 +6,7 @@ import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.models.daos.BaseAvatarCacheDao;
 
 public final class AvatarCacheService extends AbstractAvatarCacheService<AvatarCacheModel> {
+
     private static AvatarCacheService INSTANCE;
 
     private AvatarCacheService(Jophiel jophiel, BaseAvatarCacheDao<AvatarCacheModel> avatarCacheDao) {

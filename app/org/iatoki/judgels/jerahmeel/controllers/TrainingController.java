@@ -6,7 +6,12 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import play.mvc.Result;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Authenticated(value = {LoggedIn.class, HasRole.class})
+@Singleton
+@Named
 public final class TrainingController extends BaseController {
 
     public TrainingController() {

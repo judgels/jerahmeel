@@ -6,11 +6,15 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel_;
 import play.db.jpa.JPA;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
+@Singleton
+@Named("sessionProblemDao")
 public final class SessionProblemHibernateDao extends AbstractHibernateDao<Long, SessionProblemModel> implements SessionProblemDao {
 
     public SessionProblemHibernateDao() {

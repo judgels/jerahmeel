@@ -6,11 +6,15 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel_;
 import play.db.jpa.JPA;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.List;
 
+@Singleton
+@Named("sessionDependencyDao")
 public final class SessionDependencyHibernateDao extends AbstractHibernateDao<Long, SessionDependencyModel> implements SessionDependencyDao {
 
     public SessionDependencyHibernateDao() {

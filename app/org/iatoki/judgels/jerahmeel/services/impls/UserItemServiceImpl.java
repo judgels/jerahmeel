@@ -7,13 +7,19 @@ import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Singleton
+@Named("userItemService")
 public final class UserItemServiceImpl implements UserItemService {
 
     private final UserItemDao userItemDao;
 
+    @Inject
     public UserItemServiceImpl(UserItemDao userItemDao) {
         this.userItemDao = userItemDao;
     }

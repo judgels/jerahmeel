@@ -6,10 +6,14 @@ import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel_;
 import play.db.jpa.JPA;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+@Singleton
+@Named("courseSessionDao")
 public final class CourseSessionHibernateDao extends AbstractHibernateDao<Long, CourseSessionModel> implements CourseSessionDao {
 
     public CourseSessionHibernateDao() {

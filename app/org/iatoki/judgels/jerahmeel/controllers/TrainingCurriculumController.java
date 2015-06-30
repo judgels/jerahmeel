@@ -16,12 +16,19 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Authenticated(value = {LoggedIn.class, HasRole.class})
+@Singleton
+@Named
 public final class TrainingCurriculumController extends BaseController {
     private static final long PAGE_SIZE = 20;
 
     private final CurriculumService curriculumService;
 
+    @Inject
     public TrainingCurriculumController(CurriculumService curriculumService) {
         this.curriculumService = curriculumService;
     }

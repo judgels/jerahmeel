@@ -25,14 +25,21 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
+@Singleton
+@Named
 public final class CurriculumController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
 
     private final CurriculumService curriculumService;
 
+    @Inject
     public CurriculumController(CurriculumService curriculumService) {
         this.curriculumService = curriculumService;
     }

@@ -22,10 +22,15 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Singleton
+@Named("curriculumCourseService")
 public final class CurriculumCourseServiceImpl implements CurriculumCourseService {
 
     private final CurriculumCourseDao curriculumCourseDao;
@@ -34,6 +39,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     private final SessionDependencyDao sessionDependencyDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public CurriculumCourseServiceImpl(CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, CourseSessionDao courseSessionDao, SessionDependencyDao sessionDependencyDao, UserItemDao userItemDao) {
         this.curriculumCourseDao = curriculumCourseDao;
         this.courseDao = courseDao;

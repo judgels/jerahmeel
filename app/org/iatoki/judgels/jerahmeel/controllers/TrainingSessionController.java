@@ -27,8 +27,15 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Authenticated(value = {LoggedIn.class, HasRole.class})
+@Singleton
+@Named
 public final class TrainingSessionController extends BaseController {
+
     private static final long PAGE_SIZE = 20;
 
     private final CurriculumService curriculumService;
@@ -37,6 +44,7 @@ public final class TrainingSessionController extends BaseController {
     private final CourseSessionService courseSessionService;
     private final UserItemService userItemService;
 
+    @Inject
     public TrainingSessionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, UserItemService userItemService) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;

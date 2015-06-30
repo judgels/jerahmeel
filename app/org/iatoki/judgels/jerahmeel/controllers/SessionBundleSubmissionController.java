@@ -38,12 +38,17 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
+@Singleton
+@Named
 public final class SessionBundleSubmissionController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
@@ -51,16 +56,17 @@ public final class SessionBundleSubmissionController extends BaseController {
     private final SessionService sessionService;
     private final BundleSubmissionService bundleSubmissionService;
     private final SessionProblemService sessionProblemService;
-    private final FileSystemProvider bundleSubmissionLocalFileProvider;
-    private final FileSystemProvider bundleSubmissionRemoteFileProvider;
+    private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
+    private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
     private final UserItemService userItemService;
 
-    public SessionBundleSubmissionController(SessionService sessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileProvider, FileSystemProvider bundleSubmissionRemoteFileProvider, UserItemService userItemService) {
+    @Inject
+    public SessionBundleSubmissionController(SessionService sessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileSystemProvider, FileSystemProvider bundleSubmissionRemoteFileSystemProvider, UserItemService userItemService) {
         this.sessionService = sessionService;
         this.bundleSubmissionService = bundleSubmissionService;
         this.sessionProblemService = sessionProblemService;
-        this.bundleSubmissionLocalFileProvider = bundleSubmissionLocalFileProvider;
-        this.bundleSubmissionRemoteFileProvider = bundleSubmissionRemoteFileProvider;
+        this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
+        this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
         this.userItemService = userItemService;
     }
 
@@ -73,7 +79,7 @@ public final class SessionBundleSubmissionController extends BaseController {
 
         BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dynamicForm, SessionControllerUtils.getCurrentStatementLanguage());
         String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), session.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileProvider, bundleSubmissionRemoteFileProvider, submissionJid, answer);
+        bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, answer);
 
         return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
     }
@@ -120,7 +126,7 @@ public final class SessionBundleSubmissionController extends BaseController {
         Session session = sessionService.findSessionBySessionId(sessionId);
         BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
         try {
-            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileProvider, bundleSubmissionRemoteFileProvider, bundleSubmission.getJid());
+            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
             SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
             String sessionProblemAlias = sessionProblem.getAlias();
             String sessionProblemName = JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid());
@@ -154,7 +160,7 @@ public final class SessionBundleSubmissionController extends BaseController {
 
         BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
         try {
-            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileProvider, bundleSubmissionRemoteFileProvider, bundleSubmission.getJid());
+            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
             bundleSubmissionService.regrade(bundleSubmission.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
             return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
@@ -181,7 +187,7 @@ public final class SessionBundleSubmissionController extends BaseController {
 
         for (BundleSubmission bundleSubmission : bundleSubmissions) {
             try {
-                BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileProvider, bundleSubmissionRemoteFileProvider, bundleSubmission.getJid());
+                BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
                 bundleSubmissionService.regrade(bundleSubmission.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
             } catch (IOException e) {
                 throw new RuntimeException(e);

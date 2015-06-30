@@ -11,12 +11,18 @@ import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionModel;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
+@Named("sessionService")
 public final class SessionServiceImpl implements SessionService {
 
     private final SessionDao sessionDao;
 
+    @Inject
     public SessionServiceImpl(SessionDao sessionDao) {
         this.sessionDao = sessionDao;
     }

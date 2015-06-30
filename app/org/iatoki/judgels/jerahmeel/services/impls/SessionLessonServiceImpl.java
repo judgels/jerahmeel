@@ -15,14 +15,20 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionLessonModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionLessonModel_;
 import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Singleton
+@Named("sessionLessonService")
 public final class SessionLessonServiceImpl implements SessionLessonService {
 
     private final SessionLessonDao sessionLessonDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public SessionLessonServiceImpl(SessionLessonDao sessionLessonDao, UserItemDao userItemDao) {
         this.sessionLessonDao = sessionLessonDao;
         this.userItemDao = userItemDao;

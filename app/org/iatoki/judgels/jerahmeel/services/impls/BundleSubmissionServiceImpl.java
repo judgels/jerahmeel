@@ -14,8 +14,13 @@ import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
+@Named("bundleSubmissionService")
 public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionServiceImpl<BundleSubmissionModel, BundleGradingModel> {
 
     private final BundleSubmissionDao submissionDao;
@@ -23,6 +28,7 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public BundleSubmissionServiceImpl(BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, BundleProblemGrader bundleProblemGrader, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         super(submissionDao, gradingDao, bundleProblemGrader);
         this.submissionDao = submissionDao;

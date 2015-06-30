@@ -14,8 +14,13 @@ import org.iatoki.judgels.sandalphon.services.impls.AbstractSubmissionServiceImp
 import org.iatoki.judgels.sandalphon.Submission;
 import org.iatoki.judgels.sealtiel.Sealtiel;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
+@Named("submissionService")
 public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<SubmissionModel, GradingModel> {
 
     private final SubmissionDao submissionDao;
@@ -23,6 +28,7 @@ public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<S
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public SubmissionServiceImpl(SubmissionDao submissionDao, GradingDao gradingDao, Sealtiel sealtiel, String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         super(submissionDao, gradingDao, sealtiel, gabrielClientJid);
         this.submissionDao = submissionDao;

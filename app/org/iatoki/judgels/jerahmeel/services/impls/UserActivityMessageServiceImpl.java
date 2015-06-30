@@ -1,8 +1,8 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
 import org.iatoki.judgels.jophiel.UserActivityMessage;
 import org.iatoki.judgels.jophiel.services.UserActivityMessageService;
+import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
 
 import java.util.List;
 

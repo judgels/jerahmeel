@@ -11,12 +11,18 @@ import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseModel;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
+@Named("courseService")
 public final class CourseServiceImpl implements CourseService {
 
     private final CourseDao courseDao;
 
+    @Inject
     public CourseServiceImpl(CourseDao courseDao) {
         this.courseDao = courseDao;
     }

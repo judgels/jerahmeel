@@ -19,15 +19,21 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Singleton
+@Named("sessionProblemService")
 public final class SessionProblemServiceImpl implements SessionProblemService {
 
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public SessionProblemServiceImpl(SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         this.sessionProblemDao = sessionProblemDao;
         this.userItemDao = userItemDao;

@@ -14,16 +14,22 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Singleton
+@Named("sessionDependencyService")
 public final class SessionDependencyServiceImpl implements SessionDependencyService {
 
     private final SessionDao sessionDao;
     private final SessionDependencyDao sessionDependencyDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public SessionDependencyServiceImpl(SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, UserItemDao userItemDao) {
         this.sessionDao = sessionDao;
         this.sessionDependencyDao = sessionDependencyDao;

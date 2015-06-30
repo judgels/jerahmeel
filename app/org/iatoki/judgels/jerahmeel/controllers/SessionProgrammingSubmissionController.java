@@ -37,11 +37,16 @@ import play.i18n.Messages;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
+@Singleton
+@Named
 public final class SessionProgrammingSubmissionController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
@@ -49,16 +54,17 @@ public final class SessionProgrammingSubmissionController extends BaseController
     private final SessionService sessionService;
     private final SubmissionService submissionService;
     private final SessionProblemService sessionProblemService;
-    private final FileSystemProvider submissionLocalFileProvider;
-    private final FileSystemProvider submissionRemoteFileProvider;
+    private final FileSystemProvider submissionLocalFileSystemProvider;
+    private final FileSystemProvider submissionRemoteFileSystemProvider;
     private final UserItemService userItemService;
 
-    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileProvider, FileSystemProvider submissionRemoteFileProvider, UserItemService userItemService) {
+    @Inject
+    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileSystemProvider, FileSystemProvider submissionRemoteFileSystemProvider, UserItemService userItemService) {
         this.sessionService = sessionService;
         this.submissionService = submissionService;
         this.sessionProblemService = sessionProblemService;
-        this.submissionLocalFileProvider = submissionLocalFileProvider;
-        this.submissionRemoteFileProvider = submissionRemoteFileProvider;
+        this.submissionLocalFileSystemProvider = submissionLocalFileSystemProvider;
+        this.submissionRemoteFileSystemProvider = submissionRemoteFileSystemProvider;
         this.userItemService = userItemService;
     }
 
@@ -75,7 +81,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         try {
             GradingSource source = SubmissionAdapters.fromGradingEngine(gradingEngine).createGradingSourceFromNewSubmission(body);
             String submissionJid = submissionService.submit(problemJid, session.getJid(), gradingEngine, gradingLanguage, null, source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-            SubmissionAdapters.fromGradingEngine(gradingEngine).storeSubmissionFiles(submissionLocalFileProvider, submissionRemoteFileProvider, submissionJid, source);
+            SubmissionAdapters.fromGradingEngine(gradingEngine).storeSubmissionFiles(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submissionJid, source);
 
             ControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + session.getName() + ".");
 
@@ -131,7 +137,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         Session session = sessionService.findSessionBySessionId(sessionId);
         Submission submission = submissionService.findSubmissionById(submissionId);
 
-        GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileProvider, submissionRemoteFileProvider, submission.getJid());
+        GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
         String authorName = JidCacheService.getInstance().getDisplayName(submission.getAuthorJid());
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), submission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
@@ -164,7 +170,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         Session session = sessionService.findSessionBySessionId(sessionId);
 
         Submission submission = submissionService.findSubmissionById(submissionId);
-        GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileProvider, submissionRemoteFileProvider, submission.getJid());
+        GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
         submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
@@ -187,7 +193,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
         }
 
         for (Submission submission : submissions) {
-            GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileProvider, submissionRemoteFileProvider, submission.getJid());
+            GradingSource source = SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
             submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 

@@ -10,12 +10,18 @@ import org.iatoki.judgels.jerahmeel.models.daos.CurriculumDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumModel;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import java.util.List;
 
+@Singleton
+@Named("curriculumService")
 public final class CurriculumServiceImpl implements CurriculumService {
 
     private final CurriculumDao curriculumDao;
 
+    @Inject
     public CurriculumServiceImpl(CurriculumDao curriculumDao) {
         this.curriculumDao = curriculumDao;
     }

@@ -27,8 +27,14 @@ import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = {"admin"})
+@Singleton
+@Named
 public final class CourseSessionController extends BaseController {
 
     private static final long PAGE_SIZE = 20;
@@ -37,6 +43,7 @@ public final class CourseSessionController extends BaseController {
     private final CourseSessionService courseSessionService;
     private final SessionService sessionService;
 
+    @Inject
     public CourseSessionController(CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService) {
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;

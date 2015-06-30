@@ -6,10 +6,14 @@ import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel_;
 import play.db.jpa.JPA;
 
+import javax.inject.Named;
+import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
+@Singleton
+@Named("curriculumCourseDao")
 public final class CurriculumCourseHibernateDao extends AbstractHibernateDao<Long, CurriculumCourseModel> implements CurriculumCourseDao {
 
     public CurriculumCourseHibernateDao() {
