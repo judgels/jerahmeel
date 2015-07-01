@@ -1,10 +1,10 @@
 training.training=Training
 training.curriculums=Curriculums
 training.courses=Courses
-training.sessions=Sessions
+training.sessions=Chapters
 training.submissions.bundle=Non Programming Submissions
 training.submissions.programming=Programming Submissions
-training.session.isLocked=Session is still Locked
+training.session.isLocked=Chapter is still Locked
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums
@@ -23,7 +23,7 @@ course.course=Course
 course.courses=Courses
 course.name=Name
 course.description=Description
-course.sessions=Sessions
+course.sessions=Chapters
 course.jid=Course Jid
 course.alias=Alias
 course.completeable=Completeable?
@@ -32,24 +32,24 @@ course.list=Courses
 course.create=Create Course
 course.update=Update Course
 
-error.course.sessionExist=Session already Existed
+error.course.sessionExist=Chapter already Existed
 error.course.invalidJid=Invalid Course
 error.course.session.duplicateAlias=Alias already Existed
 
-session.session=Session
-session.sessions=Sessions
+session.session=Chapter
+session.sessions=Chapters
 session.name=Name
 session.description=Description
 session.dependencies=Dependencies
-session.jid=Session Jid
+session.jid=Chapter Jid
 session.alias=Alias
 session.completeable=Completeable?
 
-session.list=Sessions
-session.create=Create Session
-session.update=Update Session
+session.list=Chapters
+session.create=Create Chapter
+session.update=Update Chapter
 
-error.session.invalidJid=Invalid Session
+error.session.invalidJid=Invalid Chapter
 
 session.lesson=Lesson
 session.lessons=Lessons
