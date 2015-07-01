@@ -76,6 +76,7 @@ session.problem.secret=Problem Secret
 session.problem.create=Create
 
 error.session.problemExist=Problem Already Existed.
+error.session.problem.duplicateAlias=Alias already Existed
 error.problem.invalidJid=Invalid Problem Jid.
 
 session.submissions=Submissions

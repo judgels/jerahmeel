@@ -96,6 +96,15 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
+    public void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status) {
+        SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
+        sessionProblemModel.alias = alias;
+        sessionProblemModel.status = status.name();
+
+        sessionProblemDao.edit(sessionProblemModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+    }
+
+    @Override
     public void removeSessionProblem(long sessionProblemId) throws SessionProblemNotFoundException {
         SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
         if (sessionProblemModel != null) {

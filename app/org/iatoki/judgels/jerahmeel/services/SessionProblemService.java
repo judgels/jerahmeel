@@ -21,6 +21,8 @@ public interface SessionProblemService {
 
     void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status);
 
+    void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status);
+
     void removeSessionProblem(long sessionProblemId) throws SessionProblemNotFoundException;
 
     Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid);

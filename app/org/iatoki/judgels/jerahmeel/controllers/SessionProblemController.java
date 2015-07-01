@@ -7,6 +7,7 @@ import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
+import org.iatoki.judgels.jerahmeel.controllers.forms.SessionProblemUpdateForm;
 import org.iatoki.judgels.jerahmeel.services.JidCacheService;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
@@ -22,6 +23,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.createProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.updateSessionProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.sandalphon.Sandalphon;
@@ -182,6 +184,52 @@ public final class SessionProblemController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
+    @AddCSRFToken
+    public Result updateProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
+
+        if (session.getJid().equals(sessionProblem.getSessionJid())) {
+            SessionProblemUpdateForm sessionProblemUpdateForm = new SessionProblemUpdateForm();
+            sessionProblemUpdateForm.alias = sessionProblem.getAlias();
+            sessionProblemUpdateForm.status = sessionProblem.getStatus().name();
+
+            Form<SessionProblemUpdateForm> form = Form.form(SessionProblemUpdateForm.class).fill(sessionProblemUpdateForm);
+
+            return showUpdateProblem(session, sessionProblem, form);
+        } else {
+            return notFound();
+        }
+    }
+
+    @Transactional
+    @RequireCSRFCheck
+    public Result postUpdateProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionProblemId(sessionProblemId);
+
+        if (session.getJid().equals(sessionProblem.getSessionJid())) {
+            Form<SessionProblemUpdateForm> form = Form.form(SessionProblemUpdateForm.class).bindFromRequest();
+            if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
+                SessionProblemUpdateForm sessionProblemUpdateForm = form.get();
+                if ((sessionProblemUpdateForm.alias.equals(sessionProblem.getAlias())) || (!sessionProblemService.isInSessionByAlias(session.getJid(), sessionProblemUpdateForm.alias))) {
+                    sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemUpdateForm.alias, SessionProblemStatus.valueOf(sessionProblemUpdateForm.status));
+
+                    return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
+                } else {
+                    form.reject(Messages.get("error.session.problem.duplicateAlias"));
+
+                    return showUpdateProblem(session, sessionProblem, form);
+                }
+            } else {
+                return showUpdateProblem(session, sessionProblem, form);
+            }
+        } else {
+            return notFound();
+        }
+    }
+
     private Result showListSessionProblems(Session session, Page<SessionProblem> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listSessionProblemsView.render(session.getId(), currentPage, orderBy, orderDir, filterString));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.problems"), new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.createProblem(session.getId())), c));
@@ -212,4 +260,18 @@ public final class SessionProblemController extends BaseController {
         return ControllerUtils.getInstance().lazyOk(content);
     }
 
+    private Result showUpdateProblem(Session session, SessionProblem sessionProblem, Form<SessionProblemUpdateForm> form) {
+        LazyHtml content = new LazyHtml(updateSessionProblemView.render(form, session.getId(), sessionProblem));
+        SessionControllerUtils.appendUpdateLayout(content, session);
+        ControllerUtils.getInstance().appendSidebarLayout(content);
+        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
+                new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
+                new InternalLink(Messages.get("session.problems"), routes.SessionController.jumpToProblems(session.getId())),
+                new InternalLink(Messages.get("commons.view"), routes.SessionProblemController.viewSessionProblems(session.getId())),
+                new InternalLink(Messages.get("commons.update"), routes.SessionProblemController.updateProblem(session.getId(), sessionProblem.getId()))
+        ));
+        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Problems - Update");
+
+        return ControllerUtils.getInstance().lazyOk(content);
+    }
 }
