@@ -7,6 +7,7 @@ import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
+import org.iatoki.judgels.jerahmeel.controllers.forms.SessionLessonUpdateForm;
 import org.iatoki.judgels.jerahmeel.services.JidCacheService;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
@@ -21,6 +22,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.createLessonView;
+import org.iatoki.judgels.jerahmeel.views.html.session.lesson.updateSessionLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
 import org.iatoki.judgels.sandalphon.Sandalphon;
@@ -174,6 +176,52 @@ public final class SessionLessonController extends BaseController {
         }
     }
 
+    @Transactional(readOnly = true)
+    @AddCSRFToken
+    public Result updateLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+
+        if (session.getJid().equals(sessionLesson.getSessionJid())) {
+            SessionLessonUpdateForm sessionLessonUpdateForm = new SessionLessonUpdateForm();
+            sessionLessonUpdateForm.alias = sessionLesson.getAlias();
+            sessionLessonUpdateForm.status = sessionLesson.getStatus().name();
+
+            Form<SessionLessonUpdateForm> form = Form.form(SessionLessonUpdateForm.class).fill(sessionLessonUpdateForm);
+
+            return showUpdateLesson(session, sessionLesson, form);
+        } else {
+            return notFound();
+        }
+    }
+
+    @Transactional
+    @RequireCSRFCheck
+    public Result postUpdateLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
+        Session session = sessionService.findSessionBySessionId(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+
+        if (session.getJid().equals(sessionLesson.getSessionJid())) {
+            Form<SessionLessonUpdateForm> form = Form.form(SessionLessonUpdateForm.class).bindFromRequest();
+            if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
+                SessionLessonUpdateForm sessionLessonUpdateForm = form.get();
+                if ((sessionLessonUpdateForm.alias.equals(sessionLesson.getAlias())) || (!sessionLessonService.isInSessionByAlias(session.getJid(), sessionLessonUpdateForm.alias))) {
+                    sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonUpdateForm.alias, SessionLessonStatus.valueOf(sessionLessonUpdateForm.status));
+
+                    return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
+                } else {
+                    form.reject(Messages.get("error.session.lesson.duplicateAlias"));
+
+                    return showUpdateLesson(session, sessionLesson, form);
+                }
+            } else {
+                return showUpdateLesson(session, sessionLesson, form);
+            }
+        } else {
+            return notFound();
+        }
+    }
+
 
     private Result showListSessionLessons(Session session, Page<SessionLesson> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listSessionLessonsView.render(session.getId(), currentPage, orderBy, orderDir, filterString));
@@ -201,6 +249,21 @@ public final class SessionLessonController extends BaseController {
               new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.createLesson(session.getId()))
         ));
         ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Create");
+
+        return ControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private Result showUpdateLesson(Session session, SessionLesson sessionLesson, Form<SessionLessonUpdateForm> form) {
+        LazyHtml content = new LazyHtml(updateSessionLessonView.render(form, session.getId(), sessionLesson));
+        SessionControllerUtils.appendUpdateLayout(content, session);
+        ControllerUtils.getInstance().appendSidebarLayout(content);
+        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
+                new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
+                new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
+                new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId())),
+                new InternalLink(Messages.get("commons.update"), routes.SessionLessonController.updateLesson(session.getId(), sessionLesson.getId()))
+        ));
+        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Update");
 
         return ControllerUtils.getInstance().lazyOk(content);
     }

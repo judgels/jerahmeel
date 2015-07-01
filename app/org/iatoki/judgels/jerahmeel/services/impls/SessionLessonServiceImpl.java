@@ -83,6 +83,15 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
+    public void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status) {
+        SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
+        sessionLessonModel.alias = alias;
+        sessionLessonModel.status = status.name();
+
+        sessionLessonDao.edit(sessionLessonModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+    }
+
+    @Override
     public void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
         if (sessionLessonModel != null) {

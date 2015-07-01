@@ -5,6 +5,7 @@ import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
+import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 
 public interface SessionLessonService {
 
@@ -17,6 +18,8 @@ public interface SessionLessonService {
     Page<SessionLessonProgress> findSessionLessons(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status);
+
+    void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status);
 
     void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException;
 

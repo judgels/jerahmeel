@@ -62,6 +62,7 @@ session.lesson.secret=Lesson Secret
 session.lesson.create=Create
 
 error.session.lessonExist=Lesson Already Existed.
+error.session.lesson.duplicateAlias=Alias already Existed
 error.lesson.invalidJid=Invalid Lesson Jid.
 
 session.problem=Problem
