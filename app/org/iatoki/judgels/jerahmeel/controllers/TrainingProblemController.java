@@ -71,7 +71,7 @@ public final class TrainingProblemController extends BaseController {
 
     @Transactional
     public Result viewProblems(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        return listProblems(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "asc", "");
+        return listProblems(curriculumId, curriculumCourseId, courseSessionId, 0, "alias", "asc", "");
     }
 
     @Transactional

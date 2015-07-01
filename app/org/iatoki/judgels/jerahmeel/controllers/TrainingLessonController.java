@@ -68,7 +68,7 @@ public final class TrainingLessonController extends BaseController {
 
     @Transactional
     public Result viewLessons(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        return listLessons(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "asc", "");
+        return listLessons(curriculumId, curriculumCourseId, courseSessionId, 0, "alias", "asc", "");
     }
 
     @Transactional

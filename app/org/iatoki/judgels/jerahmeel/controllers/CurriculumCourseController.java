@@ -46,7 +46,7 @@ public final class CurriculumCourseController extends BaseController {
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
-        return listCreateCourses(curriculumId, 0, "id", "asc", "");
+        return listCreateCourses(curriculumId, 0, "alias", "asc", "");
     }
 
     @Transactional(readOnly = true)

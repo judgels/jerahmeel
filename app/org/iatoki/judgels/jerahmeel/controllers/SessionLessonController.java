@@ -53,7 +53,7 @@ public final class SessionLessonController extends BaseController {
 
     @Transactional(readOnly = true)
     public Result viewSessionLessons(long sessionId) throws SessionNotFoundException {
-        return listSessionLessons(sessionId, 0, "id", "asc", "");
+        return listSessionLessons(sessionId, 0, "alias", "asc", "");
     }
 
     @Transactional(readOnly = true)

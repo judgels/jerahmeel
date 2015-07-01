@@ -55,7 +55,7 @@ public final class SessionProblemController extends BaseController {
 
     @Transactional(readOnly = true)
     public Result viewSessionProblems(long sessionId) throws SessionNotFoundException {
-        return listSessionProblems(sessionId, 0, "id", "asc", "");
+        return listSessionProblems(sessionId, 0, "alias", "asc", "");
     }
 
     @Transactional(readOnly = true)
