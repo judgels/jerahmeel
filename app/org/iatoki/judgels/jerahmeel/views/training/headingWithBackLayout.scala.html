@@ -1,0 +1,8 @@
+@(heading: String, backAction: org.iatoki.judgels.commons.InternalLink)(content: Html)
+
+<h2>
+    @heading
+    <a class="btn btn-danger btn-sm" href="@backAction.getTarget"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> @backAction.getLabel</a>
+</h2>
+
+@content

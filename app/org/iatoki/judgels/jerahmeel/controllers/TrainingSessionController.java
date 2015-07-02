@@ -71,7 +71,7 @@ public final class TrainingSessionController extends BaseController {
 
     private Result showListSessions(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, Page<CourseSessionProgress> currentPage, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), currentPage, orderBy, orderDir, filterString));
-        CourseControllerUtils.appendViewLayout(content, curriculumCourse, course);
+        CourseControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course);
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
               new InternalLink(Messages.get("training.curriculums"), routes.TrainingController.jumpToCurriculums()),

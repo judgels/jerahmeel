@@ -6,7 +6,8 @@ import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.views.html.layouts.accessTypesLayout;
 import org.iatoki.judgels.commons.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.commons.views.html.layouts.headingLayout;
-import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
+import org.iatoki.judgels.jerahmeel.views.html.training.headingWithBackLayout;
+import org.iatoki.judgels.jerahmeel.views.html.training.headingWithActionAndBackLayout;
 import org.iatoki.judgels.commons.views.html.layouts.tabLayout;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.Curriculum;
@@ -31,11 +32,24 @@ public final class SessionControllerUtils {
         );
         content.appendLayout(c -> descriptionLayout.render(session.getDescription(), c));
         if (JerahmeelUtils.hasRole("admin")) {
-            content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(), new InternalLink(Messages.get("commons.update"), routes.SessionController.updateSessionGeneral(session.getId())), c));
+            content.appendLayout(c -> headingWithActionAndBackLayout.render(
+                    Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(),
+                    new InternalLink(Messages.get("commons.update"), routes.SessionController.updateSessionGeneral(session.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getAlias(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
+                    c)
+            );
         } else if (courseSession.isCompleteable()){
-            content.appendLayout(c -> headingLayout.render(Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(), c));
+            content.appendLayout(c -> headingWithBackLayout.render(
+                    Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getAlias(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
+                    c)
+            );
         } else {
-            content.appendLayout(c -> headingLayout.render(session.getName(), c));
+            content.appendLayout(c -> headingWithBackLayout.render(
+                    session.getName(),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getAlias(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
+                    c)
+            );
         }
     }
 

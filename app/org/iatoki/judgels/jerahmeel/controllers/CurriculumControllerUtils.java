@@ -5,7 +5,8 @@ import org.iatoki.judgels.commons.InternalLink;
 import org.iatoki.judgels.commons.LazyHtml;
 import org.iatoki.judgels.commons.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.commons.views.html.layouts.headingLayout;
-import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
+import org.iatoki.judgels.jerahmeel.views.html.training.headingWithBackLayout;
+import org.iatoki.judgels.jerahmeel.views.html.training.headingWithActionAndBackLayout;
 import org.iatoki.judgels.commons.views.html.layouts.tabLayout;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
@@ -20,9 +21,17 @@ public final class CurriculumControllerUtils {
     static void appendViewLayout(LazyHtml content, Curriculum curriculum) {
         content.appendLayout(c -> descriptionLayout.render(curriculum.getDescription(), c));
         if (JerahmeelUtils.hasRole("admin")) {
-            content.appendLayout(c -> headingWithActionLayout.render(Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(), new InternalLink(Messages.get("commons.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())), c));
+            content.appendLayout(c -> headingWithActionAndBackLayout.render(
+                    Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(),
+                    new InternalLink(Messages.get("commons.update"),routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())),
+                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
+                    c)
+            );
         } else {
-            content.appendLayout(c -> headingLayout.render(curriculum.getName(), c));
+            content.appendLayout(c -> headingWithBackLayout.render(curriculum.getName(),
+                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
+                    c)
+            );
         }
     }
 

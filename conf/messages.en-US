@@ -112,6 +112,9 @@ user.username=Username
 user.name=Name
 user.roles=Roles
 
+training.backToHome=Back to Home
+training.backTo=Back to
+
 training.course.completed=Completed
 training.course.inProgress=In Progress
 training.course.available=Available
