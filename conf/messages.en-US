@@ -112,6 +112,8 @@ user.username=Username
 user.name=Name
 user.roles=Roles
 
+training.welcome=Welcome to Training Gate!
+training.home=Training Home
 training.backToHome=Back to Home
 training.backTo=Back to
 

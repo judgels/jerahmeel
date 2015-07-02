@@ -36,12 +36,12 @@ public final class TrainingCurriculumController extends BaseController {
         Page<Curriculum> currentPage = curriculumService.pageCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
         LazyHtml content = new LazyHtml(listCurriculumsView.render(currentPage, orderBy, orderDir, filterString));
-        content.appendLayout(c -> headingLayout.render(Messages.get("curriculum.list"), c));
+        content.appendLayout(c -> headingLayout.render(Messages.get("training.home"), c));
         ControllerUtils.getInstance().appendSidebarLayout(content);
         ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("training.curriculums"), routes.TrainingController.jumpToCurriculums())
+              new InternalLink(Messages.get("training.home"), routes.TrainingController.jumpToCurriculums())
         ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
+        ControllerUtils.getInstance().appendTemplateLayout(content, "Home");
 
         return ControllerUtils.getInstance().lazyOk(content);
     }
