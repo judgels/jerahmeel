@@ -57,6 +57,8 @@ public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<S
         }
         userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
 
+        userItemDao.flush();
+
         completed = true;
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {

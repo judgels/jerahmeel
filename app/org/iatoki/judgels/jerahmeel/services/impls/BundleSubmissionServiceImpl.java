@@ -57,6 +57,8 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         }
         userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
 
+        userItemDao.flush();
+
         completed = true;
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
