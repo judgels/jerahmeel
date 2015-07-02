@@ -70,7 +70,7 @@ public final class CourseServiceImpl implements CourseService {
         courseModel.name = name;
         courseModel.description = description;
 
-        courseDao.persist(courseModel, "michael", IdentityUtils.getIpAddress());
+        courseDao.persist(courseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
     }
 
     @Override
@@ -80,7 +80,7 @@ public final class CourseServiceImpl implements CourseService {
             courseModel.name = name;
             courseModel.description = description;
 
-            courseDao.edit(courseModel, "michael", IdentityUtils.getIpAddress());
+            courseDao.edit(courseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         } else {
             throw new CourseNotFoundException("Course not found.");
         }

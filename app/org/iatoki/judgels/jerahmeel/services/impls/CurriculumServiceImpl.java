@@ -46,7 +46,7 @@ public final class CurriculumServiceImpl implements CurriculumService {
         curriculumModel.name = name;
         curriculumModel.description = description;
 
-        curriculumDao.persist(curriculumModel, "michael", IdentityUtils.getIpAddress());
+        curriculumDao.persist(curriculumModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
     }
 
     @Override
@@ -56,7 +56,7 @@ public final class CurriculumServiceImpl implements CurriculumService {
             curriculumModel.name = name;
             curriculumModel.description = description;
 
-            curriculumDao.edit(curriculumModel, "michael", IdentityUtils.getIpAddress());
+            curriculumDao.edit(curriculumModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         } else {
             throw new CurriculumNotFoundException("Curriculum not found.");
         }

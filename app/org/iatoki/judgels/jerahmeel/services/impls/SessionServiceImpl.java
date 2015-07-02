@@ -71,7 +71,7 @@ public final class SessionServiceImpl implements SessionService {
         sessionModel.name = name;
         sessionModel.description = description;
 
-        sessionDao.persist(sessionModel, "michael", IdentityUtils.getIpAddress());
+        sessionDao.persist(sessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
     }
 
     @Override
@@ -81,7 +81,7 @@ public final class SessionServiceImpl implements SessionService {
             sessionModel.name = name;
             sessionModel.description = description;
 
-            sessionDao.edit(sessionModel, "michael", IdentityUtils.getIpAddress());
+            sessionDao.edit(sessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         } else {
             throw new SessionNotFoundException("Session not found.");
         }
