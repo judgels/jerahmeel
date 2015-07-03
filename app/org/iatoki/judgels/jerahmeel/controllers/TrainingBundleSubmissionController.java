@@ -122,8 +122,8 @@ public final class TrainingBundleSubmissionController extends BaseController {
             LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), bundleSubmissions, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualProblemJid));
             content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
             content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+                    new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
+                    new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
                   ), c)
             );
             SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -162,8 +162,8 @@ public final class TrainingBundleSubmissionController extends BaseController {
 
                 LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() {}.getType()), answer, JidCacheService.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
                 content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
-                            new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                            new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
+                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
                       ), c)
                 );
                 SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);

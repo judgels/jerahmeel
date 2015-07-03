@@ -71,7 +71,7 @@ public final class SessionController extends BaseController {
     }
 
     public Result jumpToSubmissions(long sessionId) {
-        return redirect(routes.SessionController.jumpToBundleSubmissions(sessionId));
+        return redirect(routes.SessionController.jumpToProgrammingSubmissions(sessionId));
     }
 
     public Result jumpToBundleSubmissions(long sessionId) {

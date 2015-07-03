@@ -33,7 +33,7 @@ public final class TrainingController extends BaseController {
     }
 
     public Result jumpToSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingController.jumpToBundleSubmissions(curriculumId, curriculumCourseId, courseSessionId));
+        return redirect(routes.TrainingController.jumpToProgrammingSubmissions(curriculumId, curriculumCourseId, courseSessionId));
     }
 
     public Result jumpToBundleSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
