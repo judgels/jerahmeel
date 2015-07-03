@@ -1,14 +1,14 @@
-package org.iatoki.judgels.jerahmeel.services;
+package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.commons.AbstractJidCacheService;
+import org.iatoki.judgels.commons.services.impls.AbstractBaseJidCacheServiceImpl;
 import org.iatoki.judgels.commons.models.daos.interfaces.BaseJidCacheDao;
 import org.iatoki.judgels.jerahmeel.models.entities.JidCacheModel;
 
-public final class JidCacheService extends AbstractJidCacheService<JidCacheModel> {
+public final class JidCacheServiceImpl extends AbstractBaseJidCacheServiceImpl<JidCacheModel> {
 
-    private static JidCacheService INSTANCE;
+    private static JidCacheServiceImpl INSTANCE;
 
-    private JidCacheService(BaseJidCacheDao<JidCacheModel> jidCacheDao) {
+    private JidCacheServiceImpl(BaseJidCacheDao<JidCacheModel> jidCacheDao) {
         super(jidCacheDao);
     }
 
@@ -16,10 +16,10 @@ public final class JidCacheService extends AbstractJidCacheService<JidCacheModel
         if (INSTANCE != null) {
             throw new UnsupportedOperationException("JidCacheService instance has already been built");
         }
-        INSTANCE = new JidCacheService(jidCacheDao);
+        INSTANCE = new JidCacheServiceImpl(jidCacheDao);
     }
 
-    public static JidCacheService getInstance() {
+    public static JidCacheServiceImpl getInstance() {
         if (INSTANCE == null) {
             throw new UnsupportedOperationException("JidCacheService instance has not been built");
         }

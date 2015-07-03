@@ -8,7 +8,7 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.controllers.forms.SessionProblemUpdateForm;
-import org.iatoki.judgels.jerahmeel.services.JidCacheService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
@@ -160,7 +160,7 @@ public final class SessionProblemController extends BaseController {
             if (problemName != null) {
                 if (!sessionProblemService.isInSessionByAlias(session.getJid(), data.alias)) {
                     sessionProblemService.addSessionProblem(session.getJid(), data.problemJid, data.problemSecret, data.alias, SessionProblemType.valueOf(data.type), SessionProblemStatus.valueOf(data.status));
-                    JidCacheService.getInstance().putDisplayName(data.problemJid, problemName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+                    JidCacheServiceImpl.getInstance().putDisplayName(data.problemJid, problemName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
                     return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
                 } else {

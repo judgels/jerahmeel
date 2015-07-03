@@ -1,15 +1,15 @@
-package org.iatoki.judgels.jerahmeel.services;
+package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.jophiel.services.AbstractAvatarCacheService;
+import org.iatoki.judgels.jophiel.services.impls.AbstractBaseAvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.models.entities.AvatarCacheModel;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.models.daos.BaseAvatarCacheDao;
 
-public final class AvatarCacheService extends AbstractAvatarCacheService<AvatarCacheModel> {
+public final class AvatarCacheServiceImpl extends AbstractBaseAvatarCacheServiceImpl<AvatarCacheModel> {
 
-    private static AvatarCacheService INSTANCE;
+    private static AvatarCacheServiceImpl INSTANCE;
 
-    private AvatarCacheService(Jophiel jophiel, BaseAvatarCacheDao<AvatarCacheModel> avatarCacheDao) {
+    private AvatarCacheServiceImpl(Jophiel jophiel, BaseAvatarCacheDao<AvatarCacheModel> avatarCacheDao) {
         super(jophiel, avatarCacheDao);
     }
 
@@ -17,10 +17,10 @@ public final class AvatarCacheService extends AbstractAvatarCacheService<AvatarC
         if (INSTANCE != null) {
             throw new UnsupportedOperationException("AvatarCacheService instance has already been built");
         }
-        INSTANCE = new AvatarCacheService(jophiel, avatarCacheDao);
+        INSTANCE = new AvatarCacheServiceImpl(jophiel, avatarCacheDao);
     }
 
-    public static AvatarCacheService getInstance() {
+    public static AvatarCacheServiceImpl getInstance() {
         if (INSTANCE == null) {
             throw new UnsupportedOperationException("AvatarCacheService instance has not been built");
         }

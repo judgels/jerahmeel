@@ -1,5 +1,5 @@
 @(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionProblem], orderBy: String, orderDir: String, filterString: String)
-@import org.iatoki.judgels.jerahmeel.services.JidCacheService
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
@@ -29,7 +29,7 @@
         <tr>
             <td>@sessionProblem.getId</td>
             <td>@sessionProblem.getAlias</td>
-            <td>@JidCacheService.getInstance().getDisplayName(sessionProblem.getProblemJid)</td>
+            <td>@JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid)</td>
             <td>@sessionProblem.getStatus.name()</td>
             <td class="text-center">
                 <a href="@routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>

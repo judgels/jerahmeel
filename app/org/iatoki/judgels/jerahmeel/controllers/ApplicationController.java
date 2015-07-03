@@ -5,8 +5,8 @@ import org.iatoki.judgels.commons.JudgelsUtils;
 import org.iatoki.judgels.jophiel.controllers.forms.ViewpointForm;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.jophiel.Jophiel;
-import org.iatoki.judgels.jerahmeel.services.AvatarCacheService;
-import org.iatoki.judgels.jerahmeel.services.JidCacheService;
+import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.User;
 import org.iatoki.judgels.jerahmeel.services.UserService;
@@ -79,8 +79,8 @@ public final class ApplicationController extends BaseController {
     @Transactional
     public Result afterLogin(String returnUri) {
         if (session().containsKey("role")) {
-            JudgelsUtils.updateUserJidCache(JidCacheService.getInstance());
-            Jophiel.updateUserAvatarCache(AvatarCacheService.getInstance());
+            JudgelsUtils.updateUserJidCache(JidCacheServiceImpl.getInstance());
+            Jophiel.updateUserAvatarCache(AvatarCacheServiceImpl.getInstance());
 
             if (JudgelsUtils.hasViewPoint()) {
                 try {
@@ -100,8 +100,8 @@ public final class ApplicationController extends BaseController {
 
     @Transactional
     public Result afterProfile(String returnUri) {
-        JudgelsUtils.updateUserJidCache(JidCacheService.getInstance());
-        Jophiel.updateUserAvatarCache(AvatarCacheService.getInstance());
+        JudgelsUtils.updateUserJidCache(JidCacheServiceImpl.getInstance());
+        Jophiel.updateUserAvatarCache(AvatarCacheServiceImpl.getInstance());
 
         return redirect(returnUri);
     }

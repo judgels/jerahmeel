@@ -8,7 +8,7 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.controllers.forms.SessionLessonUpdateForm;
-import org.iatoki.judgels.jerahmeel.services.JidCacheService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.controllers.forms.SessionLessonCreateForm;
@@ -152,7 +152,7 @@ public final class SessionLessonController extends BaseController {
             if (lessonName != null) {
                 if (!sessionLessonService.isInSessionByAlias(session.getJid(), data.alias)) {
                     sessionLessonService.addSessionLesson(session.getJid(), data.lessonJid, data.lessonSecret, data.alias, SessionLessonStatus.valueOf(data.status));
-                    JidCacheService.getInstance().putDisplayName(data.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+                    JidCacheServiceImpl.getInstance().putDisplayName(data.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
                     return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
                 } else {

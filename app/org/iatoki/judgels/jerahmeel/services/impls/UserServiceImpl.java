@@ -7,12 +7,10 @@ import org.iatoki.judgels.commons.IdentityUtils;
 import org.iatoki.judgels.commons.JudgelsUtils;
 import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
-import org.iatoki.judgels.jerahmeel.services.JidCacheService;
 import org.iatoki.judgels.jerahmeel.User;
 import org.iatoki.judgels.jerahmeel.UserNotFoundException;
 import org.iatoki.judgels.jerahmeel.models.daos.UserDao;
 import org.iatoki.judgels.jerahmeel.models.entities.UserModel;
-import org.iatoki.judgels.jerahmeel.services.AvatarCacheService;
 import org.iatoki.judgels.jerahmeel.services.UserService;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.UserInfo;
@@ -128,8 +126,8 @@ public final class UserServiceImpl implements UserService {
             if (!userDao.existsByUserJid(userJid))
                 createUser(user.getJid(), roles);
 
-            JidCacheService.getInstance().putDisplayName(user.getJid(), JudgelsUtils.getUserDisplayName(user.getUsername(), user.getName()), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-            AvatarCacheService.getInstance().putImageUrl(user.getJid(), user.getProfilePictureUrl(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            JidCacheServiceImpl.getInstance().putDisplayName(user.getJid(), JudgelsUtils.getUserDisplayName(user.getUsername(), user.getName()), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            AvatarCacheServiceImpl.getInstance().putImageUrl(user.getJid(), user.getProfilePictureUrl(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         } catch (IOException e) {
             // do nothing
         }

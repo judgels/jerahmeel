@@ -1,5 +1,5 @@
 @(sessionId: Long, page: org.iatoki.judgels.commons.Page[org.iatoki.judgels.jerahmeel.SessionLesson], orderBy: String, orderDir: String, filterString: String)
-@import org.iatoki.judgels.jerahmeel.services.JidCacheService
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
@@ -29,7 +29,7 @@
         <tr>
             <td>@sessionLesson.getId</td>
             <td>@sessionLesson.getAlias</td>
-            <td>@JidCacheService.getInstance().getDisplayName(sessionLesson.getLessonJid)</td>
+            <td>@JidCacheServiceImpl.getInstance().getDisplayName(sessionLesson.getLessonJid)</td>
             <td>@sessionLesson.getStatus.name()</td>
             <td class="text-center">
                 <a href="@routes.SessionLessonController.viewLesson(sessionId, sessionLesson.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>

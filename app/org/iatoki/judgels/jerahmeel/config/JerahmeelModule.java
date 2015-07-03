@@ -2,58 +2,78 @@ package org.iatoki.judgels.jerahmeel.config;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.typesafe.config.Config;
-import com.typesafe.config.ConfigFactory;
 import org.iatoki.judgels.commons.AWSFileSystemProvider;
 import org.iatoki.judgels.commons.FileSystemProvider;
-import org.iatoki.judgels.commons.JudgelsProperties;
 import org.iatoki.judgels.commons.LocalFileSystemProvider;
+import org.iatoki.judgels.commons.config.JudgelsAbstractModule;
 import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
+import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
 import org.iatoki.judgels.jophiel.Jophiel;
+import org.iatoki.judgels.jophiel.services.BaseUserService;
 import org.iatoki.judgels.sandalphon.Sandalphon;
+import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 import org.iatoki.judgels.sealtiel.Sealtiel;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
-@Configuration
-@ComponentScan({
-        "org.iatoki.judgels.jerahmeel.models.daos",
-        "org.iatoki.judgels.jerahmeel.services",
-})
-public class PersistenceConfig {
+public class JerahmeelModule extends JudgelsAbstractModule {
 
-    @Bean
-    public JudgelsProperties judgelsProperties() {
-        org.iatoki.judgels.jerahmeel.BuildInfo$ buildInfo = org.iatoki.judgels.jerahmeel.BuildInfo$.MODULE$;
-        JudgelsProperties.buildInstance(buildInfo.name(), buildInfo.version(), ConfigFactory.load());
-        return JudgelsProperties.getInstance();
+    @Override
+    protected void manualBinding() {
+        bind(Jophiel.class).toInstance(jophiel());
+        bind(Sandalphon.class).toInstance(sandalphon());
+        bind(Sealtiel.class).toInstance(sealtiel());
+
+        FileSystemProvider bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider();
+        if (bundleSubmissionLocalFileSystemProvider != null) {
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFile.class).toInstance(bundleSubmissionLocalFileSystemProvider());
+        }
+
+        FileSystemProvider bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider();
+        if (bundleSubmissionRemoteFileSystemProvider != null) {
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toInstance(bundleSubmissionRemoteFileSystemProvider());
+        }
+
+        FileSystemProvider submissionLocalFileSystemProvider = submissionLocalFileSystemProvider();
+        if (submissionLocalFileSystemProvider != null) {
+            bind(FileSystemProvider.class).annotatedWith(SubmissionLocalFile.class).toInstance(submissionLocalFileSystemProvider());
+        }
+
+        FileSystemProvider submissionRemoteFileSystemProvider = submissionRemoteFileSystemProvider();
+        if (submissionRemoteFileSystemProvider != null) {
+            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toInstance(submissionRemoteFileSystemProvider());
+        }
+
+        bindConstant().annotatedWith(GabrielClientJid.class).to(gabrielClientJid());
+        bind(BaseUserService.class).to(UserServiceImpl.class);
+        bind(BundleProblemGrader.class).to(Sandalphon.class);
     }
 
-    @Bean
-    public JerahmeelProperties jerahmeelProperties() {
-        Config config = ConfigFactory.load();
-        JerahmeelProperties.buildInstance(config);
+    @Override
+    protected String getDaosImplPackage() {
+        return "org.iatoki.judgels.jerahmeel.models.daos.impls";
+    }
+
+    @Override
+    protected String getServicesImplPackage() {
+        return "org.iatoki.judgels.jerahmeel.services.impls";
+    }
+
+    private JerahmeelProperties jerahmeelProperties() {
         return JerahmeelProperties.getInstance();
     }
 
-    @Bean
-    public Jophiel jophiel() {
+    private Jophiel jophiel() {
         return new Jophiel(jerahmeelProperties().getJophielBaseUrl(), jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
     }
 
-    @Bean
-    public Sandalphon sandalphon() {
+    private Sandalphon sandalphon() {
         return new Sandalphon(jerahmeelProperties().getSandalphonBaseUrl(), jerahmeelProperties().getSandalphonClientJid(), jerahmeelProperties().getSandalphonClientSecret());
     }
 
-    @Bean
-    public Sealtiel sealtiel() {
+    private Sealtiel sealtiel() {
         return new Sealtiel(jerahmeelProperties().getSealtielBaseUrl(), jerahmeelProperties().getSealtielClientJid(), jerahmeelProperties().getSealtielClientSecret());
     }
 
-    @Bean
-    public FileSystemProvider bundleSubmissionRemoteFileSystemProvider() {
+    private FileSystemProvider bundleSubmissionRemoteFileSystemProvider() {
         FileSystemProvider bundleSubmissionRemoteFileSystemProvider = null;
         if (jerahmeelProperties().isSubmissionUsingAWSS3()) {
             AmazonS3Client awsS3Client;
@@ -68,14 +88,11 @@ public class PersistenceConfig {
         return bundleSubmissionRemoteFileSystemProvider;
     }
 
-    @Bean
-    public FileSystemProvider bundleSubmissionLocalFileSystemProvider() {
+    private FileSystemProvider bundleSubmissionLocalFileSystemProvider() {
         return new LocalFileSystemProvider(jerahmeelProperties().getSubmissionLocalDir());
     }
 
-
-    @Bean
-    public FileSystemProvider submissionRemoteFileSystemProvider() {
+    private FileSystemProvider submissionRemoteFileSystemProvider() {
         FileSystemProvider submissionRemoteFileSystemProvider = null;
         if (jerahmeelProperties().isSubmissionUsingAWSS3()) {
             AmazonS3Client awsS3Client;
@@ -90,13 +107,11 @@ public class PersistenceConfig {
         return submissionRemoteFileSystemProvider;
     }
 
-    @Bean
-    public FileSystemProvider submissionLocalFileSystemProvider() {
+    private FileSystemProvider submissionLocalFileSystemProvider() {
         return new LocalFileSystemProvider(jerahmeelProperties().getSubmissionLocalDir());
     }
 
-    @Bean
-    public String gabrielClientJid() {
+    private String gabrielClientJid() {
         return jerahmeelProperties().getSealtielGabrielClientJid();
     }
 }

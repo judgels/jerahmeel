@@ -10,10 +10,8 @@ lazy val jerahmeel = (project in file("."))
     .settings(
         name := "jerahmeel",
         version := IO.read(file("version.properties")).trim,
-        scalaVersion := "2.11.1",
-        libraryDependencies ++= Seq(
-            "org.apache.poi" % "poi" % "3.10-FINAL"
-        )
+        scalaVersion := "2.11.7",
+        routesGenerator := InjectedRoutesGenerator
     )
     .settings(TestNGPlugin.testNGSettings: _*)
     .settings(

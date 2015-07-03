@@ -1,14 +1,11 @@
 package org.iatoki.judgels.jerahmeel;
 
 import com.amazonaws.services.s3.model.Region;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import com.typesafe.config.Config;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Set;
 
 public final class JerahmeelProperties {
     private static JerahmeelProperties INSTANCE;
@@ -43,16 +40,6 @@ public final class JerahmeelProperties {
     private String submissionAWSSecretKey;
     private String submissionAWSS3BucketName;
     private Region submissionAWSS3BucketRegion;
-
-    private boolean fileUsingAWSS3;
-    private Boolean fileAWSUsingKeys;
-    private File fileLocalDir;
-    private String fileAWSAccessKey;
-    private String fileAWSSecretKey;
-    private String fileAWSS3BucketName;
-    private Region fileAWSS3BucketRegion;
-
-    private Set<String> criticalContestJids;
 
     private JerahmeelProperties(Config config) {
         this.config = config;
@@ -190,82 +177,6 @@ public final class JerahmeelProperties {
         throw new RuntimeException("Missing aws.global.key.use or aws.submission.key.use in");
     }
 
-    public boolean isFileUsingAWSS3() {
-        return fileUsingAWSS3;
-    }
-
-    public File getFileLocalDir() {
-        return fileLocalDir;
-    }
-
-    public String getFileAWSAccessKey() {
-        if (!isFileUsingAWSS3()) {
-            throw new UnsupportedOperationException("File is not using AWS S3");
-        }
-        if (fileAWSAccessKey != null) {
-            return fileAWSAccessKey;
-        }
-        if (globalAWSAccessKey != null) {
-            return globalAWSAccessKey;
-        }
-
-        throw new RuntimeException("Missing aws.global.key.access or aws.submission.key.access");
-    }
-
-    public String getFileAWSSecretKey() {
-        if (!isFileUsingAWSS3()) {
-            throw new UnsupportedOperationException("Submission is not using AWS S3");
-        }
-        if (fileAWSUsingKeys != null) {
-            return fileAWSSecretKey;
-        }
-        if (globalAWSSecretKey != null) {
-            return globalAWSSecretKey;
-        }
-
-        throw new RuntimeException("Missing aws.global.key.secret or aws.aws.key.secret in");
-    }
-
-    public String getFileAWSS3BucketName() {
-        if (!isFileUsingAWSS3()) {
-            throw new UnsupportedOperationException("File is not using AWS S3");
-        }
-        return fileAWSS3BucketName;
-    }
-
-    public Region getFileAWSS3BucketRegion() {
-        if (!isFileUsingAWSS3()) {
-            throw new UnsupportedOperationException("File is not using AWS S3");
-        }
-        if (fileAWSS3BucketRegion != null) {
-            return fileAWSS3BucketRegion;
-        }
-        if (globalAWSS3Region != null) {
-            return globalAWSS3Region;
-        }
-
-        throw new RuntimeException("Missing aws.global.s3.bucket.regionId or aws.file.s3.bucket.regionId");
-    }
-
-    public boolean isFileAWSUsingKeys() {
-        if (!isFileUsingAWSS3()) {
-            throw new UnsupportedOperationException("Submission is not using AWS S3");
-        }
-
-        if (fileAWSUsingKeys != null) {
-            return fileAWSUsingKeys;
-        }
-        if (globalAWSUsingKeys != null) {
-            return globalAWSUsingKeys;
-        }
-
-        throw new RuntimeException("Missing aws.global.key.use or aws.file.key.use in");
-    }
-
-    public boolean isContestCritial(String contestJid) {
-        return criticalContestJids.contains(contestJid);
-    }
-    
     private void build() {
         jerahmeelBaseUrl = requireStringValue("jerahmeel.baseUrl");
         jerahmeelBaseDataDir = requireDirectoryValue("jerahmeel.baseDataDir");
@@ -300,29 +211,6 @@ public final class JerahmeelProperties {
             FileUtils.forceMkdir(submissionLocalDir);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-
-        fileUsingAWSS3 = requireBooleanValue("aws.file.s3.use");
-        fileAWSUsingKeys = getBooleanValue("aws.file.key.use");
-        fileAWSAccessKey = getStringValue("aws.file.key.access");
-        fileAWSSecretKey = getStringValue("aws.file.key.secret");
-        fileAWSS3BucketName = getStringValue("aws.file.s3.bucket.name");
-        fileAWSS3BucketRegion = Region.fromValue(getStringValue("aws.file.s3.bucket.regionId"));
-
-        if (!fileUsingAWSS3) {
-            try {
-                fileLocalDir = new File(jerahmeelBaseDataDir, "file");
-                FileUtils.forceMkdir(fileLocalDir);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        String criticalContestJidsAsString = getStringValue("uriel.criticalContestJids");
-        if (criticalContestJidsAsString != null) {
-            criticalContestJids = ImmutableSet.copyOf(Sets.newHashSet(criticalContestJidsAsString.split(",")));
-        } else {
-            criticalContestJids = ImmutableSet.of();
         }
     }
 

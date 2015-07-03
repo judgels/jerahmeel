@@ -10,6 +10,7 @@ import org.iatoki.judgels.jerahmeel.models.entities.GradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
+import org.iatoki.judgels.sandalphon.services.SubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractSubmissionServiceImpl;
 import org.iatoki.judgels.sandalphon.Submission;
 import org.iatoki.judgels.sealtiel.Sealtiel;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Singleton
 @Named("submissionService")
-public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<SubmissionModel, GradingModel> {
+public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<SubmissionModel, GradingModel> implements SubmissionService {
 
     private final SubmissionDao submissionDao;
     private final GradingDao gradingDao;
