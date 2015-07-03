@@ -82,7 +82,7 @@ public final class TrainingLessonController extends BaseController {
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
             Page<SessionLessonProgress> sessionLessonPage = sessionLessonService.findSessionLessons(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
+            if ((!userItemService.isUserItemExist(IdentityUtils.getUserJid(), session.getJid())) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid()))) {
                 userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
             }
 
