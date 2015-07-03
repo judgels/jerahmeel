@@ -100,6 +100,8 @@ public final class TrainingLessonController extends BaseController {
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
 
         if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) && (sessionLesson.getSessionJid().equals(courseSession.getSessionJid()))) {
+            response().setHeader("X-Frame-Options", "Allow-From *");
+
             Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
             Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
 
