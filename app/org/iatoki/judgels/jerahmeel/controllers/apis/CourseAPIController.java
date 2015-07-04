@@ -12,12 +12,16 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 
+@Named
 public final class CourseAPIController extends Controller {
 
     private final CourseService courseService;
 
+    @Inject
     public CourseAPIController(CourseService courseService) {
         this.courseService = courseService;
     }

@@ -13,18 +13,20 @@ import org.iatoki.judgels.commons.views.html.layouts.accessTypesLayout;
 import org.iatoki.judgels.commons.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.GradingSource;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.UserItem;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.config.SubmissionLocalFile;
+import org.iatoki.judgels.jerahmeel.config.SubmissionRemoteFile;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.Submission;
 import org.iatoki.judgels.sandalphon.SubmissionAdapters;
@@ -37,6 +39,7 @@ import play.i18n.Messages;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -59,7 +62,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
     private final UserItemService userItemService;
 
     @Inject
-    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileSystemProvider, FileSystemProvider submissionRemoteFileSystemProvider, UserItemService userItemService) {
+    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, @SubmissionLocalFile FileSystemProvider submissionLocalFileSystemProvider, @SubmissionRemoteFile @Nullable FileSystemProvider submissionRemoteFileSystemProvider, UserItemService userItemService) {
         this.sessionService = sessionService;
         this.submissionService = submissionService;
         this.sessionProblemService = sessionProblemService;

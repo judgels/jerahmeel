@@ -2,6 +2,7 @@ package org.iatoki.judgels.jerahmeel.config;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.google.inject.util.Providers;
 import org.iatoki.judgels.commons.AWSFileSystemProvider;
 import org.iatoki.judgels.commons.FileSystemProvider;
 import org.iatoki.judgels.commons.LocalFileSystemProvider;
@@ -22,24 +23,22 @@ public class JerahmeelModule extends JudgelsAbstractModule {
         bind(Sandalphon.class).toInstance(sandalphon());
         bind(Sealtiel.class).toInstance(sealtiel());
 
-        FileSystemProvider bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider();
-        if (bundleSubmissionLocalFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFile.class).toInstance(bundleSubmissionLocalFileSystemProvider());
-        }
+        bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFile.class).toInstance(bundleSubmissionLocalFileSystemProvider());
 
         FileSystemProvider bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider();
         if (bundleSubmissionRemoteFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toInstance(bundleSubmissionRemoteFileSystemProvider());
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toInstance(bundleSubmissionRemoteFileSystemProvider);
+        } else {
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toProvider(Providers.of(null));
         }
 
-        FileSystemProvider submissionLocalFileSystemProvider = submissionLocalFileSystemProvider();
-        if (submissionLocalFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(SubmissionLocalFile.class).toInstance(submissionLocalFileSystemProvider());
-        }
+        bind(FileSystemProvider.class).annotatedWith(SubmissionLocalFile.class).toInstance(submissionLocalFileSystemProvider());
 
         FileSystemProvider submissionRemoteFileSystemProvider = submissionRemoteFileSystemProvider();
         if (submissionRemoteFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toInstance(submissionRemoteFileSystemProvider());
+            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toInstance(submissionRemoteFileSystemProvider);
+        } else {
+            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toProvider(Providers.of(null));
         }
 
         bindConstant().annotatedWith(GabrielClientJid.class).to(gabrielClientJid());

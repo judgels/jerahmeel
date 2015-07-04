@@ -13,6 +13,8 @@ import org.iatoki.judgels.commons.views.html.layouts.accessTypesLayout;
 import org.iatoki.judgels.commons.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFile;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFile;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
@@ -46,6 +48,7 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -71,7 +74,7 @@ public final class TrainingBundleSubmissionController extends BaseController {
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
 
     @Inject
-    public TrainingBundleSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileSystemProvider, FileSystemProvider bundleSubmissionRemoteFileSystemProvider) {
+    public TrainingBundleSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, @BundleSubmissionLocalFile FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFile @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;

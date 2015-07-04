@@ -13,6 +13,8 @@ import org.iatoki.judgels.commons.Page;
 import org.iatoki.judgels.commons.controllers.BaseController;
 import org.iatoki.judgels.commons.views.html.layouts.accessTypesLayout;
 import org.iatoki.judgels.commons.views.html.layouts.heading3Layout;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFile;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFile;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
@@ -38,6 +40,7 @@ import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -61,7 +64,7 @@ public final class SessionBundleSubmissionController extends BaseController {
     private final UserItemService userItemService;
 
     @Inject
-    public SessionBundleSubmissionController(SessionService sessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, FileSystemProvider bundleSubmissionLocalFileSystemProvider, FileSystemProvider bundleSubmissionRemoteFileSystemProvider, UserItemService userItemService) {
+    public SessionBundleSubmissionController(SessionService sessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, @BundleSubmissionLocalFile FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFile @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, UserItemService userItemService) {
         this.sessionService = sessionService;
         this.bundleSubmissionService = bundleSubmissionService;
         this.sessionProblemService = sessionProblemService;

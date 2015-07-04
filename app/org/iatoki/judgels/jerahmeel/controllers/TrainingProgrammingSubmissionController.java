@@ -13,6 +13,8 @@ import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.GradingSource;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.config.SubmissionLocalFile;
+import org.iatoki.judgels.jerahmeel.config.SubmissionRemoteFile;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
@@ -45,6 +47,7 @@ import play.i18n.Messages;
 import play.mvc.Http;
 import play.mvc.Result;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -69,7 +72,7 @@ public final class TrainingProgrammingSubmissionController extends BaseControlle
     private final FileSystemProvider submissionRemoteFileSystemProvider;
 
     @Inject
-    public TrainingProgrammingSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, SubmissionService submissionService, SessionProblemService sessionProblemService, FileSystemProvider submissionLocalFileSystemProvider, FileSystemProvider submissionRemoteFileSystemProvider) {
+    public TrainingProgrammingSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, SubmissionService submissionService, SessionProblemService sessionProblemService, @SubmissionLocalFile FileSystemProvider submissionLocalFileSystemProvider, @SubmissionRemoteFile @Nullable FileSystemProvider submissionRemoteFileSystemProvider) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
