@@ -13,7 +13,7 @@
 @for(courseSessionProgress <- page.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingController.jumpToLessons(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">
+            <a href="@routes.TrainingController.jumpToSession(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">
                 @if(courseSessionProgress.getCourseSession.isCompleteable) {
                     @{courseSessionProgress.getCourseSession.getAlias}.
                 }

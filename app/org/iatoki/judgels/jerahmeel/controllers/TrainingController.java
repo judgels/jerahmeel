@@ -1,11 +1,16 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import org.iatoki.judgels.commons.controllers.BaseController;
+import org.iatoki.judgels.jerahmeel.CourseSession;
+import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import play.db.jpa.Transactional;
 import play.mvc.Result;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -14,7 +19,11 @@ import javax.inject.Singleton;
 @Named
 public final class TrainingController extends BaseController {
 
-    public TrainingController() {
+    private final CourseSessionService courseSessionService;
+
+    @Inject
+    public TrainingController(CourseSessionService courseSessionService) {
+        this.courseSessionService = courseSessionService;
     }
 
     public Result jumpToCurriculums() {
@@ -27,6 +36,16 @@ public final class TrainingController extends BaseController {
 
     public Result jumpToSessions(long curriculumId, long curriculumCourseId) {
         return redirect(routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourseId));
+    }
+
+    @Transactional(readOnly = true)
+    public Result jumpToSession(long curriculumId, long curriculumCourseId, long courseSessionId) throws CourseSessionNotFoundException {
+        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        if (courseSession.isCompleteable()) {
+            return redirect(routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionId));
+        } else {
+            return redirect(routes.TrainingProblemController.viewProblems(curriculumId, curriculumCourseId, courseSessionId));
+        }
     }
 
     public Result jumpToLessons(long curriculumId, long curriculumCourseId, long courseSessionId) {
