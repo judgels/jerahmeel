@@ -2,6 +2,7 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import org.iatoki.judgels.gabriel.GradingResult;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
 import org.iatoki.judgels.jerahmeel.models.daos.GradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SubmissionDao;
@@ -30,7 +31,7 @@ public final class SubmissionServiceImpl extends AbstractSubmissionServiceImpl<S
     private final UserItemDao userItemDao;
 
     @Inject
-    public SubmissionServiceImpl(SubmissionDao submissionDao, GradingDao gradingDao, Sealtiel sealtiel, String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+    public SubmissionServiceImpl(SubmissionDao submissionDao, GradingDao gradingDao, Sealtiel sealtiel, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         super(submissionDao, gradingDao, sealtiel, gabrielClientJid);
         this.submissionDao = submissionDao;
         this.gradingDao = gradingDao;
