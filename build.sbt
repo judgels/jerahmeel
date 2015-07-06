@@ -11,7 +11,8 @@ lazy val jerahmeel = (project in file("."))
         name := "jerahmeel",
         version := IO.read(file("version.properties")).trim,
         scalaVersion := "2.11.7",
-        routesGenerator := InjectedRoutesGenerator
+        routesGenerator := InjectedRoutesGenerator,
+        PlayKeys.externalizeResources := false
     )
     .settings(TestNGPlugin.testNGSettings: _*)
     .settings(
