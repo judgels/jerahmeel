@@ -94,6 +94,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
             CourseProgress progress = CourseProgress.LOCKED;
             for (CourseSessionModel courseSessionModel : courseSessionModels) {
                 if ((completedJids.contains(courseSessionModel.sessionJid)) && (curriculumCourseModel.completeable)) {
+                    progress = CourseProgress.IN_PROGRESS;
                     completed++;
                 } else if ((onProgressJids.contains(courseSessionModel.sessionJid)) && (curriculumCourseModel.completeable)) {
                     progress = CourseProgress.IN_PROGRESS;
