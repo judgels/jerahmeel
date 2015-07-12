@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.models.daos.impls;
 
-import org.iatoki.judgels.commons.models.daos.hibernate.AbstractHibernateDao;
+import org.iatoki.judgels.play.models.daos.hibernate.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel_;

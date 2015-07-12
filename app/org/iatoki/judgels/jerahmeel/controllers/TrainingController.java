@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
-import org.iatoki.judgels.commons.controllers.BaseController;
+import org.iatoki.judgels.play.controllers.BaseController;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;

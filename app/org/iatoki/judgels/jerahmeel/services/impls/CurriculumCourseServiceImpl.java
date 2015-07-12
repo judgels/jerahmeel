@@ -2,8 +2,8 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.iatoki.judgels.commons.IdentityUtils;
-import org.iatoki.judgels.commons.Page;
+import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.CourseProgress;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;

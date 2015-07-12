@@ -2,8 +2,8 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.iatoki.judgels.commons.IdentityUtils;
-import org.iatoki.judgels.commons.Page;
+import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.models.daos.CurriculumDao;

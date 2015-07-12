@@ -1,10 +1,10 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.commons.InternalLink;
-import org.iatoki.judgels.commons.LazyHtml;
-import org.iatoki.judgels.commons.Page;
-import org.iatoki.judgels.commons.controllers.BaseController;
+import org.iatoki.judgels.play.InternalLink;
+import org.iatoki.judgels.play.LazyHtml;
+import org.iatoki.judgels.play.Page;
+import org.iatoki.judgels.play.controllers.BaseController;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;

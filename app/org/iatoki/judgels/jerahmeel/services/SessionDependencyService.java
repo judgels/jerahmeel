@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services;
 
-import org.iatoki.judgels.commons.Page;
+import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.SessionDependency;
 import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
 

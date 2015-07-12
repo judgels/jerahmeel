@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.models.daos.impls;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.commons.models.daos.hibernate.AbstractJudgelsHibernateDao;
+import org.iatoki.judgels.play.models.daos.hibernate.AbstractJudgelsHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionModel_;

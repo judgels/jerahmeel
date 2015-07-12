@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers.apis;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.commons.AutoComplete;
+import org.iatoki.judgels.AutoComplete;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;

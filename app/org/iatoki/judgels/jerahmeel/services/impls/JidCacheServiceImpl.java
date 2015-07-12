@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.commons.services.impls.AbstractBaseJidCacheServiceImpl;
-import org.iatoki.judgels.commons.models.daos.interfaces.BaseJidCacheDao;
+import org.iatoki.judgels.play.services.impls.AbstractBaseJidCacheServiceImpl;
+import org.iatoki.judgels.play.models.daos.interfaces.BaseJidCacheDao;
 import org.iatoki.judgels.jerahmeel.models.entities.JidCacheModel;
 
 public final class JidCacheServiceImpl extends AbstractBaseJidCacheServiceImpl<JidCacheModel> {

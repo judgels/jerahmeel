@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.commons.IdentityUtils;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.jerahmeel.UserItem;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
