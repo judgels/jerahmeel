@@ -11,7 +11,7 @@ import org.iatoki.judgels.jerahmeel.services.impls.UserActivityMessageServiceImp
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.UserActivityMessagePusher;
 import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
-import org.iatoki.judgels.sandalphon.GradingResponsePoller;
+import org.iatoki.judgels.sandalphon.runnables.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.services.SubmissionService;
 import org.iatoki.judgels.sealtiel.Sealtiel;
 import play.Application;

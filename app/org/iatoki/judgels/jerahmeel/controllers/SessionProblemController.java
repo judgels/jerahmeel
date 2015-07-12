@@ -27,7 +27,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.problem.updateSessionProb
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.sandalphon.Sandalphon;
-import org.iatoki.judgels.sandalphon.programming.LanguageRestriction;
+import org.iatoki.judgels.sandalphon.LanguageRestriction;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;

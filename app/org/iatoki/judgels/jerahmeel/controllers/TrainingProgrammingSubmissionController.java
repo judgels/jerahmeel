@@ -38,7 +38,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.Submission;
-import org.iatoki.judgels.sandalphon.SubmissionAdapters;
+import org.iatoki.judgels.sandalphon.adapters.impls.SubmissionAdapters;
 import org.iatoki.judgels.sandalphon.SubmissionException;
 import org.iatoki.judgels.sandalphon.SubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.services.SubmissionService;

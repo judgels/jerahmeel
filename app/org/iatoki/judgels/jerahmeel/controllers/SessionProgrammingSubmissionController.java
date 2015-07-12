@@ -29,7 +29,7 @@ import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.Submission;
-import org.iatoki.judgels.sandalphon.SubmissionAdapters;
+import org.iatoki.judgels.sandalphon.adapters.impls.SubmissionAdapters;
 import org.iatoki.judgels.sandalphon.SubmissionException;
 import org.iatoki.judgels.sandalphon.SubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.services.SubmissionService;
