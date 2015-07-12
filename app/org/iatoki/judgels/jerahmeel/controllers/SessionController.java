@@ -11,7 +11,7 @@ import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.controllers.forms.SessionUpsertForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionUpsertForm;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;

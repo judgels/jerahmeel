@@ -1,11 +1,8 @@
-package org.iatoki.judgels.jerahmeel.controllers.forms;
+package org.iatoki.judgels.jerahmeel.forms;
 
 import play.data.validation.Constraints;
 
-public final class CourseSessionCreateForm {
-
-    @Constraints.Required
-    public String sessionJid;
+public final class CurriculumCourseUpdateForm {
 
     @Constraints.Required
     public String alias;

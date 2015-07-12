@@ -6,7 +6,7 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.controllers.forms.SessionDependencyCreateForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionDependencyCreateForm;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.SessionDependency;

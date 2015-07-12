@@ -1,12 +1,13 @@
-package org.iatoki.judgels.jerahmeel.controllers.forms;
+package org.iatoki.judgels.jerahmeel.forms;
 
 import play.data.validation.Constraints;
 
-public class SessionProblemUpdateForm {
+public final class CourseSessionUpdateForm {
 
     @Constraints.Required
     public String alias;
 
     @Constraints.Required
-    public String status;
+    public boolean completeable;
+
 }

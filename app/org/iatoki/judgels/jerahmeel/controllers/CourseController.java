@@ -10,7 +10,7 @@ import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.controllers.forms.CourseUpsertForm;
+import org.iatoki.judgels.jerahmeel.forms.CourseUpsertForm;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
