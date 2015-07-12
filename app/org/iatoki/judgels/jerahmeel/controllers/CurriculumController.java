@@ -10,7 +10,7 @@ import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.controllers.forms.CurriculumUpsertForm;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumUpsertForm;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;

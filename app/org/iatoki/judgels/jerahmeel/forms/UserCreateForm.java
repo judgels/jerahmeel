@@ -1,4 +1,4 @@
-package org.iatoki.judgels.jerahmeel.controllers.forms;
+package org.iatoki.judgels.jerahmeel.forms;
 
 import org.apache.commons.lang3.StringUtils;
 import play.data.validation.Constraints;
