@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.BaseController;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
@@ -35,7 +35,7 @@ import javax.inject.Singleton;
 @Authorized(value = {"admin"})
 @Singleton
 @Named
-public final class CourseSessionController extends BaseController {
+public final class CourseSessionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 

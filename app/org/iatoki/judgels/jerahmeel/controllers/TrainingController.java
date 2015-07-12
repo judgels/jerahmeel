@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
-import org.iatoki.judgels.play.controllers.BaseController;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -17,7 +17,7 @@ import javax.inject.Singleton;
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
-public final class TrainingController extends BaseController {
+public final class TrainingController extends AbstractJudgelsController {
 
     private final CourseSessionService courseSessionService;
 

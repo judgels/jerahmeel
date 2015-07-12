@@ -5,7 +5,7 @@ import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.BaseController;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.jerahmeel.controllers.forms.SessionLessonUpdateForm;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
@@ -44,7 +44,7 @@ import java.net.URI;
 @Authorized(value = {"admin"})
 @Singleton
 @Named
-public final class SessionLessonController extends BaseController {
+public final class SessionLessonController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 

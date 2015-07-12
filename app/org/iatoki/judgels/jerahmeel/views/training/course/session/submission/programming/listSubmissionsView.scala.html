@@ -7,7 +7,7 @@
 @import org.iatoki.judgels.play.views.html.table.paginationView
 
 @import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.play.JudgelsUtils
+@import org.iatoki.judgels.play.JudgelsPlayUtils
 @import scala.collection.JavaConversions
 
 <form class="form-inline pull-right" method="GET" action="@routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
@@ -50,7 +50,7 @@
                 <td><small>@gradingLanguageToNameMap.get(submission.getGradingLanguage)</small></td>
                 <td><small>@submission.getLatestVerdict.getName</small></td>
                 <td><small>@submission.getLatestScore</small></td>
-                <td><small><time class="display-time" datetime="@JudgelsUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
+                <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
                 <td class="text-center">
                     <a href="@routes.TrainingProgrammingSubmissionController.viewSubmission(curriculumId, curriculumCourseId, courseSessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                 </td>

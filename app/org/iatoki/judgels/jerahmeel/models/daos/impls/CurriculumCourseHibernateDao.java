@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.models.daos.impls;
 
-import org.iatoki.judgels.play.models.daos.hibernate.AbstractHibernateDao;
+import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CurriculumCourseDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel_;

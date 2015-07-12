@@ -3,7 +3,7 @@ package org.iatoki.judgels.jerahmeel.controllers;
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
-import org.iatoki.judgels.play.views.html.layouts.accessTypesLayout;
+import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.jerahmeel.views.html.training.headingWithBackLayout;
@@ -54,7 +54,7 @@ public final class SessionControllerUtils {
     }
 
     static void appendUpdateLayout(LazyHtml content, Session session) {
-        content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("session.update"), routes.SessionController.updateSessionGeneral(session.getId())),
                     new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
                     new InternalLink(Messages.get("session.problems"), routes.SessionController.jumpToProblems(session.getId())),

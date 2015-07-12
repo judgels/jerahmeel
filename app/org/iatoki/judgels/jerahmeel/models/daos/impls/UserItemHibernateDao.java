@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.models.daos.impls;
 
-import org.iatoki.judgels.play.models.daos.hibernate.AbstractHibernateDao;
+import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel_;

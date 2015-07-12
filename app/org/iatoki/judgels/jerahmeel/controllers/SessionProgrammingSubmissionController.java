@@ -6,10 +6,10 @@ import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
-import org.iatoki.judgels.play.ListTableSelectionForm;
+import org.iatoki.judgels.play.forms.ListTableSelectionForm;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.BaseController;
-import org.iatoki.judgels.play.views.html.layouts.accessTypesLayout;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.GradingSource;
@@ -50,7 +50,7 @@ import java.util.Map;
 @Authorized(value = {"admin"})
 @Singleton
 @Named
-public final class SessionProgrammingSubmissionController extends BaseController {
+public final class SessionProgrammingSubmissionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
@@ -117,7 +117,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
 
         LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), submissions, userJids, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                 new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
                 new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
               ), c)
@@ -149,7 +149,7 @@ public final class SessionProgrammingSubmissionController extends BaseController
 
         LazyHtml content = new LazyHtml(SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).renderViewSubmission(submission, source, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
 
-        content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
                     new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
         ), c)

@@ -6,8 +6,8 @@ import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.BaseController;
-import org.iatoki.judgels.play.views.html.layouts.accessTypesLayout;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.GradingSource;
@@ -56,7 +56,7 @@ import java.util.Map;
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
-public final class TrainingProgrammingSubmissionController extends BaseController {
+public final class TrainingProgrammingSubmissionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
@@ -141,7 +141,7 @@ public final class TrainingProgrammingSubmissionController extends BaseControlle
 
             LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), submissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
             content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-            content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+            content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
                     new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
                   ), c)
@@ -183,7 +183,7 @@ public final class TrainingProgrammingSubmissionController extends BaseControlle
             String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
             LazyHtml content = new LazyHtml(SubmissionAdapters.fromGradingEngine(submission.getGradingEngine()).renderViewSubmission(submission, source, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
-            content.appendLayout(c -> accessTypesLayout.render(ImmutableList.of(
+            content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
                     new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
                   ), c)

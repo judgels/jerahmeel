@@ -5,7 +5,7 @@ import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.BaseController;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
@@ -34,7 +34,7 @@ import javax.inject.Singleton;
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
-public final class TrainingSessionController extends BaseController {
+public final class TrainingSessionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
