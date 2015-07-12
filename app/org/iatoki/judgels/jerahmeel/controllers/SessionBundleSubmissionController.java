@@ -33,7 +33,7 @@ import org.iatoki.judgels.sandalphon.BundleDetailResult;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
-import org.iatoki.judgels.sandalphon.views.html.bundleSubmissionView;
+import org.iatoki.judgels.sandalphon.views.html.problem.bundle.submission.bundleSubmissionView;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
