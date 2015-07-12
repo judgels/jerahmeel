@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel.controllers;
 
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
-import org.iatoki.judgels.jophiel.controllers.forms.ViewpointForm;
+import org.iatoki.judgels.jophiel.forms.ViewpointForm;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
