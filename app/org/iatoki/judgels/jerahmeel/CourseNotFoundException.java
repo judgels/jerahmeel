@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-import org.iatoki.judgels.commons.EntityNotFoundException;
+import org.iatoki.judgels.play.EntityNotFoundException;
 
 public final class CourseNotFoundException extends EntityNotFoundException {
 
