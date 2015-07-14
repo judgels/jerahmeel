@@ -4,9 +4,10 @@ import akka.actor.Scheduler;
 import org.iatoki.judgels.jerahmeel.controllers.ControllerUtils;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
-import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.UserService;
+import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.runnables.UserActivityMessagePusher;
@@ -23,6 +24,10 @@ import scala.concurrent.duration.Duration;
 import java.util.concurrent.TimeUnit;
 
 public final class Global extends org.iatoki.judgels.play.Global {
+
+    public Global() {
+        super(new JerahmeelDataMigrationServiceImpl());
+    }
 
     @Override
     public void onStart(Application application) {
