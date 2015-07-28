@@ -6,7 +6,7 @@ import com.google.inject.util.Providers;
 import org.iatoki.judgels.AWSFileSystemProvider;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.LocalFileSystemProvider;
-import org.iatoki.judgels.play.config.AbstractJudgelsModule;
+import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
 import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
 import org.iatoki.judgels.jophiel.Jophiel;
@@ -15,7 +15,7 @@ import org.iatoki.judgels.sandalphon.Sandalphon;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 import org.iatoki.judgels.sealtiel.Sealtiel;
 
-public class JerahmeelModule extends AbstractJudgelsModule {
+public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
     @Override
     protected void manualBinding() {

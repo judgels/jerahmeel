@@ -12,6 +12,8 @@ import org.iatoki.judgels.jerahmeel.services.impls.UserActivityMessageServiceImp
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.runnables.UserActivityMessagePusher;
 import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
+import org.iatoki.judgels.play.AbstractGlobal;
+import org.iatoki.judgels.play.services.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.runnables.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.services.SubmissionService;
 import org.iatoki.judgels.sealtiel.Sealtiel;
@@ -23,11 +25,7 @@ import scala.concurrent.duration.Duration;
 
 import java.util.concurrent.TimeUnit;
 
-public final class Global extends org.iatoki.judgels.play.Global {
-
-    public Global() {
-        super(new JerahmeelDataMigrationServiceImpl());
-    }
+public final class Global extends AbstractGlobal {
 
     @Override
     public void onStart(Application application) {
@@ -36,6 +34,11 @@ public final class Global extends org.iatoki.judgels.play.Global {
         scheduleThreads(application.injector());
 
         super.onStart(application);
+    }
+
+    @Override
+    protected BaseDataMigrationService getDataMigrationService() {
+        return new JerahmeelDataMigrationServiceImpl();
     }
 
     private void buildServices(Injector injector) {
