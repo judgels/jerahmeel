@@ -1,0 +1,17 @@
+@(form: Form[org.iatoki.judgels.jerahmeel.forms.CourseUpsertForm], modelId: Long)
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.formErrorView
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-2", "col-md-10") }
+
+@formErrorView(form)
+
+@b3.form(org.iatoki.judgels.jerahmeel.controllers.routes.CourseController.postUpdateCourseGeneral(modelId)) {
+
+    @helper.CSRF.formField
+
+    @upsertCourseView(form)
+
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
+}

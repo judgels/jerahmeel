@@ -1,0 +1,9 @@
+@(heading: String, action: org.iatoki.judgels.play.InternalLink, backAction: org.iatoki.judgels.play.InternalLink)(content: Html)
+
+<h2>
+    @heading
+    <a class="btn btn-primary btn-sm" href="@action.getTarget">@action.getLabel</a>
+    <a class="btn btn-danger btn-sm" href="@backAction.getTarget"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> @backAction.getLabel</a>
+</h2>
+
+@content

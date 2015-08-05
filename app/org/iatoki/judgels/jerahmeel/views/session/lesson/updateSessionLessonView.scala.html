@@ -1,0 +1,22 @@
+@(form: Form[org.iatoki.judgels.jerahmeel.forms.SessionLessonUpdateForm], sessionId: Long, sessionLesson: org.iatoki.judgels.jerahmeel.SessionLesson)
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.formErrorView
+@import org.iatoki.judgels.jerahmeel.SessionLessonStatus
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-2", "col-md-10") }
+
+@formErrorView(form)
+
+@b3.form(org.iatoki.judgels.jerahmeel.controllers.routes.SessionLessonController.postUpdateLesson(sessionId, sessionLesson.getId)) {
+
+    @helper.CSRF.formField
+
+    @b3.static('_label -> Messages.get("session.lesson.jid")) { @sessionLesson.getLessonJid }
+
+    @b3.text(form("alias"), '_label -> Messages.get("course.alias"), 'class -> "form-control")
+    @b3.select(form("status"), SessionLessonStatus.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.lesson.status"), 'class -> "form-control selectpicker")
+
+
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
+}

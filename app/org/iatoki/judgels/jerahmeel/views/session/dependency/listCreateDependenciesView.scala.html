@@ -1,0 +1,58 @@
+@(sessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.SessionDependency], orderBy: String, orderDir: String, filterString: String, form: Form[org.iatoki.judgels.jerahmeel.forms.SessionDependencyCreateForm])
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.formErrorView
+@import org.iatoki.judgels.play.views.html.table.tableView
+@import org.iatoki.judgels.play.views.html.table.tableHeadersView
+@import org.iatoki.judgels.play.views.html.table.searchView
+@import org.iatoki.judgels.play.views.html.table.paginationView
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
+
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionDependencyController.listCreateDependencies(sessionId, newPageIndex, newOrderBy, newOrderDir)}
+
+@formErrorView(form)
+
+@b3.form(routes.SessionDependencyController.postCreateDependency(sessionId, page.getPageIndex, orderBy, orderDir, filterString)) {
+
+    @helper.CSRF.formField
+
+    @b3.text(form("sessionJid"), '_label -> Messages.get("session.jid"), 'class -> "form-control session_autocomplete")
+
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.add") }
+}
+
+<script type="text/javascript">
+    var sessionAutoCompleteUrl = "@org.iatoki.judgels.jerahmeel.controllers.apis.routes.SessionAPIController.sessionAutoCompleteList()";
+</script>
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/sessionAutoComplete.js")"></script>
+
+
+@searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
+
+<div class="clearfix"></div>
+
+@tableView() {
+    @tableHeadersView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)(
+        "id" -> Messages.get("commons.id"),
+        "" -> Messages.get("session.name")
+    )
+
+
+    <tbody>
+    @for(sessionDependency <- page.getData()) {
+        <tr>
+            <td>@sessionDependency.getId</td>
+            <td>@sessionDependency.getDependedSessionName</td>
+            <td class="text-center">
+                <a href="@routes.SessionDependencyController.deleteDependency(sessionId, sessionDependency.getId)" onclick="confirmLink ( event, this.href )"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></a>
+            </td>
+        </tr>
+    }
+    </tbody>
+}
+
+@paginationView(page, orderBy, orderDir, filterString, listFunc)

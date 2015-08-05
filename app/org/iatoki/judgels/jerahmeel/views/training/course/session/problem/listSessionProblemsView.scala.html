@@ -1,0 +1,45 @@
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.SessionProblemProgress], orderBy: String, orderDir: String, filterString: String)
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+
+@import org.iatoki.judgels.jerahmeel.ProblemProgress
+@import play.i18n.Messages
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
+
+@import org.iatoki.judgels.play.views.html.table.searchView
+@import org.iatoki.judgels.play.views.html.table.paginationView
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
+
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingProblemController.listProblems(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir)}
+
+@searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
+
+<div class="clearfix"></div>
+
+@for(sessionProblemProgress <- page.getData()) {
+    <div class="panel panel-default">
+        <div class="panel-body clearfix">
+            <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @JidCacheServiceImpl.getInstance().getDisplayName(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
+            <div class="pull-right">
+                @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
+                    <span class="alert alert-success">
+                        @Messages.get("training.problem.completed")
+                    </span>
+                } else {
+                    @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
+                        <span class="alert alert-info">
+                            @Messages.get("training.problem.viewed")
+                        </span>
+                    } else {
+                        <span class="alert alert-warning">
+                            @Messages.get("training.problem.notViewed")
+                        </span>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@paginationView(page, orderBy, orderDir, filterString, listFunc)

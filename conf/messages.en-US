@@ -1,0 +1,137 @@
+training.training=Training
+training.curriculums=Curriculums
+training.courses=Courses
+training.sessions=Chapters
+training.submissions.bundle=Non Programming Submissions
+training.submissions.programming=Programming Submissions
+training.session.isLocked=Chapter is still Locked
+
+curriculum.curriculum=Curriculum
+curriculum.curriculums=Curriculums
+curriculum.name=Name
+curriculum.description=Description
+curriculum.courses=Courses
+
+curriculum.list=Curriculums
+curriculum.create=Create Curriculum
+curriculum.update=Update Curriculum
+
+error.curriculum.courseExist=Course already Existed
+error.curriculum.course.duplicateAlias=Alias already Existed
+
+course.course=Course
+course.courses=Courses
+course.name=Name
+course.description=Description
+course.sessions=Chapters
+course.jid=Course Jid
+course.alias=Alias
+course.completeable=Completeable?
+
+course.list=Courses
+course.create=Create Course
+course.update=Update Course
+
+error.course.sessionExist=Chapter already Existed
+error.course.invalidJid=Invalid Course
+error.course.session.duplicateAlias=Alias already Existed
+
+session.session=Chapter
+session.sessions=Chapters
+session.name=Name
+session.description=Description
+session.dependencies=Dependencies
+session.jid=Chapter Jid
+session.alias=Alias
+session.completeable=Completeable?
+
+session.list=Chapters
+session.create=Create Chapter
+session.update=Update Chapter
+
+error.session.invalidJid=Invalid Chapter
+
+session.lesson=Lesson
+session.lessons=Lessons
+session.lesson.alias=Alias
+session.lesson.name=Name
+session.lesson.status=Status
+session.lesson.jid=Lesson Jid
+session.lesson.secret=Lesson Secret
+
+session.lesson.create=Create
+
+error.session.lessonExist=Lesson Already Existed.
+error.session.lesson.duplicateAlias=Alias already Existed
+error.lesson.invalidJid=Invalid Lesson Jid.
+
+session.problem=Problem
+session.problems=Problems
+session.problem.alias=Alias
+session.problem.name=Name
+session.problem.type=Type
+session.problem.status=Status
+session.problem.jid=Problem Jid
+session.problem.secret=Problem Secret
+
+session.problem.create=Create
+
+error.session.problemExist=Problem Already Existed.
+error.session.problem.duplicateAlias=Alias already Existed
+error.problem.invalidJid=Invalid Problem Jid.
+
+session.submissions=Submissions
+session.submissions.bundle=Bundle Submissions
+session.submissions.programming=Programming Submissions
+
+submission.submissions=Submissions
+submission.author=Author
+submission.time=Time
+submission.gradingLanguage=Language
+submission.verdict=Verdict
+submission.pts=Pts
+submission.prob=Prob
+submission.lang=Lang
+submission.score=Score
+
+problem.problem=Problem
+
+user.users=Users
+user.user=User
+
+user.list=Users
+user.create=Create User
+user.view=View User
+user.update=Update User
+
+user.create.error.usernameNotFound=Username not found
+user.create.error.userAlreadyExists=User already exists
+user.delete.confirmation=Are you sure you want to delete?
+
+user.username=Username
+user.name=Name
+user.roles=Roles
+
+training.welcome=Welcome to Training Gate!
+training.home=Training Home
+training.backToHome=Back to Home
+training.backTo=Back to
+
+training.course.completed=Completed
+training.course.inProgress=In Progress
+training.course.available=Available
+training.course.locked=Locked
+
+training.session.completed=Completed
+training.session.inProgress=In Progress
+training.session.available=Available
+training.session.locked=Submissions Locked
+
+training.lesson.viewed=Viewed
+training.lesson.notViewed=Not Viewed
+
+training.problem.viewed=Viewed
+training.problem.notViewed=Not Viewed
+training.problem.completed=Completed
+
+error.system.sandalphon.connection=Sandalphon Connection has problem.
