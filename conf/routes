@@ -1,4 +1,4 @@
-->          /                                                                                                                                                       jerahmeelcommons.Routes
+->          /                                                                                                                                                       playcommons.Routes
 ->          /                                                                                                                                                       jophielcommons.Routes
 
 GET         /                                                                                                                                                       @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.index()
