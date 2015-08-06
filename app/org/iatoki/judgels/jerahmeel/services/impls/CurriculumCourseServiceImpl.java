@@ -2,6 +2,16 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.GradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.SubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
+import org.iatoki.judgels.jerahmeel.models.entities.GradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
+import org.iatoki.judgels.jerahmeel.models.entities.SubmissionModel;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.CourseProgress;
@@ -21,11 +31,13 @@ import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
+import org.iatoki.judgels.sandalphon.ProblemType;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,14 +49,24 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     private final CourseDao courseDao;
     private final CourseSessionDao courseSessionDao;
     private final SessionDependencyDao sessionDependencyDao;
+    private final SessionProblemDao sessionProblemDao;
+    private final BundleSubmissionDao bundleSubmissionDao;
+    private final BundleGradingDao bundleGradingDao;
+    private final SubmissionDao submissionDao;
+    private final GradingDao gradingDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CurriculumCourseServiceImpl(CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, CourseSessionDao courseSessionDao, SessionDependencyDao sessionDependencyDao, UserItemDao userItemDao) {
+    public CurriculumCourseServiceImpl(CurriculumCourseDao curriculumCourseDao, CourseDao courseDao, CourseSessionDao courseSessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, SubmissionDao submissionDao, GradingDao gradingDao, UserItemDao userItemDao) {
         this.curriculumCourseDao = curriculumCourseDao;
         this.courseDao = courseDao;
         this.courseSessionDao = courseSessionDao;
         this.sessionDependencyDao = sessionDependencyDao;
+        this.sessionProblemDao = sessionProblemDao;
+        this.bundleSubmissionDao = bundleSubmissionDao;
+        this.bundleGradingDao = bundleGradingDao;
+        this.submissionDao = submissionDao;
+        this.gradingDao = gradingDao;
         this.userItemDao = userItemDao;
     }
 
@@ -112,7 +134,40 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
             if (completed == courseSessionModels.size()) {
                 progress = CourseProgress.COMPLETED;
             }
-            curriculumCourseProgressBuilder.add(new CurriculumCourseProgress(createFromModel(curriculumCourseModel), progress));
+
+            double totalScore = 0;
+            for (CourseSessionModel courseSessionModel : courseSessionModels) {
+                List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(courseSessionModel.sessionJid);
+
+
+                for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
+                    if (sessionProblemModel.type.equals(ProblemType.BUNDLE.name())) {
+                        double maxScore = 0;
+                        List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.findByContestJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                        Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.findGradingsForSubmissions(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                        for (String submissionJid : bundleGradingModels.keySet()) {
+                            double submissionScore = bundleGradingModels.get(submissionJid).get(bundleGradingModels.get(submissionJid).size() - 1).score;
+                            if (submissionScore > maxScore) {
+                                maxScore = submissionScore;
+                            }
+                        }
+                        totalScore += maxScore;
+                    } else if (sessionProblemModel.type.equals(ProblemType.PROGRAMMING.name())) {
+                        double maxScore = 0;
+                        List<SubmissionModel> submissionModels = submissionDao.findByContestJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                        Map<String, List<GradingModel>> gradingModels = gradingDao.findGradingsForSubmissions(submissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                        for (String submissionJid : gradingModels.keySet()) {
+                            double submissionScore = gradingModels.get(submissionJid).get(gradingModels.get(submissionJid).size() - 1).score;
+                            if (submissionScore > maxScore) {
+                                maxScore = submissionScore;
+                            }
+                        }
+                        totalScore += maxScore;
+                    }
+                }
+            }
+
+            curriculumCourseProgressBuilder.add(new CurriculumCourseProgress(createFromModel(curriculumCourseModel), progress, completed, courseSessionModels.size(), totalScore));
         }
 
         return new Page<>(curriculumCourseProgressBuilder.build(), totalPages, pageIndex, pageSize);

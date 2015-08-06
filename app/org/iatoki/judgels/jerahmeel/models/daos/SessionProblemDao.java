@@ -6,6 +6,7 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import java.util.List;
 
 public interface SessionProblemDao extends Dao<Long, SessionProblemModel> {
+
     boolean existBySessionJidAndAlias(String sessionJid, String alias);
 
     List<SessionProblemModel> findBySessionJid(String sessionJid);

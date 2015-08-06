@@ -22,21 +22,21 @@
             <div class="pull-right">
                 @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
                     <span class="alert alert-danger">
-                        @Messages.get("training.course.locked")
+                        @Messages.get("training.course.locked") <strong>[- / @curriculumCourseProgress.getTotalSessions]</strong>
                     </span>
                 } else {
                     @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
                         <span class="alert alert-success">
-                            @Messages.get("training.course.completed")
+                            @Messages.get("training.course.completed") <strong>[@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]</strong>
                         </span>
                     } else {
                         @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
                             <span class="alert alert-info">
-                                @Messages.get("training.course.inProgress")
+                                @Messages.get("training.course.inProgress") <strong>[@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]</strong>
                             </span>
                         } else {
                             <span class="alert alert-warning">
-                                @Messages.get("training.course.available")
+                                @Messages.get("training.course.available") <strong>[@curriculumCourseProgress.getTotalScores]</strong>
                             </span>
                         }
                     }
