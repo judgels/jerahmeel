@@ -134,7 +134,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
             return ControllerUtils.getInstance().lazyOk(content);
         } else {
             return notFound();
-        }    
+        }
     }
 
     @Transactional(readOnly = true)

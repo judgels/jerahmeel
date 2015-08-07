@@ -38,7 +38,7 @@ public final class SessionControllerUtils {
                     new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getAlias(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );
-        } else if (courseSession.isCompleteable()){
+        } else if (courseSession.isCompleteable()) {
             content.appendLayout(c -> headingWithBackLayout.render(
                     Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(),
                     new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getAlias(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),

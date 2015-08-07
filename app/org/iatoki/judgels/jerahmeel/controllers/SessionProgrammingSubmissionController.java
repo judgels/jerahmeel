@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
-@Authorized(value = {"admin"})
+@Authorized(value = "admin")
 @Singleton
 @Named
 public final class SessionProgrammingSubmissionController extends AbstractJudgelsController {

@@ -32,7 +32,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
-@Authorized(value = {"admin"})
+@Authorized(value = "admin")
 @Singleton
 @Named
 public final class CourseSessionController extends AbstractJudgelsController {

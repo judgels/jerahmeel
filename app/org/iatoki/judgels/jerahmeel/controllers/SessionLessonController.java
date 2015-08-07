@@ -41,7 +41,7 @@ import java.io.IOException;
 import java.net.URI;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
-@Authorized(value = {"admin"})
+@Authorized(value = "admin")
 @Singleton
 @Named
 public final class SessionLessonController extends AbstractJudgelsController {

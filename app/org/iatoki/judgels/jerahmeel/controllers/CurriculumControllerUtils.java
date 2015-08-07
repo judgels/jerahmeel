@@ -23,7 +23,7 @@ public final class CurriculumControllerUtils {
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(),
-                    new InternalLink(Messages.get("commons.update"),routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())),
+                    new InternalLink(Messages.get("commons.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())),
                     new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
                     c)
             );

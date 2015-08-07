@@ -10,7 +10,7 @@ public interface CourseSessionService {
     boolean existByCourseJidAndAlias(String courseJid, String alias);
 
     boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid);
-    
+
     CourseSession findByCourseSessionId(long courseSessionId) throws CourseSessionNotFoundException;
 
     Page<CourseSession> findCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);

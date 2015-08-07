@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
-@Authorized(value = {"admin"})
+@Authorized(value = "admin")
 @Singleton
 @Named
 public final class SessionBundleSubmissionController extends AbstractJudgelsController {
@@ -134,7 +134,7 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
             String sessionProblemAlias = sessionProblem.getAlias();
             String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
 
-            LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() {}.getType()), answer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
+            LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), answer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
             content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
                     new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))

@@ -13,5 +13,4 @@ public interface CurriculumService {
     void createCurriculum(String name, String description);
 
     void updateCurriculum(long curriculumId, String name, String description) throws CurriculumNotFoundException;
-    
 }

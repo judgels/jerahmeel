@@ -1,18 +1,18 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.JudgelsPlayUtils;
-import org.iatoki.judgels.jophiel.forms.ViewpointForm;
-import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.jophiel.Jophiel;
-import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.User;
-import org.iatoki.judgels.jerahmeel.services.UserService;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.UserService;
+import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jophiel.Jophiel;
+import org.iatoki.judgels.jophiel.forms.ViewpointForm;
+import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.JudgelsPlayUtils;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
@@ -53,8 +53,8 @@ public final class ApplicationController extends AbstractJudgelsController {
         } else if (session().containsKey("username")) {
             return redirect(routes.ApplicationController.authRole(returnUri));
         } else {
-            returnUri = org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.afterLogin(returnUri).absoluteURL(request(), request().secure());
-            return redirect(org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.login(returnUri));
+            String newReturnUri = org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.afterLogin(returnUri).absoluteURL(request(), request().secure());
+            return redirect(org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.login(newReturnUri));
         }
     }
 
@@ -93,8 +93,8 @@ public final class ApplicationController extends AbstractJudgelsController {
             }
             return redirect(returnUri);
         } else {
-            returnUri = org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.afterLogin(returnUri).absoluteURL(request(), request().secure());
-            return redirect(routes.ApplicationController.authRole(returnUri));
+            String newReturnUri = org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.afterLogin(returnUri).absoluteURL(request(), request().secure());
+            return redirect(routes.ApplicationController.authRole(newReturnUri));
         }
     }
 

@@ -80,5 +80,6 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         } else {
             userItemModel.status = UserItemStatus.VIEWED.name();
         }
-        userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);    }
+        userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
+    }
 }

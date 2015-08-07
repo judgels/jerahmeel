@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 @Singleton
 @Named("bundleSubmissionDao")
 public final class BundleSubmissionHibernateDao extends AbstractBundleSubmissionHibernateDao<BundleSubmissionModel> implements BundleSubmissionDao {
+
     public BundleSubmissionHibernateDao() {
         super(BundleSubmissionModel.class);
     }
@@ -18,5 +19,4 @@ public final class BundleSubmissionHibernateDao extends AbstractBundleSubmission
     public BundleSubmissionModel createSubmissionModel() {
         return new BundleSubmissionModel();
     }
-
 }
