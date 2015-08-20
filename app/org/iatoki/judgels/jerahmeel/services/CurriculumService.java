@@ -6,9 +6,9 @@ import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 
 public interface CurriculumService {
 
-    Page<Curriculum> pageCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<Curriculum> getPageOfCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Curriculum findCurriculumByCurriculumId(long curriculumId) throws CurriculumNotFoundException;
+    Curriculum findCurriculumById(long curriculumId) throws CurriculumNotFoundException;
 
     void createCurriculum(String name, String description);
 

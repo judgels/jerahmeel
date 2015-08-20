@@ -14,6 +14,4 @@ public abstract class UserItemModel_ extends AbstractModel_ {
 	public static volatile SingularAttribute<UserItemModel, String> userJid;
 	public static volatile SingularAttribute<UserItemModel, String> itemJid;
 	public static volatile SingularAttribute<UserItemModel, String> status;
-
 }
-

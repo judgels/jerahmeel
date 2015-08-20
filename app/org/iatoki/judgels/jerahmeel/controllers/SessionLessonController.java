@@ -48,15 +48,15 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
-    private final SessionService sessionService;
-    private final SessionLessonService sessionLessonService;
     private final Sandalphon sandalphon;
+    private final SessionLessonService sessionLessonService;
+    private final SessionService sessionService;
 
     @Inject
-    public SessionLessonController(SessionService sessionService, SessionLessonService sessionLessonService, Sandalphon sandalphon) {
-        this.sessionService = sessionService;
-        this.sessionLessonService = sessionLessonService;
+    public SessionLessonController(Sandalphon sandalphon, SessionLessonService sessionLessonService, SessionService sessionService) {
         this.sandalphon = sandalphon;
+        this.sessionLessonService = sessionLessonService;
+        this.sessionService = sessionService;
     }
 
     @Transactional(readOnly = true)
@@ -66,52 +66,49 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     public Result listSessionLessons(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
 
-        Page<SessionLesson> sessionPage = sessionLessonService.findSessionLessons(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<SessionLesson> pageOfSessionLessons = sessionLessonService.getPageOfSessionLessons(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        return showListSessionLessons(session, sessionPage, orderBy, orderDir, filterString);
+        return showListSessionLessons(session, pageOfSessionLessons, orderBy, orderDir, filterString);
     }
 
     @Transactional(readOnly = true)
     public Result viewLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionById(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (session.getJid().equals(sessionLesson.getSessionJid())) {
-            String requestUrl = sandalphon.getLessonStatementRenderUri().toString();
-            String requestBody = sandalphon.getLessonStatementRenderRequestBody(sessionLesson.getLessonJid(), sessionLesson.getLessonSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
-
-            LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
-            SessionControllerUtils.appendUpdateLayout(content, session);
-            ControllerUtils.getInstance().appendSidebarLayout(content);
-            ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-                  new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-                  new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
-                  new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId())),
-                  new InternalLink(sessionLesson.getAlias(), routes.SessionLessonController.viewLesson(session.getId(), sessionLesson.getId()))
-            ));
-
-            ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lesson - View");
-
-            return ControllerUtils.getInstance().lazyOk(content);
-        } else {
+        if (!session.getJid().equals(sessionLesson.getSessionJid())) {
             return forbidden();
         }
+
+        String requestUrl = sandalphon.getLessonStatementRenderUri().toString();
+        String requestBody = sandalphon.getLessonStatementRenderRequestBody(sessionLesson.getLessonJid(), sessionLesson.getLessonSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+
+        LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
+        SessionControllerUtils.appendUpdateLayout(content, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session,
+                new InternalLink(sessionLesson.getAlias(), routes.SessionLessonController.viewLesson(session.getId(), sessionLesson.getId()))
+        );
+
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lesson - View");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional(readOnly = true)
     public Result renderImage(long sessionId, long sessionLessonId, String imageFilename) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionById(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (session.getJid().equals(sessionLesson.getSessionJid())) {
-            URI imageUri = sandalphon.getLessonMediaRenderUri(sessionLesson.getLessonJid(), imageFilename);
-
-            return redirect(imageUri.toString());
-        } else {
+        if (!session.getJid().equals(sessionLesson.getSessionJid())) {
             return notFound();
         }
+
+        URI imageUri = sandalphon.getLessonMediaRenderUri(sessionLesson.getLessonJid(), imageFilename);
+
+        return redirect(imageUri.toString());
     }
 
     public Result switchLanguage() {
@@ -124,108 +121,108 @@ public final class SessionLessonController extends AbstractJudgelsController {
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createLesson(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        Form<SessionLessonCreateForm> form = Form.form(SessionLessonCreateForm.class);
+        Session session = sessionService.findSessionById(sessionId);
+        Form<SessionLessonCreateForm> sessionLessonCreateForm = Form.form(SessionLessonCreateForm.class);
 
-        return showCreateLesson(session, form);
+        return showCreateLesson(session, sessionLessonCreateForm);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postCreateLesson(long sessionId) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        Form<SessionLessonCreateForm> form = Form.form(SessionLessonCreateForm.class).bindFromRequest();
+        Session session = sessionService.findSessionById(sessionId);
+        Form<SessionLessonCreateForm> sessionLessonCreateForm = Form.form(SessionLessonCreateForm.class).bindFromRequest();
 
-        if (form.hasErrors() || form.hasGlobalErrors()) {
-            return showCreateLesson(session, form);
-        } else {
-            SessionLessonCreateForm data = form.get();
-            String lessonName = null;
-            try {
-                lessonName = sandalphon.verifyLessonJid(data.lessonJid);
-            } catch (IOException e) {
-                form.reject(Messages.get("error.system.sandalphon.connection"));
-
-                return showCreateLesson(session, form);
-            }
-
-            if (lessonName != null) {
-                if (!sessionLessonService.isInSessionByAlias(session.getJid(), data.alias)) {
-                    sessionLessonService.addSessionLesson(session.getJid(), data.lessonJid, data.lessonSecret, data.alias, SessionLessonStatus.valueOf(data.status));
-                    JidCacheServiceImpl.getInstance().putDisplayName(data.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-
-                    return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
-                } else {
-                    form.reject(Messages.get("error.session.lessonExist"));
-
-                    return showCreateLesson(session, form);
-                }
-            } else {
-                form.reject(Messages.get("error.lesson.invalidJid"));
-
-                return showCreateLesson(session, form);
-            }
+        if (formHasErrors(sessionLessonCreateForm)) {
+            return showCreateLesson(session, sessionLessonCreateForm);
         }
+
+        SessionLessonCreateForm sessionLessonCreateData = sessionLessonCreateForm.get();
+        String lessonName = null;
+        try {
+            lessonName = sandalphon.verifyLessonJid(sessionLessonCreateData.lessonJid);
+        } catch (IOException e) {
+            sessionLessonCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
+
+            return showCreateLesson(session, sessionLessonCreateForm);
+        }
+
+        if (lessonName == null) {
+            sessionLessonCreateForm.reject(Messages.get("error.lesson.invalidJid"));
+
+            return showCreateLesson(session, sessionLessonCreateForm);
+        }
+
+        if (sessionLessonService.aliasExistsInSession(session.getJid(), sessionLessonCreateData.alias)) {
+            sessionLessonCreateForm.reject(Messages.get("error.session.lessonExist"));
+
+            return showCreateLesson(session, sessionLessonCreateForm);
+        }
+
+        sessionLessonService.addSessionLesson(session.getJid(), sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret, sessionLessonCreateData.alias, SessionLessonStatus.valueOf(sessionLessonCreateData.status));
+        JidCacheServiceImpl.getInstance().putDisplayName(sessionLessonCreateData.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }
 
     @Transactional
     public Result deleteLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionById(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (session.getJid().equals(sessionLesson.getSessionJid())) {
-            sessionLessonService.removeSessionLesson(sessionLessonId);
-
-            return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
-        } else {
+        if (!session.getJid().equals(sessionLesson.getSessionJid())) {
             return forbidden();
         }
+
+        sessionLessonService.removeSessionLesson(sessionLessonId);
+
+        return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionById(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (session.getJid().equals(sessionLesson.getSessionJid())) {
-            SessionLessonUpdateForm sessionLessonUpdateForm = new SessionLessonUpdateForm();
-            sessionLessonUpdateForm.alias = sessionLesson.getAlias();
-            sessionLessonUpdateForm.status = sessionLesson.getStatus().name();
-
-            Form<SessionLessonUpdateForm> form = Form.form(SessionLessonUpdateForm.class).fill(sessionLessonUpdateForm);
-
-            return showUpdateLesson(session, sessionLesson, form);
-        } else {
+        if (!session.getJid().equals(sessionLesson.getSessionJid())) {
             return notFound();
         }
+
+        SessionLessonUpdateForm sessionLessonUpdateData = new SessionLessonUpdateForm();
+        sessionLessonUpdateData.alias = sessionLesson.getAlias();
+        sessionLessonUpdateData.status = sessionLesson.getStatus().name();
+
+        Form<SessionLessonUpdateForm> sessionLessonUpdateForm = Form.form(SessionLessonUpdateForm.class).fill(sessionLessonUpdateData);
+
+        return showUpdateLesson(session, sessionLesson, sessionLessonUpdateForm);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postUpdateLesson(long sessionId, long sessionLessonId) throws SessionNotFoundException, SessionLessonNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        SessionLesson sessionLesson = sessionLessonService.findSessionLessonBySessionLessonId(sessionLessonId);
+        Session session = sessionService.findSessionById(sessionId);
+        SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (session.getJid().equals(sessionLesson.getSessionJid())) {
-            Form<SessionLessonUpdateForm> form = Form.form(SessionLessonUpdateForm.class).bindFromRequest();
-            if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
-                SessionLessonUpdateForm sessionLessonUpdateForm = form.get();
-                if ((sessionLessonUpdateForm.alias.equals(sessionLesson.getAlias())) || (!sessionLessonService.isInSessionByAlias(session.getJid(), sessionLessonUpdateForm.alias))) {
-                    sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonUpdateForm.alias, SessionLessonStatus.valueOf(sessionLessonUpdateForm.status));
-
-                    return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
-                } else {
-                    form.reject(Messages.get("error.session.lesson.duplicateAlias"));
-
-                    return showUpdateLesson(session, sessionLesson, form);
-                }
-            } else {
-                return showUpdateLesson(session, sessionLesson, form);
-            }
-        } else {
+        if (!session.getJid().equals(sessionLesson.getSessionJid())) {
             return notFound();
         }
+
+        Form<SessionLessonUpdateForm> sessionLessonUpdateForm = Form.form(SessionLessonUpdateForm.class).bindFromRequest();
+        if (formHasErrors(sessionLessonUpdateForm)) {
+            return showUpdateLesson(session, sessionLesson, sessionLessonUpdateForm);
+        }
+
+        SessionLessonUpdateForm sessionLessonUpdateData = sessionLessonUpdateForm.get();
+        if (!sessionLessonUpdateData.alias.equals(sessionLesson.getAlias()) && sessionLessonService.aliasExistsInSession(session.getJid(), sessionLessonUpdateData.alias)) {
+            sessionLessonUpdateForm.reject(Messages.get("error.session.lesson.duplicateAlias"));
+
+            return showUpdateLesson(session, sessionLesson, sessionLessonUpdateForm);
+        }
+
+        sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonUpdateData.alias, SessionLessonStatus.valueOf(sessionLessonUpdateData.status));
+
+        return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }
 
 
@@ -233,44 +230,43 @@ public final class SessionLessonController extends AbstractJudgelsController {
         LazyHtml content = new LazyHtml(listSessionLessonsView.render(session.getId(), currentPage, orderBy, orderDir, filterString));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.lessons"), new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.createLesson(session.getId())), c));
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     private Result showCreateLesson(Session session, Form<SessionLessonCreateForm> form) {
         LazyHtml content = new LazyHtml(createLessonView.render(session.getId(), form));
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId())),
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session,
               new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.createLesson(session.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Create");
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Create");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     private Result showUpdateLesson(Session session, SessionLesson sessionLesson, Form<SessionLessonUpdateForm> form) {
         LazyHtml content = new LazyHtml(updateSessionLessonView.render(form, session.getId(), sessionLesson));
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-                new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-                new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
-                new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId())),
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session,
                 new InternalLink(Messages.get("commons.update"), routes.SessionLessonController.updateLesson(session.getId(), sessionLesson.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Update");
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons - Update");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Session session, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = SessionControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("commons.view"), routes.SessionLessonController.viewSessionLessons(session.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

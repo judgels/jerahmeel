@@ -7,8 +7,7 @@ import java.util.List;
 
 public interface SessionDependencyDao extends Dao<Long, SessionDependencyModel> {
 
-    boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
+    boolean existsBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
 
-    List<SessionDependencyModel> findBySessionJid(String sessionJid);
-
+    List<SessionDependencyModel> getBySessionJid(String sessionJid);
 }

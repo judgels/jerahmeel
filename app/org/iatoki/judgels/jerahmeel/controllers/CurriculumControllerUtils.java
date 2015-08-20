@@ -43,4 +43,11 @@ public final class CurriculumControllerUtils {
         );
         content.appendLayout(c -> headingLayout.render(Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(), c));
     }
+
+    static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()));
+
+        return breadcrumbsBuilder;
+    }
 }

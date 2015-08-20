@@ -13,8 +13,8 @@ import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFile;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFile;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
@@ -56,31 +56,31 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
     private static final long PAGE_SIZE = 20;
 
-    private final SessionService sessionService;
-    private final BundleSubmissionService bundleSubmissionService;
-    private final SessionProblemService sessionProblemService;
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
+    private final BundleSubmissionService bundleSubmissionService;
+    private final SessionProblemService sessionProblemService;
+    private final SessionService sessionService;
     private final UserItemService userItemService;
 
     @Inject
-    public SessionBundleSubmissionController(SessionService sessionService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, @BundleSubmissionLocalFile FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFile @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, UserItemService userItemService) {
-        this.sessionService = sessionService;
-        this.bundleSubmissionService = bundleSubmissionService;
-        this.sessionProblemService = sessionProblemService;
+    public SessionBundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService, UserItemService userItemService) {
         this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
         this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
+        this.bundleSubmissionService = bundleSubmissionService;
+        this.sessionService = sessionService;
+        this.sessionProblemService = sessionProblemService;
         this.userItemService = userItemService;
     }
 
     @Transactional
     public Result postSubmitProblem(long sessionId, String problemJid) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), problemJid);
 
-        DynamicForm dynamicForm = DynamicForm.form().bindFromRequest();
+        DynamicForm dForm = DynamicForm.form().bindFromRequest();
 
-        BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dynamicForm, SessionControllerUtils.getCurrentStatementLanguage());
+        BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, SessionControllerUtils.getCurrentStatementLanguage());
         String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), session.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, answer);
 
@@ -94,109 +94,114 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
     @Transactional(readOnly = true)
     public Result listSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
 
         String actualUserJid = "(none)".equals(userJid) ? null : userJid;
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
-        Page<BundleSubmission> bundleSubmissions = bundleSubmissionService.pageSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
+        Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
         Map<String, String> problemJidToAliasMap = sessionProblemService.findBundleProblemJidToAliasMapBySessionJid(session.getJid());
-        List<UserItem> userItems = userItemService.findAllUserItemByItemJid(session.getJid());
+        List<UserItem> userItems = userItemService.getUserItemsByItemJid(session.getJid());
         List<String> userJids = Lists.transform(userItems, u -> u.getUserJid());
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), bundleSubmissions, userJids, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), pageOfBundleSubmissions, userJids, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-                new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
-              ), c)
-        );
+        appendSubtabLayout(content, session);
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
-              new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionBundleSubmissionController.viewSubmissions(session.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional(readOnly = true)
     public Result viewSubmission(long sessionId, long bundleSubmissionId) throws SessionNotFoundException, BundleSubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
+        Session session = sessionService.findSessionById(sessionId);
+        BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
+        BundleAnswer bundleAnswer;
         try {
-            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
-            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
-            String sessionProblemAlias = sessionProblem.getAlias();
-            String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
-
-            LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), answer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
-            content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                    new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-                    new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
-                  ), c)
-            );
-            SessionControllerUtils.appendUpdateLayout(content, session);
-            ControllerUtils.getInstance().appendSidebarLayout(content);
-            ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-                  new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-                  new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
-                  new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())),
-                  new InternalLink(Messages.get("commons.view"), routes.SessionBundleSubmissionController.viewSubmissions(session.getId())),
-                  new InternalLink(sessionProblemAlias, routes.SessionBundleSubmissionController.viewSubmission(session.getId(), bundleSubmission.getId()))
-            ));
-            ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions - View");
-
-            return ControllerUtils.getInstance().lazyOk(content);
+            bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
+        String sessionProblemAlias = sessionProblem.getAlias();
+        String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
+
+        LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
+        appendSubtabLayout(content, session);
+        SessionControllerUtils.appendUpdateLayout(content, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session,
+                new InternalLink(sessionProblemAlias, routes.SessionBundleSubmissionController.viewSubmission(session.getId(), bundleSubmission.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions - View");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional
     public Result regradeSubmission(long sessionId, long bundleSubmissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, BundleSubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
 
-        BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
+        BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
+        BundleAnswer bundleAnswer;
         try {
-            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
-            bundleSubmissionService.regrade(bundleSubmission.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-
-            return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+            bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
     @Transactional
     public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, BundleSubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
 
-        ListTableSelectionForm data = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
-
+        ListTableSelectionForm listTableSelectionData = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
         List<BundleSubmission> bundleSubmissions;
 
-        if (data.selectAll) {
-            bundleSubmissions = bundleSubmissionService.findSubmissionsWithoutGradingsByFilters(orderBy, orderDir, userJid, problemJid, session.getJid());
-        } else if (data.selectJids != null) {
-            bundleSubmissions = bundleSubmissionService.findSubmissionsWithoutGradingsByJids(data.selectJids);
+        if (listTableSelectionData.selectAll) {
+            bundleSubmissions = bundleSubmissionService.getBundleSubmissionsByFilters(orderBy, orderDir, userJid, problemJid, session.getJid());
+        } else if (listTableSelectionData.selectJids != null) {
+            bundleSubmissions = bundleSubmissionService.getBundleSubmissionsByJids(listTableSelectionData.selectJids);
         } else {
             return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
         }
 
         for (BundleSubmission bundleSubmission : bundleSubmissions) {
+            BundleAnswer bundleAnswer;
             try {
-                BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
-                bundleSubmissionService.regrade(bundleSubmission.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+                bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+            bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+    }
+
+    private void appendSubtabLayout(LazyHtml content, Session session) {
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
+                        new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
+                ), c)
+        );
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Session session, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = SessionControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("commons.view"), routes.SessionBundleSubmissionController.viewSubmissions(session.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

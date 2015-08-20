@@ -38,10 +38,10 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
 
     @Override
     public boolean isDependenciesFulfilled(String userJid, String sessionJid) {
-        List<UserItemModel> completedUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
+        List<UserItemModel> completedUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
         Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
 
-        List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(sessionJid);
+        List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.getBySessionJid(sessionJid);
         Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
 
         dependencyJids.removeAll(completedJids);
@@ -49,12 +49,12 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
     }
 
     @Override
-    public boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid) {
-        return sessionDependencyDao.existBySessionJidAndDependencyJid(sessionJid, dependencyJid);
+    public boolean existsBySessionJidAndDependencyJid(String sessionJid, String dependencyJid) {
+        return sessionDependencyDao.existsBySessionJidAndDependencyJid(sessionJid, dependencyJid);
     }
 
     @Override
-    public SessionDependency findSessionDependencyBySessionDependencyId(long sessionDependencyId) throws SessionDependencyNotFoundException {
+    public SessionDependency findSessionDependencyById(long sessionDependencyId) throws SessionDependencyNotFoundException {
         SessionDependencyModel sessionDependencyModel = sessionDependencyDao.findById(sessionDependencyId);
         if (sessionDependencyModel != null) {
             return new SessionDependency(sessionDependencyModel.id, sessionDependencyModel.sessionJid, sessionDependencyModel.dependedSessionJid, null);
@@ -64,7 +64,7 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
     }
 
     @Override
-    public Page<SessionDependency> findSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionDependency> getPageOfSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionDependencyDao.countByFilters(filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 

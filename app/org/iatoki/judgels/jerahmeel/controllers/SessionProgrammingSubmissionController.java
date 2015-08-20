@@ -17,8 +17,8 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.UserItem;
-import org.iatoki.judgels.jerahmeel.config.SubmissionLocalFile;
-import org.iatoki.judgels.jerahmeel.config.SubmissionRemoteFile;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
@@ -28,11 +28,11 @@ import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.programming.listSubmissionsView;
-import org.iatoki.judgels.sandalphon.Submission;
+import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.adapters.impls.SubmissionAdapterRegistry;
-import org.iatoki.judgels.sandalphon.SubmissionException;
-import org.iatoki.judgels.sandalphon.SubmissionNotFoundException;
-import org.iatoki.judgels.sandalphon.services.SubmissionService;
+import org.iatoki.judgels.sandalphon.ProgrammingSubmissionException;
+import org.iatoki.judgels.sandalphon.ProgrammingSubmissionNotFoundException;
+import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
@@ -54,26 +54,26 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
 
     private static final long PAGE_SIZE = 20;
 
-    private final SessionService sessionService;
-    private final SubmissionService submissionService;
     private final SessionProblemService sessionProblemService;
+    private final SessionService sessionService;
     private final FileSystemProvider submissionLocalFileSystemProvider;
     private final FileSystemProvider submissionRemoteFileSystemProvider;
+    private final ProgrammingSubmissionService submissionService;
     private final UserItemService userItemService;
 
     @Inject
-    public SessionProgrammingSubmissionController(SessionService sessionService, SubmissionService submissionService, SessionProblemService sessionProblemService, @SubmissionLocalFile FileSystemProvider submissionLocalFileSystemProvider, @SubmissionRemoteFile @Nullable FileSystemProvider submissionRemoteFileSystemProvider, UserItemService userItemService) {
-        this.sessionService = sessionService;
-        this.submissionService = submissionService;
+    public SessionProgrammingSubmissionController(SessionProblemService sessionProblemService, SessionService sessionService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider submissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider submissionRemoteFileSystemProvider, ProgrammingSubmissionService submissionService, UserItemService userItemService) {
         this.sessionProblemService = sessionProblemService;
+        this.sessionService = sessionService;
         this.submissionLocalFileSystemProvider = submissionLocalFileSystemProvider;
         this.submissionRemoteFileSystemProvider = submissionRemoteFileSystemProvider;
+        this.submissionService = submissionService;
         this.userItemService = userItemService;
     }
 
     @Transactional
     public Result postSubmitProblem(long sessionId, String problemJid) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), problemJid);
 
         Http.MultipartFormData body = request().body().asMultipartFormData();
@@ -86,9 +86,9 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
             String submissionJid = submissionService.submit(problemJid, session.getJid(), gradingEngine, gradingLanguage, null, source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
             SubmissionAdapterRegistry.getInstance().getByGradingEngineName(gradingEngine).storeSubmissionFiles(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submissionJid, source);
 
-            ControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + session.getName() + ".");
+            JerahmeelControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + session.getName() + ".");
 
-        } catch (SubmissionException e) {
+        } catch (ProgrammingSubmissionException e) {
             flash("submissionError", e.getMessage());
 
             return redirect(routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId()));
@@ -104,41 +104,32 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
 
     @Transactional(readOnly = true)
     public Result listSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+        Session session = sessionService.findSessionById(sessionId);
 
         String actualUserJid = "(none)".equals(userJid) ? null : userJid;
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
-        Page<Submission> submissions = submissionService.pageSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
+        Page<ProgrammingSubmission> pageOfSubmissions = submissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
         Map<String, String> problemJidToAliasMap = sessionProblemService.findProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
-        List<UserItem> userItems = userItemService.findAllUserItemByItemJid(session.getJid());
+        List<UserItem> userItems = userItemService.getUserItemsByItemJid(session.getJid());
         List<String> userJids = Lists.transform(userItems, u -> u.getUserJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), submissions, userJids, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), pageOfSubmissions, userJids, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-                new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
-              ), c)
-        );
+        appendSubtabLayout(content, session);
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
-              new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionProgrammingSubmissionController.viewSubmissions(session.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional(readOnly = true)
-    public Result viewSubmission(long sessionId, long submissionId) throws SessionNotFoundException, SubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
-        Submission submission = submissionService.findSubmissionById(submissionId);
+    public Result viewSubmission(long sessionId, long submissionId) throws SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+        Session session = sessionService.findSessionById(sessionId);
+        ProgrammingSubmission submission = submissionService.findProgrammingSubmissionById(submissionId);
 
         GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
@@ -148,31 +139,22 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
         LazyHtml content = new LazyHtml(SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, source, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
-
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                    new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-                    new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
-        ), c)
-        );
+        appendSubtabLayout(content, session);
         SessionControllerUtils.appendUpdateLayout(content, session);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()),
-              new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())),
-              new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.SessionProgrammingSubmissionController.viewSubmissions(session.getId())),
-              new InternalLink(sessionProblemAlias, routes.SessionProgrammingSubmissionController.viewSubmission(session.getId(), submission.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions - View");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, session,
+                new InternalLink(sessionProblemAlias, routes.SessionProgrammingSubmissionController.viewSubmission(session.getId(), submission.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions - View");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional
-    public Result regradeSubmission(long sessionId, long submissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, SubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+    public Result regradeSubmission(long sessionId, long submissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+        Session session = sessionService.findSessionById(sessionId);
 
-        Submission submission = submissionService.findSubmissionById(submissionId);
+        ProgrammingSubmission submission = submissionService.findProgrammingSubmissionById(submissionId);
         GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
         submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
@@ -180,26 +162,44 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
     }
 
     @Transactional
-    public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, SubmissionNotFoundException {
-        Session session = sessionService.findSessionBySessionId(sessionId);
+    public Result regradeSubmissions(long sessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+        Session session = sessionService.findSessionById(sessionId);
 
         ListTableSelectionForm data = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
 
-        List<Submission> submissions;
+        List<ProgrammingSubmission> submissions;
 
         if (data.selectAll) {
-            submissions = submissionService.findSubmissionsWithoutGradingsByFilters(orderBy, orderDir, userJid, problemJid, session.getJid());
+            submissions = submissionService.getProgrammingSubmissionsByFilters(orderBy, orderDir, userJid, problemJid, session.getJid());
         } else if (data.selectJids != null) {
-            submissions = submissionService.findSubmissionsWithoutGradingsByJids(data.selectJids);
+            submissions = submissionService.getProgrammingSubmissionsByJids(data.selectJids);
         } else {
             return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
         }
 
-        for (Submission submission : submissions) {
+        for (ProgrammingSubmission submission : submissions) {
             GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
             submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+    }
+
+    private void appendSubtabLayout(LazyHtml content, Session session) {
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())),
+                        new InternalLink(Messages.get("session.submissions.bundle"), routes.SessionController.jumpToBundleSubmissions(session.getId()))
+                ), c)
+        );
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Session session, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = SessionControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.submissions"), routes.SessionController.jumpToSubmissions(session.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.submissions.programming"), routes.SessionController.jumpToProgrammingSubmissions(session.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("commons.view"), routes.SessionProgrammingSubmissionController.viewSubmissions(session.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

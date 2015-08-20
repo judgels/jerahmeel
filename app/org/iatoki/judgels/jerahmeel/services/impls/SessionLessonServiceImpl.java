@@ -35,12 +35,12 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public boolean isInSessionByAlias(String sessionJid, String alias) {
-        return sessionLessonDao.existBySessionJidAndAlias(sessionJid, alias);
+    public boolean aliasExistsInSession(String sessionJid, String alias) {
+        return sessionLessonDao.existsBySessionJidAndAlias(sessionJid, alias);
     }
 
     @Override
-    public SessionLesson findSessionLessonBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException {
+    public SessionLesson findSessionLessonById(long sessionLessonId) throws SessionLessonNotFoundException {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
         if (sessionLessonModel != null) {
             return createFromModel(sessionLessonModel);
@@ -50,7 +50,7 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public Page<SessionLesson> findSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionLesson> getPageOfSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -60,14 +60,14 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public Page<SessionLessonProgress> findSessionLessons(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionLessonProgress> getPageOfSessionLessonsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<SessionLessonProgress> sessionLessonProgressBuilder = ImmutableList.builder();
         for (SessionLessonModel sessionLessonModel :  sessionLessonModels) {
             LessonProgress progress = LessonProgress.NOT_VIEWED;
-            if (userItemDao.existByUserJidAndItemJid(userJid, sessionLessonModel.lessonJid)) {
+            if (userItemDao.existsByUserJidAndItemJid(userJid, sessionLessonModel.lessonJid)) {
                 progress = LessonProgress.VIEWED;
             }
             sessionLessonProgressBuilder.add(new SessionLessonProgress(createFromModel(sessionLessonModel), progress));

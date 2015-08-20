@@ -1,6 +1,7 @@
-@(form: Form[org.iatoki.judgels.jerahmeel.forms.CourseUpsertForm])(implicit fieldConstructor: b3.B3FieldConstructor)
-
 @import play.i18n.Messages
+@import org.iatoki.judgels.jerahmeel.forms.CourseUpsertForm
 
-@b3.text(form("name"), '_label -> Messages.get("course.name"))
-@b3.textarea(form("description"), '_label -> Messages.get("course.description"))
+@(courseUpsertForm: Form[CourseUpsertForm])(implicit fieldConstructor: b3.B3FieldConstructor)
+
+@b3.text(courseUpsertForm("name"), '_label -> Messages.get("course.name"))
+@b3.textarea(courseUpsertForm("description"), '_label -> Messages.get("course.description"))

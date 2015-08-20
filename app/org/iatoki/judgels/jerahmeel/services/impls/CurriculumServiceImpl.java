@@ -27,7 +27,7 @@ public final class CurriculumServiceImpl implements CurriculumService {
     }
 
     @Override
-    public Page<Curriculum> pageCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<Curriculum> getPageOfCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = curriculumDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
         List<CurriculumModel> curriculumModels = curriculumDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -37,7 +37,7 @@ public final class CurriculumServiceImpl implements CurriculumService {
     }
 
     @Override
-    public Curriculum findCurriculumByCurriculumId(long curriculumId) throws CurriculumNotFoundException {
+    public Curriculum findCurriculumById(long curriculumId) throws CurriculumNotFoundException {
         CurriculumModel curriculumModel = curriculumDao.findById(curriculumId);
         if (curriculumModel != null) {
             return createCurriculumFromModel(curriculumModel);

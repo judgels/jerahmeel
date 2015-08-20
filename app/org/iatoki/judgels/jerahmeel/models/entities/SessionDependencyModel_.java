@@ -13,6 +13,4 @@ public abstract class SessionDependencyModel_ extends AbstractModel_ {
 	public static volatile SingularAttribute<SessionDependencyModel, Long> id;
 	public static volatile SingularAttribute<SessionDependencyModel, String> sessionJid;
 	public static volatile SingularAttribute<SessionDependencyModel, String> dependedSessionJid;
-
 }
-

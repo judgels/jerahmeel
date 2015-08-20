@@ -1,23 +1,23 @@
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.SessionLessonProgress], orderBy: String, orderDir: String, filterString: String)
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
-
-@import org.iatoki.judgels.jerahmeel.LessonProgress
 @import play.i18n.Messages
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.SessionLessonProgress
+@import org.iatoki.judgels.jerahmeel.LessonProgress
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionLessonsProgress: Page[SessionLessonProgress], orderBy: String, orderDir: String, filterString: String)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingLessonController.listLessons(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir)}
 
-@searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
+@searchView(pageOfSessionLessonsProgress.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 
-@for(sessionLessonProgress <- page.getData()) {
+@for(sessionLessonProgress <- pageOfSessionLessonsProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @JidCacheServiceImpl.getInstance().getDisplayName(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
@@ -36,4 +36,4 @@
     </div>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfSessionLessonsProgress, orderBy, orderDir, filterString, listFunc)

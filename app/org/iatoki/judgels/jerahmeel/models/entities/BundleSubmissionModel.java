@@ -8,4 +8,5 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "jerahmeel_bundle_submission")
 public final class BundleSubmissionModel extends AbstractBundleSubmissionModel {
+
 }

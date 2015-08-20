@@ -1,14 +1,15 @@
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.sandalphon.BundleSubmission], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
-
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.paginationView
-
-@import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.play.JudgelsPlayUtils
 @import scala.collection.JavaConversions
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.sandalphon.BundleSubmission
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfBundleSubmissions: Page[BundleSubmission], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
 
 <form class="form-inline pull-right" method="GET" action="@routes.TrainingBundleSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
     <div class="form-group">
@@ -31,7 +32,7 @@
 <br />
 
 @tableView() {
-    @tableHeadersView(page.getPageIndex, orderBy, orderDir, "", listFunc)(
+    @tableHeadersView(pageOfBundleSubmissions.getPageIndex, orderBy, orderDir, "", listFunc)(
         "id" -> Messages.get("commons.id"),
         "" -> Messages.get("submission.prob"),
         "" -> Messages.get("submission.pts"),
@@ -39,9 +40,8 @@
     )
 
     <tbody>
-
-    @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(page.getData.map(s => s.getAuthorJid).toSeq))) { displayNamesMap =>
-        @for(submission <- page.getData) {
+    @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfBundleSubmissions.getData.map(s => s.getAuthorJid).toSeq))) { displayNamesMap =>
+        @for(submission <- pageOfBundleSubmissions.getData) {
             <tr>
                 <td><small>@submission.getId</small></td>
                 <td><small>@problemJidToAliasMap.get(submission.getProblemJid)</small></td>
@@ -56,4 +56,4 @@
     </tbody>
 }
 
-@paginationView(page, orderBy, orderDir, "", listFunc)
+@paginationView(pageOfBundleSubmissions, orderBy, orderDir, "", listFunc)

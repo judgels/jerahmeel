@@ -1,30 +1,29 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
+import org.iatoki.judgels.jerahmeel.Curriculum;
+import org.iatoki.judgels.jerahmeel.CurriculumCourse;
+import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.listCourseSessionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.jerahmeel.Course;
-import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
-import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
-import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.CurriculumCourse;
-import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
-import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.listCourseSessionsView;
 import play.db.jpa.Transactional;
-import play.i18n.Messages;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -60,34 +59,39 @@ public final class TrainingSessionController extends AbstractJudgelsController {
 
     @Transactional
     public Result listSessions(long curriculumId, long curriculumCourseId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
-        if (curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
-            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
-            Page<CourseSessionProgress> courseSessionPage = courseSessionService.findCourseSessions(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-
-            if (!userItemService.isUserItemExist(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
-                userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED);
-            }
-
-            return showListSessions(curriculum, curriculumCourse, course, courseSessionPage, orderBy, orderDir, filterString);
-        } else {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) {
             return notFound();
         }
+
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        Page<CourseSessionProgress> pageOfCourseSessionsProgress = courseSessionService.getPageOfCourseSessionsProgress(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+        if (!userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED);
+        }
+
+        return showListSessions(curriculum, curriculumCourse, course, pageOfCourseSessionsProgress, orderBy, orderDir, filterString);
     }
 
-    private Result showListSessions(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, Page<CourseSessionProgress> currentPage, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), currentPage, orderBy, orderDir, filterString));
+    private Result showListSessions(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, Page<CourseSessionProgress> pageOfCourseSessionsProgress, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessionsProgress, orderBy, orderDir, filterString));
         CourseControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("training.curriculums"), routes.TrainingController.jumpToCurriculums()),
-              new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())),
-              new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Training");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())));
+        breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

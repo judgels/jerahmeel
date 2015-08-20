@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel;
 
 public class SessionProblemProgress {
+
     private final SessionProblem sessionProblem;
     private final ProblemProgress problemProgress;
 

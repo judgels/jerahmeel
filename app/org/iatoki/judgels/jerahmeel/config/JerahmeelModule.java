@@ -23,22 +23,22 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         bind(Sandalphon.class).toInstance(sandalphon());
         bind(Sealtiel.class).toInstance(sealtiel());
 
-        bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFile.class).toInstance(bundleSubmissionLocalFileSystemProvider());
+        bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFileSystemProvider.class).toInstance(bundleSubmissionLocalFileSystemProvider());
 
         FileSystemProvider bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider();
         if (bundleSubmissionRemoteFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toInstance(bundleSubmissionRemoteFileSystemProvider);
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFileSystemProvider.class).toInstance(bundleSubmissionRemoteFileSystemProvider);
         } else {
-            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFile.class).toProvider(Providers.of(null));
+            bind(FileSystemProvider.class).annotatedWith(BundleSubmissionRemoteFileSystemProvider.class).toProvider(Providers.of(null));
         }
 
-        bind(FileSystemProvider.class).annotatedWith(SubmissionLocalFile.class).toInstance(submissionLocalFileSystemProvider());
+        bind(FileSystemProvider.class).annotatedWith(ProgrammingSubmissionLocalFileSystemProvider.class).toInstance(submissionLocalFileSystemProvider());
 
         FileSystemProvider submissionRemoteFileSystemProvider = submissionRemoteFileSystemProvider();
         if (submissionRemoteFileSystemProvider != null) {
-            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toInstance(submissionRemoteFileSystemProvider);
+            bind(FileSystemProvider.class).annotatedWith(ProgrammingSubmissionRemoteFileSystemProvider.class).toInstance(submissionRemoteFileSystemProvider);
         } else {
-            bind(FileSystemProvider.class).annotatedWith(SubmissionRemoteFile.class).toProvider(Providers.of(null));
+            bind(FileSystemProvider.class).annotatedWith(ProgrammingSubmissionRemoteFileSystemProvider.class).toProvider(Providers.of(null));
         }
 
         bindConstant().annotatedWith(GabrielClientJid.class).to(gabrielClientJid());

@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface SessionProblemDao extends Dao<Long, SessionProblemModel> {
 
-    boolean existBySessionJidAndAlias(String sessionJid, String alias);
+    boolean existsBySessionJidAndAlias(String sessionJid, String alias);
 
-    List<SessionProblemModel> findBySessionJid(String sessionJid);
+    List<SessionProblemModel> getBySessionJid(String sessionJid);
 
     SessionProblemModel findBySesssionJidAndProblemJid(String sessionJid, String problemJid);
 }

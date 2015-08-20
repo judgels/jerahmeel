@@ -8,18 +8,17 @@ import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
 
 public interface SessionLessonService {
 
-    boolean isInSessionByAlias(String sessionJid, String alias);
+    boolean aliasExistsInSession(String sessionJid, String alias);
 
-    SessionLesson findSessionLessonBySessionLessonId(long sessionLessonId) throws SessionLessonNotFoundException;
+    SessionLesson findSessionLessonById(long sessionLessonId) throws SessionLessonNotFoundException;
 
-    Page<SessionLesson> findSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<SessionLesson> getPageOfSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Page<SessionLessonProgress> findSessionLessons(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<SessionLessonProgress> getPageOfSessionLessonsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status);
 
     void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status);
 
     void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException;
-
 }

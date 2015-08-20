@@ -40,12 +40,12 @@ public final class TrainingController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     public Result jumpToSession(long curriculumId, long curriculumCourseId, long courseSessionId) throws CourseSessionNotFoundException {
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
         if (courseSession.isCompleteable()) {
             return redirect(routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionId));
-        } else {
-            return redirect(routes.TrainingProblemController.viewProblems(curriculumId, curriculumCourseId, courseSessionId));
         }
+
+        return redirect(routes.TrainingProblemController.viewProblems(curriculumId, curriculumCourseId, courseSessionId));
     }
 
     public Result jumpToLessons(long curriculumId, long curriculumCourseId, long courseSessionId) {

@@ -22,7 +22,7 @@ public final class SessionDependencyHibernateDao extends AbstractHibernateDao<Lo
     }
 
     @Override
-    public boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid) {
+    public boolean existsBySessionJidAndDependencyJid(String sessionJid, String dependencyJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<SessionDependencyModel> root = query.from(SessionDependencyModel.class);
@@ -33,7 +33,7 @@ public final class SessionDependencyHibernateDao extends AbstractHibernateDao<Lo
     }
 
     @Override
-    public List<SessionDependencyModel> findBySessionJid(String sessionJid) {
+    public List<SessionDependencyModel> getBySessionJid(String sessionJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<SessionDependencyModel> query = cb.createQuery(SessionDependencyModel.class);
         Root<SessionDependencyModel> root = query.from(SessionDependencyModel.class);

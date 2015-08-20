@@ -12,6 +12,4 @@ public abstract class SessionModel_ extends AbstractJudgelsModel_ {
 
 	public static volatile SingularAttribute<SessionModel, String> name;
 	public static volatile SingularAttribute<SessionModel, String> description;
-
 }
-

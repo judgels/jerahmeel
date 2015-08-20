@@ -10,6 +10,7 @@ import javax.inject.Singleton;
 @Singleton
 @Named("bundleGradingDao")
 public final class BundleGradingHibernateDao extends AbstractBundleGradingHibernateDao<BundleGradingModel> implements BundleGradingDao {
+
     public BundleGradingHibernateDao() {
         super(BundleGradingModel.class);
     }

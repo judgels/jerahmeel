@@ -44,9 +44,9 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         BundleSubmissionModel submissionModel = submissionDao.findByJid(gradingModel.submissionJid);
 
         String userJid = submissionModel.userCreate;
-        String sessionJid = submissionModel.contestJid;
+        String sessionJid = submissionModel.containerJid;
         String problemJid = submissionModel.problemJid;
-        List<BundleSubmission> submissionList = this.findAllSubmissionsByContestJidProblemJidAndUserJid(sessionJid, problemJid, userJid);
+        List<BundleSubmission> submissionList = this.getBundleSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(sessionJid, problemJid, userJid);
         boolean completed = false;
         int i = 0;
         while ((!completed) && (i < submissionList.size())) {
@@ -67,9 +67,9 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         userItemDao.flush();
 
         completed = true;
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
-            if (!userItemDao.existByUserJidItemJidAndStatus(userJid, sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
+            if (!userItemDao.existsByUserJidItemJidAndStatus(userJid, sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                 completed = false;
                 break;
             }

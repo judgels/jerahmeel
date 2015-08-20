@@ -51,17 +51,15 @@ public final class CourseController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     public Result listCourses(long page, String orderBy, String orderDir, String filterString) {
-        Page<Course> currentPage = courseService.pageCourses(page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<Course> pageOfCourses = courseService.getPageOfCourses(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        LazyHtml content = new LazyHtml(listCoursesView.render(currentPage, orderBy, orderDir, filterString));
+        LazyHtml content = new LazyHtml(listCoursesView.render(pageOfCourses, orderBy, orderDir, filterString));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("course.list"), new InternalLink(Messages.get("commons.create"), routes.CourseController.createCourse()), c));
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses())
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content);
+        appendTemplateLayout(content);
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     public Result jumpToSessions(long courseId) {
@@ -71,76 +69,91 @@ public final class CourseController extends AbstractJudgelsController {
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createCourse() {
-        Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class);
+        Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class);
 
-        return showCreateCourse(form);
+        return showCreateCourse(courseUpsertForm);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postCreateCourse() {
-        Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class).bindFromRequest();
+        Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class).bindFromRequest();
 
-        if (form.hasErrors() || form.hasGlobalErrors()) {
-            return showCreateCourse(form);
-        } else {
-            CourseUpsertForm courseUpsertForm = form.get();
-            courseService.createCourse(courseUpsertForm.name, courseUpsertForm.description);
-
-            return redirect(routes.CourseController.viewCourses());
+        if (formHasErrors(courseUpsertForm)) {
+            return showCreateCourse(courseUpsertForm);
         }
+
+        CourseUpsertForm courseUpsertData = courseUpsertForm.get();
+        courseService.createCourse(courseUpsertData.name, courseUpsertData.description);
+
+        return redirect(routes.CourseController.viewCourses());
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateCourseGeneral(long courseId) throws CourseNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        CourseUpsertForm courseUpsertForm = new CourseUpsertForm();
-        courseUpsertForm.name = course.getName();
-        courseUpsertForm.description = course.getDescription();
+        Course course = courseService.findCourseById(courseId);
+        CourseUpsertForm courseUpsertData = new CourseUpsertForm();
+        courseUpsertData.name = course.getName();
+        courseUpsertData.description = course.getDescription();
 
-        Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class).fill(courseUpsertForm);
+        Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class).fill(courseUpsertData);
 
-        return showUpdateCourseGeneral(form, course);
+        return showUpdateCourseGeneral(courseUpsertForm, course);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postUpdateCourseGeneral(long courseId) throws CourseNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        Form<CourseUpsertForm> form = Form.form(CourseUpsertForm.class).bindFromRequest();
+        Course course = courseService.findCourseById(courseId);
+        Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class).bindFromRequest();
 
-        if (form.hasErrors()) {
-            return showUpdateCourseGeneral(form, course);
-        } else {
-            CourseUpsertForm courseUpsertForm = form.get();
-            courseService.updateCourse(course.getId(), courseUpsertForm.name, courseUpsertForm.description);
-
-            return redirect(routes.CourseController.viewCourses());
+        if (formHasErrors(courseUpsertForm)) {
+            return showUpdateCourseGeneral(courseUpsertForm, course);
         }
+
+        CourseUpsertForm courseUpsertData = courseUpsertForm.get();
+        courseService.updateCourse(course.getId(), courseUpsertData.name, courseUpsertData.description);
+
+        return redirect(routes.CourseController.viewCourses());
     }
 
-    private Result showCreateCourse(Form<CourseUpsertForm> form) {
-        LazyHtml content = new LazyHtml(createCourseView.render(form));
+    private Result showCreateCourse(Form<CourseUpsertForm> courseUpsertForm) {
+        LazyHtml content = new LazyHtml(createCourseView.render(courseUpsertForm));
         content.appendLayout(c -> headingLayout.render(Messages.get("course.create"), c));
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
-              new InternalLink(Messages.get("course.create"), routes.CourseController.createCourse())
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Course - Create");
-        return ControllerUtils.getInstance().lazyOk(content);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content,
+                new InternalLink(Messages.get("course.create"), routes.CourseController.createCourse())
+        );
+        appendTemplateLayout(content, "Create");
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateCourseGeneral(Form<CourseUpsertForm> form, Course course) {
-        LazyHtml content = new LazyHtml(updateCourseGeneralView.render(form, course.getId()));
+    private Result showUpdateCourseGeneral(Form<CourseUpsertForm> courseUpsertForm, Course course) {
+        LazyHtml content = new LazyHtml(updateCourseGeneralView.render(courseUpsertForm, course.getId()));
         CourseControllerUtils.appendUpdateLayout(content, course);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
-              new InternalLink(Messages.get("course.update"), routes.CourseController.updateCourseGeneral(course.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Course - Update");
-        return ControllerUtils.getInstance().lazyOk(content);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content,
+                new InternalLink(Messages.get("course.update"), routes.CourseController.updateCourseGeneral(course.getId()))
+        );
+        appendTemplateLayout(content, "Update");
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = CourseControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
+    }
+
+    private void appendTemplateLayout(LazyHtml content, String... lastTitles) {
+        StringBuilder titleBuilder = new StringBuilder("Courses");
+        for (String lastTitle : lastTitles) {
+            titleBuilder.append(" - ");
+            titleBuilder.append(lastTitle);
+        }
+
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, titleBuilder.toString());
     }
 }

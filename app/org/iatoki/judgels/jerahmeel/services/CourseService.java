@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface CourseService {
 
-    boolean existByCourseJid(String courseJid);
+    boolean courseExistsByJid(String courseJid);
 
-    List<Course> findAllCourseByTerm(String term);
+    List<Course> getCoursesByTerm(String term);
 
-    Page<Course> pageCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<Course> getPageOfCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Course findCourseByCourseJid(String courseJid);
+    Course findCourseByJid(String courseJid);
 
-    Course findCourseByCourseId(long courseId) throws CourseNotFoundException;
+    Course findCourseById(long courseId) throws CourseNotFoundException;
 
     void createCourse(String name, String description);
 

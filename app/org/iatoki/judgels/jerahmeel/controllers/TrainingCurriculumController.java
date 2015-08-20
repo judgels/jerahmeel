@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 @Singleton
 @Named
 public final class TrainingCurriculumController extends AbstractJudgelsController {
+
     private static final long PAGE_SIZE = 20;
 
     private final CurriculumService curriculumService;
@@ -40,16 +41,21 @@ public final class TrainingCurriculumController extends AbstractJudgelsControlle
 
     @Transactional(readOnly = true)
     public Result listCurriculums(long page, String orderBy, String orderDir, String filterString) {
-        Page<Curriculum> currentPage = curriculumService.pageCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<Curriculum> pageOfCurriculums = curriculumService.getPageOfCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        LazyHtml content = new LazyHtml(listCurriculumsView.render(currentPage, orderBy, orderDir, filterString));
+        LazyHtml content = new LazyHtml(listCurriculumsView.render(pageOfCurriculums, orderBy, orderDir, filterString));
         content.appendLayout(c -> headingLayout.render(Messages.get("training.home"), c));
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("training.home"), routes.TrainingController.jumpToCurriculums())
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Home");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Home");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

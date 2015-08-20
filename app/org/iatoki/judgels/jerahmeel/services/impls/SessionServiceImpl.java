@@ -28,12 +28,12 @@ public final class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public boolean existBySessionJid(String sessionJid) {
+    public boolean sessionExistsByJid(String sessionJid) {
         return sessionDao.existsByJid(sessionJid);
     }
 
     @Override
-    public List<Session> findAllSessionByTerm(String term) {
+    public List<Session> getSessionsByTerm(String term) {
         List<SessionModel> sessions = sessionDao.findSortedByFilters("id", "asc", term, 0, -1);
         ImmutableList.Builder<Session> sessionBuilder = ImmutableList.builder();
 
@@ -45,7 +45,7 @@ public final class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Page<Session> pageSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<Session> getPageOfSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
         List<SessionModel> sessionModels = sessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -55,14 +55,14 @@ public final class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public Session findSessionBySessionJid(String sessionJid) {
+    public Session findSessionByJid(String sessionJid) {
         SessionModel sessionModel = sessionDao.findByJid(sessionJid);
 
         return new Session(sessionModel.id, sessionModel.jid, sessionModel.name, sessionModel.description);
     }
 
     @Override
-    public Session findSessionBySessionId(long sessionId) throws SessionNotFoundException {
+    public Session findSessionById(long sessionId) throws SessionNotFoundException {
         SessionModel sessionModel = sessionDao.findById(sessionId);
         if (sessionModel != null) {
             return createSessionFromModel(sessionModel);

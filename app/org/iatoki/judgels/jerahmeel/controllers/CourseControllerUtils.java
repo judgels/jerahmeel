@@ -50,4 +50,11 @@ public final class CourseControllerUtils {
         );
         content.appendLayout(c -> headingLayout.render(Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(), c));
     }
+
+    static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()));
+
+        return breadcrumbsBuilder;
+    }
 }

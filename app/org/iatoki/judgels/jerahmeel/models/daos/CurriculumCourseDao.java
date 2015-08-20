@@ -5,8 +5,7 @@ import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel;
 
 public interface CurriculumCourseDao extends Dao<Long, CurriculumCourseModel> {
 
-    boolean existByCurriculumJidAndAlias(String curriculumJid, String alias);
+    boolean existsByCurriculumJidAndAlias(String curriculumJid, String alias);
 
-    boolean existByCurriculumJidAndCourseJid(String curriculumJid, String courseJid);
-
+    boolean existsByCurriculumJidAndCourseJid(String curriculumJid, String courseJid);
 }

@@ -13,8 +13,8 @@ import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFile;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFile;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
@@ -62,50 +62,50 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
 
     private static final long PAGE_SIZE = 20;
 
-    private final CurriculumService curriculumService;
-    private final CurriculumCourseService curriculumCourseService;
-    private final CourseService courseService;
-    private final CourseSessionService courseSessionService;
-    private final SessionService sessionService;
-    private final SessionDependencyService sessionDependencyService;
-    private final BundleSubmissionService bundleSubmissionService;
-    private final SessionProblemService sessionProblemService;
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
+    private final BundleSubmissionService bundleSubmissionService;
+    private final CourseService courseService;
+    private final CourseSessionService courseSessionService;
+    private final CurriculumCourseService curriculumCourseService;
+    private final CurriculumService curriculumService;
+    private final SessionDependencyService sessionDependencyService;
+    private final SessionService sessionService;
+    private final SessionProblemService sessionProblemService;
 
     @Inject
-    public TrainingBundleSubmissionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionService sessionService, SessionDependencyService sessionDependencyService, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, @BundleSubmissionLocalFile FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFile @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider) {
-        this.curriculumService = curriculumService;
-        this.curriculumCourseService = curriculumCourseService;
-        this.courseService = courseService;
-        this.courseSessionService = courseSessionService;
-        this.sessionService = sessionService;
-        this.sessionDependencyService = sessionDependencyService;
-        this.bundleSubmissionService = bundleSubmissionService;
-        this.sessionProblemService = sessionProblemService;
+    public TrainingBundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, CourseService courseService, CourseSessionService courseSessionService, CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, SessionDependencyService sessionDependencyService, SessionService sessionService, SessionProblemService sessionProblemService) {
         this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
         this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
+        this.bundleSubmissionService = bundleSubmissionService;
+        this.courseService = courseService;
+        this.courseSessionService = courseSessionService;
+        this.curriculumCourseService = curriculumCourseService;
+        this.curriculumService = curriculumService;
+        this.sessionDependencyService = sessionDependencyService;
+        this.sessionService = sessionService;
+        this.sessionProblemService = sessionProblemService;
     }
 
     @Transactional
     public Result postSubmitProblem(long curriculumId, long curriculumCourseId, long courseSessionId, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseSessionNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if (((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) && (sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid()))) {
-            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
-
-            DynamicForm dynamicForm = DynamicForm.form().bindFromRequest();
-
-            BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dynamicForm, SessionControllerUtils.getCurrentStatementLanguage());
-            String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), courseSession.getSessionJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-            bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, answer);
-
-            return redirect(routes.TrainingBundleSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()));
-        } else {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid())) {
             return notFound();
         }
+
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
+
+        DynamicForm dForm = DynamicForm.form().bindFromRequest();
+
+        BundleAnswer bundleAnswer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, SessionControllerUtils.getCurrentStatementLanguage());
+        String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), courseSession.getSessionJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, bundleAnswer);
+
+        return redirect(routes.TrainingBundleSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()));
     }
 
     @Transactional(readOnly = true)
@@ -115,84 +115,86 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
 
     @Transactional(readOnly = true)
     public Result listSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) {
-            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
-            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
-
-            String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
-
-            Page<BundleSubmission> bundleSubmissions = bundleSubmissionService.pageSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, session.getJid());
-            Map<String, String> problemJidToAliasMap = sessionProblemService.findBundleProblemJidToAliasMapBySessionJid(session.getJid());
-
-            LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), bundleSubmissions, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualProblemJid));
-            content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-            content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                    new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                    new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
-                  ), c)
-            );
-            SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
-            ControllerUtils.getInstance().appendSidebarLayout(content);
-            ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-                  new InternalLink(Messages.get("training.curriculums"), routes.TrainingController.jumpToCurriculums()),
-                  new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())),
-                  new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())),
-                  new InternalLink(session.getName(), routes.TrainingController.jumpToSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                  new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
-            ));
-            ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
-
-            return ControllerUtils.getInstance().lazyOk(content);
-        } else {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
             return notFound();
         }
+
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+
+        String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
+
+        Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, session.getJid());
+        Map<String, String> problemJidToAliasMap = sessionProblemService.findBundleProblemJidToAliasMapBySessionJid(session.getJid());
+
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfBundleSubmissions, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualProblemJid));
+        content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
+        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Transactional(readOnly = true)
     public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long bundleSubmissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException, BundleSubmissionNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if ((curriculum.getJid().equals(curriculumCourse.getCurriculumJid())) && (curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()))) {
-            Course course = courseService.findCourseByCourseJid(curriculumCourse.getCourseJid());
-            Session session = sessionService.findSessionBySessionJid(courseSession.getSessionJid());
-
-            BundleSubmission bundleSubmission = bundleSubmissionService.findSubmissionById(bundleSubmissionId);
-            try {
-                BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
-                SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
-                String sessionProblemAlias = sessionProblem.getAlias();
-                String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
-
-                LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), answer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
-                content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
-                      ), c)
-                );
-                SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
-                ControllerUtils.getInstance().appendSidebarLayout(content);
-                ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-                      new InternalLink(Messages.get("training.curriculums"), routes.TrainingController.jumpToCurriculums()),
-                      new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())),
-                      new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())),
-                      new InternalLink(session.getName(), routes.TrainingController.jumpToSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                      new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                      new InternalLink(bundleSubmission.getId() + "", routes.TrainingBundleSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), bundleSubmission.getId()))
-                ));
-                ControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions - View");
-
-                return ControllerUtils.getInstance().lazyOk(content);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
             return notFound();
         }
+
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+
+        BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
+        BundleAnswer bundleAnswer;
+        try {
+            bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
+        String sessionProblemAlias = sessionProblem.getAlias();
+        String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
+
+        LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
+        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
+                new InternalLink(bundleSubmission.getId() + "", routes.TrainingBundleSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), bundleSubmission.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions - View");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendSubtabLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession) {
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
+                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+                ), c)
+        );
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())));
+        breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())));
+        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

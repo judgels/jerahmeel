@@ -6,15 +6,14 @@ import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import java.util.List;
 
 public interface UserItemService {
-    boolean isViewed(String userJid, String itemJid);
 
-    boolean isUserItemExist(String userJid, String itemJid);
+    boolean userItemExistsByUserJidAndItemJid(String userJid, String itemJid);
 
-    boolean isUserItemExist(String userJid, String itemJid, UserItemStatus status);
+    boolean userItemExistsByUserJidAndItemJidAndStatus(String userJid, String itemJid, UserItemStatus status);
 
     void upsertUserItem(String userJid, String itemJid, UserItemStatus status);
 
-    List<UserItem> findAllUserItemByUserJid(String userJid);
+    List<UserItem> getUserItemsByUserJid(String userJid);
 
-    List<UserItem> findAllUserItemByItemJid(String itemJid);
+    List<UserItem> getUserItemsByItemJid(String itemJid);
 }

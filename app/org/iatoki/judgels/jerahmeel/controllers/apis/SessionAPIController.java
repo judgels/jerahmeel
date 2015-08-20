@@ -3,13 +3,13 @@ package org.iatoki.judgels.jerahmeel.controllers.apis;
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.AutoComplete;
 import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.data.DynamicForm;
 import play.db.jpa.Transactional;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -17,7 +17,7 @@ import javax.inject.Named;
 import java.util.List;
 
 @Named
-public final class SessionAPIController extends Controller {
+public final class SessionAPIController extends AbstractJudgelsAPIController {
 
     private final SessionService sessionService;
 
@@ -32,18 +32,18 @@ public final class SessionAPIController extends Controller {
         response().setHeader("Access-Control-Allow-Origin", "*");
         response().setContentType("application/javascript");
 
-        DynamicForm form = DynamicForm.form().bindFromRequest();
-        String term = form.get("term");
-        List<Session> sessions = sessionService.findAllSessionByTerm(term);
-        ImmutableList.Builder<AutoComplete> responseBuilder = ImmutableList.builder();
+        DynamicForm dForm = DynamicForm.form().bindFromRequest();
+        String callback = dForm.get("callback");
+        String term = dForm.get("term");
+
+        List<Session> sessions = sessionService.getSessionsByTerm(term);
+        ImmutableList.Builder<AutoComplete> autoCompleteBuilder = ImmutableList.builder();
 
         for (Session session : sessions) {
-            responseBuilder.add(new AutoComplete(session.getJid(), session.getJid(), session.getName()));
+            autoCompleteBuilder.add(new AutoComplete(session.getJid(), session.getJid(), session.getName()));
         }
 
-        String callback = form.get("callback");
-
-        return ok(callback + "(" + Json.toJson(responseBuilder.build()).toString() + ")");
+        return ok(createJsonPResponse(callback, Json.toJson(autoCompleteBuilder.build()).toString()));
     }
 
 }

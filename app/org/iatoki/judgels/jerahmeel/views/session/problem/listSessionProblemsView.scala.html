@@ -1,31 +1,31 @@
-@(sessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.SessionProblem], orderBy: String, orderDir: String, filterString: String)
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
-
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.SessionProblem
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(sessionId: Long, pageOfSessionProblems: Page[SessionProblem], orderBy: String, orderDir: String, filterString: String)
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionProblemController.listSessionProblems(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
-@searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
+@searchView(pageOfSessionProblems.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 
 @tableView() {
-    @tableHeadersView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)(
+    @tableHeadersView(pageOfSessionProblems.getPageIndex, orderBy, orderDir, filterString, listFunc)(
         "id" -> Messages.get("commons.id"),
         "alias" -> Messages.get("session.problem.alias"),
         "" -> Messages.get("session.problem.name"),
         "status" -> Messages.get("session.problem.status")
     )
 
-
     <tbody>
-    @for(sessionProblem <- page.getData()) {
+    @for(sessionProblem <- pageOfSessionProblems.getData()) {
         <tr>
             <td>@sessionProblem.getId</td>
             <td>@sessionProblem.getAlias</td>
@@ -41,4 +41,4 @@
     </tbody>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfSessionProblems, orderBy, orderDir, filterString, listFunc)

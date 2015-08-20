@@ -22,7 +22,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
     }
 
     @Override
-    public boolean existByUserJidAndItemJid(String userJid, String itemJid) {
+    public boolean existsByUserJidAndItemJid(String userJid, String itemJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<UserItemModel> root = query.from(UserItemModel.class);
@@ -33,7 +33,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
     }
 
     @Override
-    public boolean existByUserJidItemJidAndStatus(String userJid, String itemJid, String status) {
+    public boolean existsByUserJidItemJidAndStatus(String userJid, String itemJid, String status) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<UserItemModel> root = query.from(UserItemModel.class);
@@ -55,7 +55,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
     }
 
     @Override
-    public List<UserItemModel> findByUserJid(String userJid) {
+    public List<UserItemModel> getByUserJid(String userJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<UserItemModel> query = cb.createQuery(UserItemModel.class);
         Root<UserItemModel> root = query.from(UserItemModel.class);
@@ -66,7 +66,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
     }
 
     @Override
-    public List<UserItemModel> findByItemJid(String itemJid) {
+    public List<UserItemModel> getByItemJid(String itemJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<UserItemModel> query = cb.createQuery(UserItemModel.class);
         Root<UserItemModel> root = query.from(UserItemModel.class);
@@ -77,7 +77,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
     }
 
     @Override
-    public List<UserItemModel> findByUserJidAndStatus(String userJid, String status) {
+    public List<UserItemModel> getByUserJidAndStatus(String userJid, String status) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<UserItemModel> query = cb.createQuery(UserItemModel.class);
         Root<UserItemModel> root = query.from(UserItemModel.class);

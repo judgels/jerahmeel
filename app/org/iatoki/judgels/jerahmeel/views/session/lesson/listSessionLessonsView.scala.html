@@ -1,31 +1,31 @@
-@(sessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.SessionLesson], orderBy: String, orderDir: String, filterString: String)
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
-
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.SessionLesson
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(sessionId: Long, pageOfSessionLessons: Page[SessionLesson], orderBy: String, orderDir: String, filterString: String)
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionLessonController.listSessionLessons(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
-@searchView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)
+@searchView(pageOfSessionLessons.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 
 @tableView() {
-    @tableHeadersView(page.getPageIndex, orderBy, orderDir, filterString, listFunc)(
+    @tableHeadersView(pageOfSessionLessons.getPageIndex, orderBy, orderDir, filterString, listFunc)(
         "id" -> Messages.get("commons.id"),
         "alias" -> Messages.get("session.lesson.alias"),
         "" -> Messages.get("session.lesson.name"),
         "status" -> Messages.get("session.lesson.status")
     )
 
-
     <tbody>
-    @for(sessionLesson <- page.getData()) {
+    @for(sessionLesson <- pageOfSessionLessons.getData()) {
         <tr>
             <td>@sessionLesson.getId</td>
             <td>@sessionLesson.getAlias</td>
@@ -41,4 +41,4 @@
     </tbody>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfSessionLessons, orderBy, orderDir, filterString, listFunc)

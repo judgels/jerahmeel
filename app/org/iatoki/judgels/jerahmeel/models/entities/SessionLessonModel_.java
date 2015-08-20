@@ -16,6 +16,4 @@ public abstract class SessionLessonModel_ extends AbstractModel_ {
 	public static volatile SingularAttribute<SessionLessonModel, String> lessonSecret;
 	public static volatile SingularAttribute<SessionLessonModel, String> alias;
 	public static volatile SingularAttribute<SessionLessonModel, String> status;
-
 }
-

@@ -17,6 +17,4 @@ public abstract class SessionProblemModel_ extends AbstractModel_ {
 	public static volatile SingularAttribute<SessionProblemModel, String> alias;
 	public static volatile SingularAttribute<SessionProblemModel, String> type;
 	public static volatile SingularAttribute<SessionProblemModel, String> status;
-
 }
-

@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface SessionService {
 
-    boolean existBySessionJid(String sessionJid);
+    boolean sessionExistsByJid(String sessionJid);
 
-    List<Session> findAllSessionByTerm(String term);
+    List<Session> getSessionsByTerm(String term);
 
-    Page<Session> pageSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<Session> getPageOfSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Session findSessionBySessionJid(String sessionJid);
+    Session findSessionByJid(String sessionJid);
 
-    Session findSessionBySessionId(long sessionId) throws SessionNotFoundException;
+    Session findSessionById(long sessionId) throws SessionNotFoundException;
 
     void createSession(String name, String description);
 

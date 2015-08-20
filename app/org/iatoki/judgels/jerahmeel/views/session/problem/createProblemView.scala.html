@@ -1,30 +1,25 @@
-@(sessionId: Long, form: Form[org.iatoki.judgels.jerahmeel.forms.SessionProblemCreateForm])
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
-
-@import org.iatoki.judgels.jerahmeel.SessionProblemType
-@import org.iatoki.judgels.jerahmeel.SessionProblemStatus
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.formErrorView
-@import org.iatoki.judgels.play.views.html.table.tableView
-@import org.iatoki.judgels.play.views.html.table.tableHeadersView
-@import org.iatoki.judgels.play.views.html.table.searchView
-@import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.jerahmeel.SessionProblemType
+@import org.iatoki.judgels.jerahmeel.SessionProblemStatus
+@import org.iatoki.judgels.jerahmeel.forms.SessionProblemCreateForm
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(sessionId: Long, sessionProblemCreateForm: Form[SessionProblemCreateForm])
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
-@formErrorView(form)
+@formErrorView(sessionProblemCreateForm)
 
 @b3.form(routes.SessionProblemController.postCreateProblem(sessionId)) {
 
     @helper.CSRF.formField
 
-    @b3.text(form("alias"), '_label -> Messages.get("session.problem.alias"), 'class -> "form-control")
-    @b3.text(form("problemJid"), '_label -> Messages.get("session.problem.jid"), 'class -> "form-control")
-    @b3.text(form("problemSecret"), '_label -> Messages.get("session.problem.secret"), 'class -> "form-control")
-    @b3.select(form("type"), SessionProblemType.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.type"), 'class -> "form-control selectpicker")
-    @b3.select(form("status"), SessionProblemStatus.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.status"), 'class -> "form-control selectpicker")
+    @b3.text(sessionProblemCreateForm("alias"), '_label -> Messages.get("session.problem.alias"), 'class -> "form-control")
+    @b3.text(sessionProblemCreateForm("problemJid"), '_label -> Messages.get("session.problem.jid"), 'class -> "form-control")
+    @b3.text(sessionProblemCreateForm("problemSecret"), '_label -> Messages.get("session.problem.secret"), 'class -> "form-control")
+    @b3.select(sessionProblemCreateForm("type"), SessionProblemType.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.type"), 'class -> "form-control selectpicker")
+    @b3.select(sessionProblemCreateForm("status"), SessionProblemStatus.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.status"), 'class -> "form-control selectpicker")
 
     @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.add") }
 }

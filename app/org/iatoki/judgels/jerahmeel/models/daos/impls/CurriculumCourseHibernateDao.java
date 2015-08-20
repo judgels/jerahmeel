@@ -21,7 +21,7 @@ public final class CurriculumCourseHibernateDao extends AbstractHibernateDao<Lon
     }
 
     @Override
-    public boolean existByCurriculumJidAndAlias(String curriculumJid, String alias) {
+    public boolean existsByCurriculumJidAndAlias(String curriculumJid, String alias) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<CurriculumCourseModel> root = query.from(CurriculumCourseModel.class);
@@ -32,7 +32,7 @@ public final class CurriculumCourseHibernateDao extends AbstractHibernateDao<Lon
     }
 
     @Override
-    public boolean existByCurriculumJidAndCourseJid(String curriculumJid, String courseJid) {
+    public boolean existsByCurriculumJidAndCourseJid(String curriculumJid, String courseJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<CurriculumCourseModel> root = query.from(CurriculumCourseModel.class);

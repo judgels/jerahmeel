@@ -20,13 +20,13 @@ import play.data.Form;
 import play.i18n.Messages;
 import play.mvc.Http;
 
-public final class ControllerUtils extends AbstractJudgelsControllerUtils {
+public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUtils {
 
-    private static ControllerUtils INSTANCE;
+    private static JerahmeelControllerUtils INSTANCE;
 
     private final Jophiel jophiel;
 
-    public ControllerUtils(Jophiel jophiel) {
+    public JerahmeelControllerUtils(Jophiel jophiel) {
         this.jophiel = jophiel;
     }
 
@@ -77,10 +77,10 @@ public final class ControllerUtils extends AbstractJudgelsControllerUtils {
         if (INSTANCE != null) {
             throw new UnsupportedOperationException("ControllerUtils instance has already been built");
         }
-        INSTANCE = new ControllerUtils(jophiel);
+        INSTANCE = new JerahmeelControllerUtils(jophiel);
     }
 
-    static ControllerUtils getInstance() {
+    static JerahmeelControllerUtils getInstance() {
         if (INSTANCE == null) {
             throw new UnsupportedOperationException("ControllerUtils instance has not been built");
         }

@@ -8,11 +8,11 @@ public interface SessionDependencyService {
 
     boolean isDependenciesFulfilled(String userJid, String sessionJid);
 
-    boolean existBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
+    boolean existsBySessionJidAndDependencyJid(String sessionJid, String dependencyJid);
 
-    SessionDependency findSessionDependencyBySessionDependencyId(long sessionDependencyId) throws SessionDependencyNotFoundException;
+    SessionDependency findSessionDependencyById(long sessionDependencyId) throws SessionDependencyNotFoundException;
 
-    Page<SessionDependency> findSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<SessionDependency> getPageOfSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     void addSessionDependency(String sessionJid, String dependedSessionJid);
 

@@ -1,26 +1,26 @@
-@(page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.Curriculum], orderBy: String, orderDir: String, filterString: String)
-
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.Curriculum
+@import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@searchView(page.getPageIndex, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)
+@(pageOfCurriculums: Page[Curriculum], orderBy: String, orderDir: String, filterString: String)
+
+@searchView(pageOfCurriculums.getPageIndex, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)
 
 <div class="clearfix"></div>
 
 @tableView() {
-    @tableHeadersView(page.getPageIndex, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)(
+    @tableHeadersView(pageOfCurriculums.getPageIndex, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)(
         "id" -> Messages.get("commons.id"),
         "name" -> Messages.get("curriculum.name")
     )
 
     <tbody>
-        @for(curriculum <- page.getData) {
+        @for(curriculum <- pageOfCurriculums.getData) {
             <tr>
                 <td>@curriculum.getId</td>
                 <td>@curriculum.getName</td>
@@ -32,4 +32,4 @@
     </tbody>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)
+@paginationView(pageOfCurriculums, orderBy, orderDir, filterString, routes.CurriculumController.listCurriculums)

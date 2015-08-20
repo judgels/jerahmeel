@@ -10,20 +10,20 @@ import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.GradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel_;
-import org.iatoki.judgels.jerahmeel.models.entities.GradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
-import org.iatoki.judgels.jerahmeel.models.entities.SubmissionModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
 import org.iatoki.judgels.play.IdentityUtils;
@@ -48,35 +48,35 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     private final SessionProblemDao sessionProblemDao;
     private final BundleSubmissionDao bundleSubmissionDao;
     private final BundleGradingDao bundleGradingDao;
-    private final SubmissionDao submissionDao;
-    private final GradingDao gradingDao;
+    private final ProgrammingSubmissionDao programmingSubmissionDao;
+    private final ProgrammingGradingDao programmingGradingDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CourseSessionServiceImpl(CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, SubmissionDao submissionDao, GradingDao gradingDao, UserItemDao userItemDao) {
+    public CourseSessionServiceImpl(CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, UserItemDao userItemDao) {
         this.courseSessionDao = courseSessionDao;
         this.sessionDao = sessionDao;
         this.sessionDependencyDao = sessionDependencyDao;
         this.sessionProblemDao = sessionProblemDao;
         this.bundleSubmissionDao = bundleSubmissionDao;
         this.bundleGradingDao = bundleGradingDao;
-        this.submissionDao = submissionDao;
-        this.gradingDao = gradingDao;
+        this.programmingSubmissionDao = programmingSubmissionDao;
+        this.programmingGradingDao = programmingGradingDao;
         this.userItemDao = userItemDao;
     }
 
     @Override
-    public boolean existByCourseJidAndAlias(String courseJid, String alias) {
-        return courseSessionDao.existByCourseJidAndAlias(courseJid, alias);
+    public boolean existsByCourseJidAndAlias(String courseJid, String alias) {
+        return courseSessionDao.existsByCourseJidAndAlias(courseJid, alias);
     }
 
     @Override
-    public boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid) {
-        return courseSessionDao.existByCourseJidAndSessionJid(courseJid, sessionJid);
+    public boolean existsByCourseJidAndSessionJid(String courseJid, String sessionJid) {
+        return courseSessionDao.existsByCourseJidAndSessionJid(courseJid, sessionJid);
     }
 
     @Override
-    public CourseSession findByCourseSessionId(long courseSessionId) throws CourseSessionNotFoundException {
+    public CourseSession findCourseSessionById(long courseSessionId) throws CourseSessionNotFoundException {
         CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
         if (courseSessionModel != null) {
             return createFromModel(courseSessionModel);
@@ -86,7 +86,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
-    public Page<CourseSession> findCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<CourseSession> getPageOfCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -96,29 +96,29 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
-    public Page<CourseSessionProgress> findCourseSessions(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<CourseSessionProgress> getPageOfCourseSessionsProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<CourseSessionProgress> courseSessionProgressBuilder = ImmutableList.builder();
-        List<UserItemModel> completedUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
+        List<UserItemModel> completedUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
         Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
-        List<UserItemModel> onProgressUserItemModel = userItemDao.findByUserJidAndStatus(userJid, UserItemStatus.VIEWED.name());
+        List<UserItemModel> onProgressUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.VIEWED.name());
         Set<String> onProgressJids = onProgressUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
         for (CourseSessionModel courseSessionModel : courseSessionModels) {
-            List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(courseSessionModel.sessionJid);
+            List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(courseSessionModel.sessionJid);
 
             long totalProblems = sessionProblemModels.size();
             long solvedProblems = 0;
             double totalScore = 0;
             for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
-                if (userItemDao.existByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
+                if (userItemDao.existsByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                     solvedProblems++;
                 }
                 if (sessionProblemModel.type.equals(ProblemType.BUNDLE.name())) {
                     double maxScore = 0;
-                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.findByContestJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
-                    Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.findGradingsForSubmissions(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                    Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.getBySubmissionJids(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
                     for (String submissionJid : bundleGradingModels.keySet()) {
                         double submissionScore = bundleGradingModels.get(submissionJid).get(bundleGradingModels.get(submissionJid).size() - 1).score;
                         if (submissionScore > maxScore) {
@@ -128,8 +128,8 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
                     totalScore += maxScore;
                 } else if (sessionProblemModel.type.equals(ProblemType.PROGRAMMING.name())) {
                     double maxScore = 0;
-                    List<SubmissionModel> submissionModels = submissionDao.findByContestJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
-                    Map<String, List<GradingModel>> gradingModels = gradingDao.findGradingsForSubmissions(submissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                    List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                    Map<String, List<ProgrammingGradingModel>> gradingModels = programmingGradingDao.getBySubmissionJids(programmingSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
                     for (String submissionJid : gradingModels.keySet()) {
                         double submissionScore = gradingModels.get(submissionJid).get(gradingModels.get(submissionJid).size() - 1).score;
                         if (submissionScore > maxScore) {
@@ -146,7 +146,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
             } else if ((onProgressJids.contains(courseSessionModel.sessionJid)) && (courseSessionModel.completeable)) {
                 progress = SessionProgress.IN_PROGRESS;
             } else {
-                List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findBySessionJid(courseSessionModel.sessionJid);
+                List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.getBySessionJid(courseSessionModel.sessionJid);
                 Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
                 dependencyJids.removeAll(completedJids);
                 if (dependencyJids.isEmpty()) {

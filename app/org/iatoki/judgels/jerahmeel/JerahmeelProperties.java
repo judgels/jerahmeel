@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 
 public final class JerahmeelProperties {
+
     private static JerahmeelProperties INSTANCE;
 
     private final Config config;

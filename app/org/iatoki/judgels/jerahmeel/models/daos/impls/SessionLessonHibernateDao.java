@@ -21,7 +21,7 @@ public final class SessionLessonHibernateDao extends AbstractHibernateDao<Long, 
     }
 
     @Override
-    public boolean existBySessionJidAndAlias(String sessionJid, String alias) {
+    public boolean existsBySessionJidAndAlias(String sessionJid, String alias) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<SessionLessonModel> root = query.from(SessionLessonModel.class);

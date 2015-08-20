@@ -59,135 +59,141 @@ public final class CourseSessionController extends AbstractJudgelsController {
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result listCreateSessions(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
+        Course course = courseService.findCourseById(courseId);
 
-        Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        Form<CourseSessionCreateForm> form = Form.form(CourseSessionCreateForm.class);
+        Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Form<CourseSessionCreateForm> courseSessionCreateForm = Form.form(CourseSessionCreateForm.class);
 
-        return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
+        return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postCreateSession(long courseId, long page, String orderBy, String orderDir, String filterString) throws CourseNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        Form<CourseSessionCreateForm> form = Form.form(CourseSessionCreateForm.class).bindFromRequest();
+        Course course = courseService.findCourseById(courseId);
+        Form<CourseSessionCreateForm> courseSessionCreateForm = Form.form(CourseSessionCreateForm.class).bindFromRequest();
 
-        if (form.hasErrors() || form.hasGlobalErrors()) {
-            Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        if (formHasErrors(courseSessionCreateForm)) {
+            Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
-        } else {
-            CourseSessionCreateForm data = form.get();
-            if (sessionService.existBySessionJid(data.sessionJid)) {
-                if (courseSessionService.existByCourseJidAndAlias(course.getJid(), data.alias)) {
-                    form.reject(Messages.get("error.course.session.duplicateAlias"));
-                    Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-
-                    return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
-                } else if (!courseSessionService.existByCourseJidAndSessionJid(course.getJid(), data.sessionJid)) {
-                    courseSessionService.addCourseSession(course.getJid(), data.sessionJid, data.alias, data.completeable);
-
-                    return redirect(routes.CourseSessionController.viewSessions(course.getId()));
-                } else {
-                    form.reject(Messages.get("error.course.sessionExist"));
-                    Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-
-                    return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
-                }
-            } else {
-                form.reject(Messages.get("error.course.invalidJid"));
-                Page<CourseSession> coursePage = courseSessionService.findCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-
-                return showListCreateSessions(course, form, coursePage, orderBy, orderDir, filterString);
-            }
+            return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
         }
+
+        CourseSessionCreateForm courseSessionCreateData = courseSessionCreateForm.get();
+        if (!sessionService.sessionExistsByJid(courseSessionCreateData.sessionJid)) {
+            courseSessionCreateForm.reject(Messages.get("error.course.invalidJid"));
+            Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+            return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+        }
+
+        if (courseSessionService.existsByCourseJidAndAlias(course.getJid(), courseSessionCreateData.alias)) {
+            courseSessionCreateForm.reject(Messages.get("error.course.session.duplicateAlias"));
+            Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+            return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+        }
+
+        if (courseSessionService.existsByCourseJidAndSessionJid(course.getJid(), courseSessionCreateData.sessionJid)) {
+            courseSessionCreateForm.reject(Messages.get("error.course.sessionExist"));
+            Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+
+            return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+        }
+
+        courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable);
+
+        return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        Course course = courseService.findCourseById(courseId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if (courseSession.getCourseJid().equals(course.getJid())) {
-            CourseSessionUpdateForm courseSessionUpdateForm = new CourseSessionUpdateForm();
-            courseSessionUpdateForm.alias = courseSession.getAlias();
-            courseSessionUpdateForm.completeable = courseSession.isCompleteable();
-            Form<CourseSessionUpdateForm> form = Form.form(CourseSessionUpdateForm.class).fill(courseSessionUpdateForm);
-
-            return showUpdateSession(course, courseSession, form);
-        } else {
+        if (!courseSession.getCourseJid().equals(course.getJid())) {
             return notFound();
         }
+
+        CourseSessionUpdateForm courseSessionUpdateData = new CourseSessionUpdateForm();
+        courseSessionUpdateData.alias = courseSession.getAlias();
+        courseSessionUpdateData.completeable = courseSession.isCompleteable();
+        Form<CourseSessionUpdateForm> courseSessionUpdateForm = Form.form(CourseSessionUpdateForm.class).fill(courseSessionUpdateData);
+
+        return showUpdateSession(course, courseSession, courseSessionUpdateForm);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postUpdateSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        Course course = courseService.findCourseById(courseId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if (courseSession.getCourseJid().equals(course.getJid())) {
-            Form<CourseSessionUpdateForm> form = Form.form(CourseSessionUpdateForm.class).bindFromRequest();
-            if (!((form.hasErrors()) || (form.hasGlobalErrors()))) {
-                CourseSessionUpdateForm courseSessionUpdateForm = form.get();
-                if ((courseSessionUpdateForm.alias.equals(courseSession.getAlias())) || (!courseSessionService.existByCourseJidAndAlias(course.getJid(), courseSessionUpdateForm.alias))) {
-                    courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateForm.alias, courseSessionUpdateForm.completeable);
-
-                    return redirect(routes.CourseSessionController.viewSessions(course.getId()));
-                } else {
-                    form.reject(Messages.get("error.course.session.duplicateAlias"));
-                    return showUpdateSession(course, courseSession, form);
-                }
-            } else {
-                return showUpdateSession(course, courseSession, form);
-            }
-        } else {
+        if (!courseSession.getCourseJid().equals(course.getJid())) {
             return notFound();
         }
+
+        Form<CourseSessionUpdateForm> courseSessionUpdateForm = Form.form(CourseSessionUpdateForm.class).bindFromRequest();
+        if (formHasErrors(courseSessionUpdateForm)) {
+            return showUpdateSession(course, courseSession, courseSessionUpdateForm);
+        }
+
+        CourseSessionUpdateForm courseSessionUpdateData = courseSessionUpdateForm.get();
+        if (!courseSessionUpdateData.alias.equals(courseSession.getAlias()) && courseSessionService.existsByCourseJidAndAlias(course.getJid(), courseSessionUpdateData.alias)) {
+            courseSessionUpdateForm.reject(Messages.get("error.course.session.duplicateAlias"));
+            return showUpdateSession(course, courseSession, courseSessionUpdateForm);
+        }
+
+        courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateData.alias, courseSessionUpdateData.completeable);
+
+        return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
 
     @Transactional
     public Result deleteSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
-        Course course = courseService.findCourseByCourseId(courseId);
-        CourseSession courseSession = courseSessionService.findByCourseSessionId(courseSessionId);
+        Course course = courseService.findCourseById(courseId);
+        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
 
-        if (course.getJid().equals(courseSession.getCourseJid())) {
-            courseSessionService.removeCourseSession(courseSessionId);
-
-            return redirect(routes.CourseSessionController.viewSessions(course.getId()));
-        } else {
+        if (!course.getJid().equals(courseSession.getCourseJid())) {
             return forbidden();
         }
+
+        courseSessionService.removeCourseSession(courseSessionId);
+
+        return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
 
-    private Result showListCreateSessions(Course course, Form<CourseSessionCreateForm> form, Page<CourseSession> currentPage, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listCreateCourseSessionsView.render(course.getId(), currentPage, orderBy, orderDir, filterString, form));
+    private Result showListCreateSessions(Course course, Form<CourseSessionCreateForm> courseSessionCreateForm, Page<CourseSession> pageOfCourseSessions, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listCreateCourseSessionsView.render(course.getId(), pageOfCourseSessions, orderBy, orderDir, filterString, courseSessionCreateForm));
         CourseControllerUtils.appendUpdateLayout(content, course);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
-              new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, course,
+                new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateSession(Course course, CourseSession courseSession, Form<CourseSessionUpdateForm> form) {
-        LazyHtml content = new LazyHtml(updateCourseSessionView.render(form, course.getId(), courseSession.getId()));
+    private Result showUpdateSession(Course course, CourseSession courseSession, Form<CourseSessionUpdateForm> courseSessionUpdateForm) {
+        LazyHtml content = new LazyHtml(updateCourseSessionView.render(courseSessionUpdateForm, course.getId(), courseSession.getId()));
         CourseControllerUtils.appendUpdateLayout(content, course);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()),
-              new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId())),
-              new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId())),
-              new InternalLink(Messages.get("commons.update"), routes.CourseSessionController.updateSession(course.getId(), courseSession.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, course,
+                new InternalLink(Messages.get("commons.update"), routes.CourseSessionController.updateSession(course.getId(), courseSession.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Courses");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, Course course, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = CourseControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId())));
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

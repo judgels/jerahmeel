@@ -7,15 +7,15 @@ import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
 
 public interface CourseSessionService {
 
-    boolean existByCourseJidAndAlias(String courseJid, String alias);
+    boolean existsByCourseJidAndAlias(String courseJid, String alias);
 
-    boolean existByCourseJidAndSessionJid(String courseJid, String sessionJid);
+    boolean existsByCourseJidAndSessionJid(String courseJid, String sessionJid);
 
-    CourseSession findByCourseSessionId(long courseSessionId) throws CourseSessionNotFoundException;
+    CourseSession findCourseSessionById(long courseSessionId) throws CourseSessionNotFoundException;
 
-    Page<CourseSession> findCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<CourseSession> getPageOfCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Page<CourseSessionProgress> findCourseSessions(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<CourseSessionProgress> getPageOfCourseSessionsProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable);
 

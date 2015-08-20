@@ -40,12 +40,12 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public boolean isInSessionByAlias(String sessionJid, String alias) {
-        return sessionProblemDao.existBySessionJidAndAlias(sessionJid, alias);
+    public boolean aliasExistsInSession(String sessionJid, String alias) {
+        return sessionProblemDao.existsBySessionJidAndAlias(sessionJid, alias);
     }
 
     @Override
-    public SessionProblem findSessionProblemBySessionProblemId(long sessionProblemId) throws SessionProblemNotFoundException {
+    public SessionProblem findSessionProblemById(long sessionProblemId) throws SessionProblemNotFoundException {
         SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
         if (sessionProblemModel != null) {
             return createFromModel(sessionProblemModel);
@@ -55,7 +55,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public Page<SessionProblem> findSessionProblems(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionProblem> getPageOfSessionProblems(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -66,14 +66,14 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public Page<SessionProblemProgress> findSessionProblems(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionProblemProgress> getPageOfSessionProblemsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<SessionProblemProgress> sessionProblemProgressBuilder = ImmutableList.builder();
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             ProblemProgress progress = ProblemProgress.NOT_VIEWED;
-            if (userItemDao.existByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid)) {
+            if (userItemDao.existsByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid)) {
                 UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, sessionProblemModel.problemJid);
                 if (UserItemStatus.VIEWED.name().equals(userItemModel.status)) {
                     progress = ProblemProgress.VIEWED;
@@ -122,7 +122,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid) {
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
 
         Map<String, String> map = Maps.newLinkedHashMap();
 
@@ -137,7 +137,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public Map<String, String> findBundleProblemJidToAliasMapBySessionJid(String sessionJid) {
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findBySessionJid(sessionJid);
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
 
         Map<String, String> map = Maps.newLinkedHashMap();
 

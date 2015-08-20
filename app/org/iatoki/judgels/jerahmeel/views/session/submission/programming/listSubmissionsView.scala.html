@@ -1,14 +1,15 @@
-@(sessionId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.sandalphon.Submission], userJids: List[String], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
-
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersWithSelectionFormView
 @import org.iatoki.judgels.play.views.html.table.paginationView
-
-@import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.play.JudgelsPlayUtils
 @import scala.collection.JavaConversions
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.sandalphon.ProgrammingSubmission
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(sessionId: Long, pageOfSubmissions: Page[ProgrammingSubmission], userJids: List[String], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
 
 <script type="text/javascript" src="@controllers.routes.Assets.at("lib/jquery/jquery.min.js")"></script>
 
@@ -60,7 +61,7 @@
 <br />
 
 @tableView() {
-    @tableHeadersWithSelectionFormView(page.getPageIndex, orderBy, orderDir, "", listFunc)(
+    @tableHeadersWithSelectionFormView(pageOfSubmissions.getPageIndex, orderBy, orderDir, "", listFunc)(
         "id" -> Messages.get("commons.id"),
         "userCreate" -> Messages.get("user.user"),
         "" -> Messages.get("submission.prob"),
@@ -71,9 +72,8 @@
     )
 
     <tbody>
-
-    @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(page.getData.map(s => s.getAuthorJid).toSeq))) { displayNamesMap =>
-        @for(submission <- page.getData) {
+    @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfSubmissions.getData.map(s => s.getAuthorJid).toSeq))) { displayNamesMap =>
+        @for(submission <- pageOfSubmissions.getData) {
             <tr>
                 <td><input type="checkbox" class="checkboxJid" name="selectJids[]" value="@submission.getJid"></td>
                 <td><small>@submission.getId</small></td>
@@ -95,4 +95,4 @@
 
 </form>
 
-@paginationView(page, orderBy, orderDir, "", listFunc)
+@paginationView(pageOfSubmissions, orderBy, orderDir, "", listFunc)

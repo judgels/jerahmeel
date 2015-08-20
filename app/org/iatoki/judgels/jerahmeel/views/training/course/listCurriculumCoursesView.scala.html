@@ -1,16 +1,17 @@
-@(curriculumId: Long, page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.CurriculumCourseProgress], orderBy: String, orderDir: String, filterString: String)
-
 @import play.i18n.Messages
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.CourseProgress
-
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress
+@import org.iatoki.judgels.jerahmeel.CourseProgress
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(curriculumId: Long, pageOfCurriculumCoursesProgress: Page[CurriculumCourseProgress], orderBy: String, orderDir: String, filterString: String)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingCourseController.listCourses(curriculumId, newPageIndex, newOrderBy, newOrderDir)}
 
-@for(curriculumCourseProgress <- page.getData()) {
+@for(curriculumCourseProgress <- pageOfCurriculumCoursesProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">
@@ -46,4 +47,4 @@
     </div>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfCurriculumCoursesProgress, orderBy, orderDir, filterString, listFunc)

@@ -51,17 +51,15 @@ public final class CurriculumController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     public Result listCurriculums(long page, String orderBy, String orderDir, String filterString) {
-        Page<Curriculum> currentPage = curriculumService.pageCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
+        Page<Curriculum> pageOfCurriculums = curriculumService.getPageOfCurriculums(page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        LazyHtml content = new LazyHtml(listCurriculumsView.render(currentPage, orderBy, orderDir, filterString));
+        LazyHtml content = new LazyHtml(listCurriculumsView.render(pageOfCurriculums, orderBy, orderDir, filterString));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("curriculum.list"), new InternalLink(Messages.get("commons.create"), routes.CurriculumController.createCurriculum()), c));
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums())
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
 
-        return ControllerUtils.getInstance().lazyOk(content);
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     public Result jumpToCourses(long curriculumId) {
@@ -71,76 +69,81 @@ public final class CurriculumController extends AbstractJudgelsController {
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createCurriculum() {
-        Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class);
+        Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class);
 
-        return showCreateCurriculum(form);
+        return showCreateCurriculum(curriculumUpsertForm);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postCreateCurriculum() {
-        Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class).bindFromRequest();
+        Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class).bindFromRequest();
 
-        if (form.hasErrors() || form.hasGlobalErrors()) {
-            return showCreateCurriculum(form);
-        } else {
-            CurriculumUpsertForm curriculumUpsertForm = form.get();
-            curriculumService.createCurriculum(curriculumUpsertForm.name, curriculumUpsertForm.description);
-
-            return redirect(routes.CurriculumController.viewCurriculums());
+        if (formHasErrors(curriculumUpsertForm)) {
+            return showCreateCurriculum(curriculumUpsertForm);
         }
+
+        CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
+        curriculumService.createCurriculum(curriculumUpsertData.name, curriculumUpsertData.description);
+
+        return redirect(routes.CurriculumController.viewCurriculums());
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result updateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
-        CurriculumUpsertForm curriculumUpsertForm = new CurriculumUpsertForm();
-        curriculumUpsertForm.name = curriculum.getName();
-        curriculumUpsertForm.description = curriculum.getDescription();
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
+        CurriculumUpsertForm curriculumUpsertData = new CurriculumUpsertForm();
+        curriculumUpsertData.name = curriculum.getName();
+        curriculumUpsertData.description = curriculum.getDescription();
 
-        Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class).fill(curriculumUpsertForm);
+        Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class).fill(curriculumUpsertData);
 
-        return showUpdateCurriculumGeneral(form, curriculum);
+        return showUpdateCurriculumGeneral(curriculumUpsertForm, curriculum);
     }
 
     @Transactional
     @RequireCSRFCheck
     public Result postUpdateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
-        Curriculum curriculum = curriculumService.findCurriculumByCurriculumId(curriculumId);
-        Form<CurriculumUpsertForm> form = Form.form(CurriculumUpsertForm.class).bindFromRequest();
+        Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
+        Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class).bindFromRequest();
 
-        if (form.hasErrors()) {
-            return showUpdateCurriculumGeneral(form, curriculum);
-        } else {
-            CurriculumUpsertForm curriculumUpsertForm = form.get();
-            curriculumService.updateCurriculum(curriculum.getId(), curriculumUpsertForm.name, curriculumUpsertForm.description);
-
-            return redirect(routes.CurriculumController.viewCurriculums());
+        if (formHasErrors(curriculumUpsertForm)) {
+            return showUpdateCurriculumGeneral(curriculumUpsertForm, curriculum);
         }
+
+        CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
+        curriculumService.updateCurriculum(curriculum.getId(), curriculumUpsertData.name, curriculumUpsertData.description);
+
+        return redirect(routes.CurriculumController.viewCurriculums());
     }
 
-    private Result showCreateCurriculum(Form<CurriculumUpsertForm> form) {
-        LazyHtml content = new LazyHtml(createCurriculumView.render(form));
+    private Result showCreateCurriculum(Form<CurriculumUpsertForm> curriculumUpsertForm) {
+        LazyHtml content = new LazyHtml(createCurriculumView.render(curriculumUpsertForm));
         content.appendLayout(c -> headingLayout.render(Messages.get("curriculum.create"), c));
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()),
-              new InternalLink(Messages.get("curriculum.create"), routes.CurriculumController.createCurriculum())
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Create");
-        return ControllerUtils.getInstance().lazyOk(content);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content,
+                new InternalLink(Messages.get("curriculum.create"), routes.CurriculumController.createCurriculum())
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Create");
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateCurriculumGeneral(Form<CurriculumUpsertForm> form, Curriculum curriculum) {
-        LazyHtml content = new LazyHtml(updateCurriculumGeneralView.render(form, curriculum.getId()));
+    private Result showUpdateCurriculumGeneral(Form<CurriculumUpsertForm> curriculumUpsertForm, Curriculum curriculum) {
+        LazyHtml content = new LazyHtml(updateCurriculumGeneralView.render(curriculumUpsertForm, curriculum.getId()));
         CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
-        ControllerUtils.getInstance().appendSidebarLayout(content);
-        ControllerUtils.getInstance().appendBreadcrumbsLayout(content, ImmutableList.of(
-              new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()),
-              new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId()))
-        ));
-        ControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Update");
-        return ControllerUtils.getInstance().lazyOk(content);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content,
+                new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Update");
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private void appendBreadcrumbsLayout(LazyHtml content, InternalLink... lastLinks) {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = CurriculumControllerUtils.getBreadcrumbsBuilder();
+        breadcrumbsBuilder.add(lastLinks);
+
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
     }
 }

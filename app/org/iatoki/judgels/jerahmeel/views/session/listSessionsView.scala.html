@@ -1,27 +1,26 @@
-@(page: org.iatoki.judgels.play.Page[org.iatoki.judgels.jerahmeel.Session], orderBy: String, orderDir: String, filterString: String)
-
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-@import org.iatoki.judgels.jerahmeel.controllers.routes
-
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.Session
+@import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@searchView(page.getPageIndex, orderBy, orderDir, filterString, routes.SessionController.listSessions)
+@(pageOfSessions: Page[Session], orderBy: String, orderDir: String, filterString: String)
+
+@searchView(pageOfSessions.getPageIndex, orderBy, orderDir, filterString, routes.SessionController.listSessions)
 
 <div class="clearfix"></div>
 
 @tableView() {
-    @tableHeadersView(page.getPageIndex, orderBy, orderDir, filterString, routes.SessionController.listSessions)(
+    @tableHeadersView(pageOfSessions.getPageIndex, orderBy, orderDir, filterString, routes.SessionController.listSessions)(
         "id" -> Messages.get("commons.id"),
         "name" -> Messages.get("session.name")
     )
 
-
     <tbody>
-        @for(session <- page.getData) {
+        @for(session <- pageOfSessions.getData) {
             <tr>
                 <td>@session.getId</td>
                 <td>@session.getName</td>
@@ -33,4 +32,4 @@
     </tbody>
 }
 
-@paginationView(page, orderBy, orderDir, filterString, routes.SessionController.listSessions)
+@paginationView(pageOfSessions, orderBy, orderDir, filterString, routes.SessionController.listSessions)

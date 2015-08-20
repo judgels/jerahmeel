@@ -4,4 +4,5 @@ import org.iatoki.judgels.play.models.daos.JudgelsDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumModel;
 
 public interface CurriculumDao extends JudgelsDao<CurriculumModel> {
+
 }

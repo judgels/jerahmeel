@@ -8,4 +8,3 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class AvatarCacheModel_ extends org.iatoki.judgels.jophiel.models.entities.AbstractAvatarCacheModel_ {
 
 }
-

@@ -22,7 +22,7 @@ public final class SessionProblemHibernateDao extends AbstractHibernateDao<Long,
     }
 
     @Override
-    public boolean existBySessionJidAndAlias(String sessionJid, String alias) {
+    public boolean existsBySessionJidAndAlias(String sessionJid, String alias) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<SessionProblemModel> root = query.from(SessionProblemModel.class);
@@ -33,7 +33,7 @@ public final class SessionProblemHibernateDao extends AbstractHibernateDao<Long,
     }
 
     @Override
-    public List<SessionProblemModel> findBySessionJid(String sessionJid) {
+    public List<SessionProblemModel> getBySessionJid(String sessionJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<SessionProblemModel> query = cb.createQuery(SessionProblemModel.class);
         Root<SessionProblemModel> root = query.from(SessionProblemModel.class);

@@ -12,6 +12,4 @@ public abstract class CourseModel_ extends AbstractJudgelsModel_ {
 
 	public static volatile SingularAttribute<CourseModel, String> name;
 	public static volatile SingularAttribute<CourseModel, String> description;
-
 }
-

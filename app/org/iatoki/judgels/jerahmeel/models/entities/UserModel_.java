@@ -9,6 +9,4 @@ import javax.persistence.metamodel.StaticMetamodel;
 public abstract class UserModel_ extends org.iatoki.judgels.jophiel.models.entities.AbstractUserModel_ {
 
 	public static volatile SingularAttribute<UserModel, String> roles;
-
 }
-

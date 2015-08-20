@@ -66,6 +66,13 @@ public final class SessionControllerUtils {
         content.appendLayout(c -> headingLayout.render(Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(), c));
     }
 
+    static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {
+        ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()));
+
+        return breadcrumbsBuilder;
+    }
+
     static void setCurrentStatementLanguage(String languageCode) {
         Controller.session("currentStatementLanguage", languageCode);
     }

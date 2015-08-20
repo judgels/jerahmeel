@@ -25,23 +25,18 @@ public final class UserItemServiceImpl implements UserItemService {
     }
 
     @Override
-    public boolean isViewed(String userJid, String itemJid) {
-        return userItemDao.existByUserJidAndItemJid(userJid, itemJid);
+    public boolean userItemExistsByUserJidAndItemJid(String userJid, String itemJid) {
+        return userItemDao.existsByUserJidAndItemJid(userJid, itemJid);
     }
 
     @Override
-    public boolean isUserItemExist(String userJid, String itemJid) {
-        return userItemDao.existByUserJidAndItemJid(userJid, itemJid);
-    }
-
-    @Override
-    public boolean isUserItemExist(String userJid, String itemJid, UserItemStatus status) {
-        return userItemDao.existByUserJidItemJidAndStatus(userJid, itemJid, status.name());
+    public boolean userItemExistsByUserJidAndItemJidAndStatus(String userJid, String itemJid, UserItemStatus status) {
+        return userItemDao.existsByUserJidItemJidAndStatus(userJid, itemJid, status.name());
     }
 
     @Override
     public void upsertUserItem(String userJid, String itemJid, UserItemStatus status) {
-        if (userItemDao.existByUserJidAndItemJid(userJid, itemJid)) {
+        if (userItemDao.existsByUserJidAndItemJid(userJid, itemJid)) {
             UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, itemJid);
             userItemModel.status = status.name();
 
@@ -57,13 +52,13 @@ public final class UserItemServiceImpl implements UserItemService {
     }
 
     @Override
-    public List<UserItem> findAllUserItemByUserJid(String userJid) {
-        return userItemDao.findByUserJid(userJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
+    public List<UserItem> getUserItemsByUserJid(String userJid) {
+        return userItemDao.getByUserJid(userJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
     }
 
     @Override
-    public List<UserItem> findAllUserItemByItemJid(String itemJid) {
-        return userItemDao.findByItemJid(itemJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
+    public List<UserItem> getUserItemsByItemJid(String itemJid) {
+        return userItemDao.getByItemJid(itemJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
     }
 
     private UserItem createFromModel(UserItemModel u) {

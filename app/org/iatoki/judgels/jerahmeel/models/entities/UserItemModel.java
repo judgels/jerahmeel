@@ -20,5 +20,4 @@ public final class UserItemModel extends AbstractModel {
     public String itemJid;
 
     public String status;
-
 }

@@ -28,12 +28,12 @@ public final class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public boolean existByCourseJid(String courseJid) {
+    public boolean courseExistsByJid(String courseJid) {
         return courseDao.existsByJid(courseJid);
     }
 
     @Override
-    public List<Course> findAllCourseByTerm(String term) {
+    public List<Course> getCoursesByTerm(String term) {
         List<CourseModel> courses = courseDao.findSortedByFilters("id", "asc", term, 0, -1);
         ImmutableList.Builder<Course> courseBuilder = ImmutableList.builder();
 
@@ -45,7 +45,7 @@ public final class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Page<Course> pageCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<Course> getPageOfCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = courseDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
         List<CourseModel> courseModels = courseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -55,13 +55,13 @@ public final class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course findCourseByCourseJid(String courseJid) {
+    public Course findCourseByJid(String courseJid) {
         CourseModel courseModel = courseDao.findByJid(courseJid);
         return createCourseFromModel(courseModel);
     }
 
     @Override
-    public Course findCourseByCourseId(long courseId) throws CourseNotFoundException {
+    public Course findCourseById(long courseId) throws CourseNotFoundException {
         CourseModel courseModel = courseDao.findById(courseId);
         if (courseModel != null) {
             return createCourseFromModel(courseModel);

@@ -24,25 +24,25 @@ public final class UserHibernateDao extends AbstractHibernateDao<Long, UserModel
     }
 
     @Override
-    public boolean existsByUserJid(String userJid) {
+    public boolean existsByJid(String jid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<Long> query = cb.createQuery(Long.class);
         Root<UserModel> root = query.from(UserModel.class);
 
         query
             .select(cb.count(root))
-            .where(cb.equal(root.get(UserModel_.userJid), userJid));
+            .where(cb.equal(root.get(UserModel_.userJid), jid));
 
         return (JPA.em().createQuery(query).getSingleResult() != 0);
     }
 
     @Override
-    public UserModel findByUserJid(String userJid) {
+    public UserModel findByJid(String jid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<UserModel> query = cb.createQuery(UserModel.class);
         Root<UserModel> root = query.from(UserModel.class);
 
-        query.where(cb.equal(root.get(UserModel_.userJid), userJid));
+        query.where(cb.equal(root.get(UserModel_.userJid), jid));
 
         return JPA.em().createQuery(query).getSingleResult();
     }

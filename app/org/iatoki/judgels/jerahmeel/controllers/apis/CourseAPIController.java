@@ -3,13 +3,13 @@ package org.iatoki.judgels.jerahmeel.controllers.apis;
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.AutoComplete;
 import org.iatoki.judgels.jerahmeel.Course;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.data.DynamicForm;
 import play.db.jpa.Transactional;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -17,7 +17,7 @@ import javax.inject.Named;
 import java.util.List;
 
 @Named
-public final class CourseAPIController extends Controller {
+public final class CourseAPIController extends AbstractJudgelsAPIController {
 
     private final CourseService courseService;
 
@@ -32,18 +32,18 @@ public final class CourseAPIController extends Controller {
         response().setHeader("Access-Control-Allow-Origin", "*");
         response().setContentType("application/javascript");
 
-        DynamicForm form = DynamicForm.form().bindFromRequest();
-        String term = form.get("term");
-        List<Course> courses = courseService.findAllCourseByTerm(term);
-        ImmutableList.Builder<AutoComplete> responseBuilder = ImmutableList.builder();
+        DynamicForm dForm = DynamicForm.form().bindFromRequest();
+        String callback = dForm.get("callback");
+        String term = dForm.get("term");
+
+        List<Course> courses = courseService.getCoursesByTerm(term);
+        ImmutableList.Builder<AutoComplete> autoCompleteBuilder = ImmutableList.builder();
 
         for (Course course : courses) {
-            responseBuilder.add(new AutoComplete(course.getJid(), course.getJid(), course.getName()));
+            autoCompleteBuilder.add(new AutoComplete(course.getJid(), course.getJid(), course.getName()));
         }
 
-        String callback = form.get("callback");
-
-        return ok(callback + "(" + Json.toJson(responseBuilder.build()).toString() + ")");
+        return ok(createJsonPResponse(callback, Json.toJson(autoCompleteBuilder.build()).toString()));
     }
 
 }
