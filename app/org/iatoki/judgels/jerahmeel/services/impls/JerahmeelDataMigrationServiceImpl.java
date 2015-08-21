@@ -28,8 +28,11 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         String programmingSubmissionTable = "jerahmeel_programming_submission";
+        String bundleSubmissionTable = "jerahmeel_bundle_submission";
         Statement statement = connection.createStatement();
 
+        statement.execute("ALTER TABLE " + bundleSubmissionTable + " DROP containerJid;");
+        statement.execute("ALTER TABLE " + bundleSubmissionTable + " CHANGE contestJid containerJid VARCHAR(255);");
         statement.execute("ALTER TABLE " + programmingSubmissionTable + " DROP containerJid;");
         statement.execute("ALTER TABLE " + programmingSubmissionTable + " CHANGE contestJid containerJid VARCHAR(255);");
     }
