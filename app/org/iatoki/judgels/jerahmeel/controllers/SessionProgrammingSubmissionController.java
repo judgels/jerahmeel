@@ -3,6 +3,7 @@ package org.iatoki.judgels.jerahmeel.controllers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.iatoki.judgels.FileSystemProvider;
+import org.iatoki.judgels.gabriel.SubmissionSource;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -12,7 +13,6 @@ import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
-import org.iatoki.judgels.gabriel.GradingSource;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
@@ -29,7 +29,8 @@ import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sandalphon.adapters.impls.SubmissionAdapterRegistry;
+import org.iatoki.judgels.sandalphon.ProgrammingSubmissionUtils;
+import org.iatoki.judgels.sandalphon.adapters.GradingEngineAdapterRegistry;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionException;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
@@ -82,9 +83,9 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         String gradingEngine = body.asFormUrlEncoded().get("engine")[0];
 
         try {
-            GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(gradingEngine).createGradingSourceFromNewSubmission(body);
-            String submissionJid = submissionService.submit(problemJid, session.getJid(), gradingEngine, gradingLanguage, null, source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-            SubmissionAdapterRegistry.getInstance().getByGradingEngineName(gradingEngine).storeSubmissionFiles(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submissionJid, source);
+            SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromNewSubmission(body);
+            String submissionJid = submissionService.submit(problemJid, session.getJid(), gradingEngine, gradingLanguage, null, submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            ProgrammingSubmissionUtils.storeSubmissionFiles(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submissionJid, submissionSource);
 
             JerahmeelControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + session.getName() + ".");
 
@@ -131,14 +132,14 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         Session session = sessionService.findSessionById(sessionId);
         ProgrammingSubmission submission = submissionService.findProgrammingSubmissionById(submissionId);
 
-        GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
+        SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), submission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
         String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
-        LazyHtml content = new LazyHtml(SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, source, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
+        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
         appendSubtabLayout(content, session);
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
@@ -155,8 +156,8 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         Session session = sessionService.findSessionById(sessionId);
 
         ProgrammingSubmission submission = submissionService.findProgrammingSubmissionById(submissionId);
-        GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
-        submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
+        submissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
@@ -178,8 +179,8 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         }
 
         for (ProgrammingSubmission submission : submissions) {
-            GradingSource source = SubmissionAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).createGradingSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
-            submissionService.regrade(submission.getJid(), source, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submission.getJid());
+            submissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return redirect(routes.SessionProgrammingSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
