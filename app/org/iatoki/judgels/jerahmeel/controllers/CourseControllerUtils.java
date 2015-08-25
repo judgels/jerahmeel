@@ -26,17 +26,17 @@ public final class CourseControllerUtils {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(),
                     new InternalLink(Messages.get("commons.update"), routes.CourseController.updateCourseGeneral(course.getId())),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(course.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
                     c)
             );
         } else if (curriculumCourse.isCompleteable()) {
             content.appendLayout(c -> headingWithBackLayout.render(Messages.get("course.course") + " " + curriculumCourse.getAlias() + ": " + course.getName(),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(course.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
                     c)
             );
         } else {
             content.appendLayout(c -> headingWithBackLayout.render(course.getName(),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(course.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
                     c)
             );
         }
