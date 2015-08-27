@@ -98,14 +98,6 @@ public final class ApplicationController extends AbstractJudgelsController {
         return redirect(returnUri);
     }
 
-    @Transactional
-    public Result afterProfile(String returnUri) {
-        JudgelsPlayUtils.updateUserJidCache(JidCacheServiceImpl.getInstance());
-        Jophiel.updateUserAvatarCache(AvatarCacheServiceImpl.getInstance());
-
-        return redirect(returnUri);
-    }
-
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional
     public Result postViewAs() {

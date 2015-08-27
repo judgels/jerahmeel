@@ -29,11 +29,11 @@ public final class Global extends AbstractGlobal {
 
     @Override
     public void onStart(Application application) {
+        super.onStart(application);
+
         buildServices(application.injector());
         buildUtils(application.injector());
         scheduleThreads(application.injector());
-
-        super.onStart(application);
     }
 
     @Override

@@ -43,7 +43,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         LazyHtml sidebarContent = new LazyHtml(profileView.render(
                 IdentityUtils.getUsername(),
                 IdentityUtils.getUserRealName(),
-                org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile(org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.afterProfile(routes.CurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
+                org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
                 org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(routes.ApplicationController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
         ));
         if (JerahmeelUtils.trullyHasRole("admin")) {
