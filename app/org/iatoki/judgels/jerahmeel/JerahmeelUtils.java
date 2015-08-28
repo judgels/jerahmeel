@@ -38,12 +38,12 @@ public final class JerahmeelUtils {
         putInSession("realAvatar", getFromSession("avatar"));
     }
 
-    public static void setUserSession(PublicUser user, org.iatoki.judgels.jerahmeel.User urielUser) {
-        putInSession("userJid", user.getJid());
-        putInSession("name", user.getName());
-        putInSession("username", user.getUsername());
+    public static void setUserSession(PublicUser publicUser, User urielUser) {
+        putInSession("userJid", publicUser.getJid());
+        putInSession("name", publicUser.getName());
+        putInSession("username", publicUser.getUsername());
         saveRolesInSession(urielUser.getRoles());
-        putInSession("avatar", user.getProfilePictureUrl().toString());
+        putInSession("avatar", publicUser.getProfilePictureUrl().toString());
     }
 
     public static void restoreSession() {
