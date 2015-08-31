@@ -1,6 +1,8 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jophiel.views.html.isLoggedInLayout;
+import org.iatoki.judgels.jophiel.views.html.isLoggedOutLayout;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
@@ -50,7 +52,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
                     IdentityUtils.getUsername(),
                     IdentityUtils.getUserRealName(),
                     org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
-                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(routes.ApplicationController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
+                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
                 ));
         }
         if (JerahmeelUtils.trullyHasRole("admin")) {
@@ -66,6 +68,11 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         sidebarContent.appendLayout(c -> linkedClientsLayout.render(jophiel.getLinkedClientsEndPoint(), "lib/jophielcommons/javascripts/linkedClients.js", c));
 
         content.appendLayout(c -> sidebarLayout.render(sidebarContent.render(), c));
+        if ((IdentityUtils.getUserJid() == null) || JerahmeelUtils.isGuest()) {
+            content.appendLayout(c -> isLoggedInLayout.render(jophiel.getIsLoggedInEndPoint(), routes.ApplicationController.auth(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()), "lib/jophielcommons/javascripts/isLoggedIn.js", c));
+        } else {
+            content.appendLayout(c -> isLoggedOutLayout.render(jophiel.getIsLoggedInEndPoint(), org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()), "lib/jophielcommons/javascripts/isLoggedOut.js", c));
+        }
     }
 
     public boolean isAdmin() {
