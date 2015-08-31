@@ -8,10 +8,10 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
@@ -30,7 +30,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
 public final class TrainingSessionController extends AbstractJudgelsController {
@@ -52,11 +51,13 @@ public final class TrainingSessionController extends AbstractJudgelsController {
         this.userItemService = userItemService;
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional
     public Result viewSessions(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException {
         return listSessions(curriculumId, curriculumCourseId, 0, "alias", "asc", "");
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional
     public Result listSessions(long curriculumId, long curriculumCourseId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
@@ -69,7 +70,7 @@ public final class TrainingSessionController extends AbstractJudgelsController {
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Page<CourseSessionProgress> pageOfCourseSessionsProgress = courseSessionService.getPageOfCourseSessionsProgress(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        if (!userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
+        if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED);
         }
 

@@ -1,9 +1,10 @@
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress
 @import org.iatoki.judgels.jerahmeel.CourseProgress
-@import org.iatoki.judgels.jerahmeel.controllers.routes
 
 @(curriculumId: Long, pageOfCurriculumCoursesProgress: Page[CurriculumCourseProgress], orderBy: String, orderDir: String, filterString: String)
 
@@ -20,29 +21,33 @@
                 }
                 @curriculumCourseProgress.getCurriculumCourse.getCourseName
             </a>
-            <div class="pull-right">
-                @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
-                    <span class="alert alert-danger">
-                        @Messages.get("training.course.locked") [- / @curriculumCourseProgress.getTotalSessions]
-                    </span>
-                } else {
-                    @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
-                        <span class="alert alert-success">
-                            @Messages.get("training.course.completed") [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
+            @if(!JerahmeelUtils.isGuest) {
+                <div class="pull-right">
+                    @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
+                        <span class="alert alert-danger">
+                            @Messages.get("training.course.locked") [- / @curriculumCourseProgress.getTotalSessions]
                         </span>
                     } else {
-                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
-                            <span class="alert alert-info">
-                                @Messages.get("training.course.inProgress") [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
+                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
+                            <span class="alert alert-success">
+                                @Messages.get("training.course.completed")
+                                [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
                             </span>
                         } else {
-                            <span class="alert alert-warning">
-                                @Messages.get("training.course.available") [@curriculumCourseProgress.getTotalScores]
-                            </span>
+                            @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
+                                <span class="alert alert-info">
+                                    @Messages.get("training.course.inProgress")
+                                    [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
+                                </span>
+                            } else {
+                                <span class="alert alert-warning">
+                                    @Messages.get("training.course.available") [@curriculumCourseProgress.getTotalScores]
+                                </span>
+                            }
                         }
                     }
-                }
-            </div>
+                </div>
+            }
         </div>
     </div>
 }

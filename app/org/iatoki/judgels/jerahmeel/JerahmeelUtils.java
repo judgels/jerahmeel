@@ -3,6 +3,7 @@ package org.iatoki.judgels.jerahmeel;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.iatoki.judgels.jophiel.PublicUser;
+import org.iatoki.judgels.play.IdentityUtils;
 import play.mvc.Http;
 
 import java.util.Arrays;
@@ -12,6 +13,10 @@ public final class JerahmeelUtils {
 
     private JerahmeelUtils() {
         // prevent instantiation
+    }
+
+    public static boolean isGuest() {
+        return IdentityUtils.getUserJid().startsWith("guest");
     }
 
     public static List<String> getDefaultRoles() {
@@ -27,7 +32,7 @@ public final class JerahmeelUtils {
     }
 
     public static boolean hasRole(String role) {
-        return Arrays.asList(getFromSession("role").split(",")).contains(role);
+        return Http.Context.current().session().containsKey("role") && Arrays.asList(getFromSession("role").split(",")).contains(role);
     }
 
     public static void backupSession() {

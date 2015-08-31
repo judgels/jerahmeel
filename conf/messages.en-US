@@ -5,6 +5,7 @@ training.sessions=Chapters
 training.submissions.bundle=Non Programming Submissions
 training.submissions.programming=Programming Submissions
 training.session.isLocked=Chapter is still Locked
+training.session.mustLogin=You must login to submit
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums

@@ -9,6 +9,7 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
@@ -17,8 +18,7 @@ import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
@@ -46,7 +46,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.net.URI;
 
-@Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
 public final class TrainingProblemController extends AbstractJudgelsController {
@@ -76,11 +75,13 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         this.userItemService = userItemService;
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional
     public Result viewProblems(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         return listProblems(curriculumId, curriculumCourseId, courseSessionId, 0, "alias", "asc", "");
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional
     public Result listProblems(long curriculumId, long curriculumCourseId, long courseSessionId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
@@ -95,13 +96,14 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
         Page<SessionProblemProgress> pageOfSessionProblemsProgress = sessionProblemService.getPageOfSessionProblemsProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-        if (!userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
+        if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
         }
 
         return showListProblems(curriculum, curriculumCourse, course, courseSession, session, pageOfSessionProblemsProgress, orderBy, orderDir, filterString);
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional
     public Result viewProblem(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionProblemId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
@@ -117,7 +119,9 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
         String reasonNotAllowedToSubmit = null;
-        if (!sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
+        if (JerahmeelUtils.isGuest()) {
+            reasonNotAllowedToSubmit = Messages.get("training.session.mustLogin");
+        } else if (!sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             reasonNotAllowedToSubmit = Messages.get("training.session.isLocked");
         }
         String postSubmitUri = null;
@@ -137,7 +141,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
                 new InternalLink(sessionProblem.getAlias(), routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()))
         );
 
-        if (!userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblem.getProblemJid())) {
+        if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblem.getProblemJid())) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED);
         }
 
@@ -146,6 +150,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = GuestView.class)
     public Result switchLanguage() {
         String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
         SessionControllerUtils.setCurrentStatementLanguage(languageCode);
@@ -153,6 +158,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         return redirect(request().getHeader("Referer"));
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result renderProblemMedia(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionProblemId, String filename) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);

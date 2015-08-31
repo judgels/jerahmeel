@@ -8,6 +8,8 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.jophiel.UserActivityMessage;
 import org.iatoki.judgels.jophiel.forms.ViewpointForm;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsControllerUtils;
+import org.iatoki.judgels.play.controllers.ControllerUtils;
+import org.iatoki.judgels.play.views.html.layouts.guestLoginView;
 import org.iatoki.judgels.play.views.html.layouts.sidebarLayout;
 import org.iatoki.judgels.play.views.html.layouts.profileView;
 import org.iatoki.judgels.play.views.html.layouts.menusLayout;
@@ -40,12 +42,17 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
             internalLinkBuilder.add(new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()));
             internalLinkBuilder.add(new InternalLink(Messages.get("user.users"), routes.UserController.index()));
         }
-        LazyHtml sidebarContent = new LazyHtml(profileView.render(
-                IdentityUtils.getUsername(),
-                IdentityUtils.getUserRealName(),
-                org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
-                org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(routes.ApplicationController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
-        ));
+        LazyHtml sidebarContent;
+        if (JerahmeelUtils.isGuest()) {
+            sidebarContent = new LazyHtml(guestLoginView.render(routes.ApplicationController.auth(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()), jophiel.getRegisterUri().toString()));
+        } else {
+            sidebarContent = new LazyHtml(profileView.render(
+                    IdentityUtils.getUsername(),
+                    IdentityUtils.getUserRealName(),
+                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
+                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(routes.ApplicationController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
+                ));
+        }
         if (JerahmeelUtils.trullyHasRole("admin")) {
             Form<ViewpointForm> form = Form.form(ViewpointForm.class);
             if (JudgelsPlayUtils.hasViewPoint()) {
@@ -66,10 +73,12 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     }
 
     public void addActivityLog(String log) {
-        try {
-            UserActivityMessageServiceImpl.getInstance().addUserActivityMessage(new UserActivityMessage(System.currentTimeMillis(), IdentityUtils.getUserJid(), log, IdentityUtils.getIpAddress()));
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (!JerahmeelUtils.isGuest()) {
+            try {
+                UserActivityMessageServiceImpl.getInstance().addUserActivityMessage(new UserActivityMessage(System.currentTimeMillis(), IdentityUtils.getUserJid(), log, IdentityUtils.getIpAddress()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 

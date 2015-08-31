@@ -5,8 +5,7 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.listCurriculumCoursesView;
@@ -22,7 +21,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-@Authenticated(value = {LoggedIn.class, HasRole.class})
 @Singleton
 @Named
 public final class TrainingCourseController extends AbstractJudgelsController {
@@ -38,11 +36,13 @@ public final class TrainingCourseController extends AbstractJudgelsController {
         this.curriculumService = curriculumService;
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
         return listCourses(curriculumId, 0, "alias", "asc", "");
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result listCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);

@@ -1,9 +1,10 @@
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.CourseSessionProgress
 @import org.iatoki.judgels.jerahmeel.SessionProgress
-@import org.iatoki.judgels.jerahmeel.controllers.routes
 
 @(curriculumId: Long, curriculumCourseId: Long, pageOfCourseSessionsProgress: Page[CourseSessionProgress], orderBy: String, orderDir: String, filterString: String)
 
@@ -20,29 +21,33 @@
                 }
                 @courseSessionProgress.getCourseSession.getSessionName
             </a>
-            <div class="pull-right">
-                @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.LOCKED)) {
-                    <span class="alert alert-danger">
-                        @Messages.get("training.session.locked") [- / @courseSessionProgress.getTotalProblems]
-                    </span>
-                } else {
-                    @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.COMPLETED)) {
-                        <span class="alert alert-success">
-                            @Messages.get("training.session.completed") [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
+            @if(!JerahmeelUtils.isGuest) {
+                <div class="pull-right">
+                    @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.LOCKED)) {
+                        <span class="alert alert-danger">
+                            @Messages.get("training.session.locked") [- / @courseSessionProgress.getTotalProblems]
                         </span>
                     } else {
-                        @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.IN_PROGRESS)) {
-                            <span class="alert alert-info">
-                                @Messages.get("training.session.inProgress") [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
+                        @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.COMPLETED)) {
+                            <span class="alert alert-success">
+                                @Messages.get("training.session.completed")
+                                [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
                             </span>
                         } else {
-                            <span class="alert alert-warning">
-                                @Messages.get("training.session.available") [@courseSessionProgress.getTotalScores]
-                            </span>
+                            @if(courseSessionProgress.getSessionProgress.equals(SessionProgress.IN_PROGRESS)) {
+                                <span class="alert alert-info">
+                                    @Messages.get("training.session.inProgress")
+                                    [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
+                                </span>
+                            } else {
+                                <span class="alert alert-warning">
+                                    @Messages.get("training.session.available") [@courseSessionProgress.getTotalScores]
+                                </span>
+                            }
                         }
                     }
-                }
-            </div>
+                </div>
+            }
         </div>
     </div>
 }
