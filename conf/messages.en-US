@@ -72,6 +72,7 @@ session.problem.alias=Alias
 session.problem.name=Name
 session.problem.type=Type
 session.problem.status=Status
+session.problem.slug=Slug
 session.problem.jid=Problem Jid
 session.problem.secret=Problem Secret
 

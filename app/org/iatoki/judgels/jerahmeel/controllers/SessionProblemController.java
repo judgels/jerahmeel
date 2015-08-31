@@ -26,6 +26,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.problem.createProblemView
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.updateSessionProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
+import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
 import org.iatoki.judgels.sandalphon.Sandalphon;
 import org.iatoki.judgels.sandalphon.LanguageRestriction;
 import play.data.DynamicForm;
@@ -41,6 +42,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
@@ -71,8 +75,10 @@ public final class SessionProblemController extends AbstractJudgelsController {
         Session session = sessionService.findSessionById(sessionId);
 
         Page<SessionProblem> pageOfSessionProblems = sessionProblemService.getPageOfSessionProblems(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        List<String> problemJids = pageOfSessionProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemSlugsMap = ResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids));
 
-        return showListSessionProblems(session, pageOfSessionProblems, orderBy, orderDir, filterString);
+        return showListSessionProblems(session, pageOfSessionProblems, orderBy, orderDir, filterString, problemSlugsMap);
     }
 
     @Transactional(readOnly = true)
@@ -233,8 +239,8 @@ public final class SessionProblemController extends AbstractJudgelsController {
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }
 
-    private Result showListSessionProblems(Session session, Page<SessionProblem> pageOfSessionProblems, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listSessionProblemsView.render(session.getId(), pageOfSessionProblems, orderBy, orderDir, filterString));
+    private Result showListSessionProblems(Session session, Page<SessionProblem> pageOfSessionProblems, String orderBy, String orderDir, String filterString, Map<String, String> problemSlugsMap) {
+        LazyHtml content = new LazyHtml(listSessionProblemsView.render(session.getId(), pageOfSessionProblems, orderBy, orderDir, filterString, problemSlugsMap));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.problems"), new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.createProblem(session.getId())), c));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);

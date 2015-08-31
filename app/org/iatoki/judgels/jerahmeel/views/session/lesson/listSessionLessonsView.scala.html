@@ -3,12 +3,11 @@
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.SessionLesson
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@(sessionId: Long, pageOfSessionLessons: Page[SessionLesson], orderBy: String, orderDir: String, filterString: String)
+@(sessionId: Long, pageOfSessionLessons: Page[SessionLesson], orderBy: String, orderDir: String, filterString: String, lessonSlugsMap: Map[String, String])
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionLessonController.listSessionLessons(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
@@ -29,7 +28,7 @@
         <tr>
             <td>@sessionLesson.getId</td>
             <td>@sessionLesson.getAlias</td>
-            <td>@JidCacheServiceImpl.getInstance().getDisplayName(sessionLesson.getLessonJid)</td>
+            <td>@lessonSlugsMap.get(sessionLesson.getLessonJid)</td>
             <td>@sessionLesson.getStatus.name()</td>
             <td class="text-center">
                 <a href="@routes.SessionLessonController.viewLesson(sessionId, sessionLesson.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>

@@ -25,6 +25,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.lesson.createLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.updateSessionLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
+import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
 import org.iatoki.judgels.sandalphon.Sandalphon;
 import play.data.DynamicForm;
 import play.data.Form;
@@ -39,6 +40,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
@@ -69,8 +73,10 @@ public final class SessionLessonController extends AbstractJudgelsController {
         Session session = sessionService.findSessionById(sessionId);
 
         Page<SessionLesson> pageOfSessionLessons = sessionLessonService.getPageOfSessionLessons(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        List<String> lessonJids = pageOfSessionLessons.getData().stream().map(cp -> cp.getLessonJid()).collect(Collectors.toList());
+        Map<String, String> lessonSlugsMap = ResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids));
 
-        return showListSessionLessons(session, pageOfSessionLessons, orderBy, orderDir, filterString);
+        return showListSessionLessons(session, pageOfSessionLessons, orderBy, orderDir, filterString, lessonSlugsMap);
     }
 
     @Transactional(readOnly = true)
@@ -226,8 +232,8 @@ public final class SessionLessonController extends AbstractJudgelsController {
     }
 
 
-    private Result showListSessionLessons(Session session, Page<SessionLesson> currentPage, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listSessionLessonsView.render(session.getId(), currentPage, orderBy, orderDir, filterString));
+    private Result showListSessionLessons(Session session, Page<SessionLesson> currentPage, String orderBy, String orderDir, String filterString, Map<String, String> lessonSlugsMap) {
+        LazyHtml content = new LazyHtml(listSessionLessonsView.render(session.getId(), currentPage, orderBy, orderDir, filterString, lessonSlugsMap));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.lessons"), new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.createLesson(session.getId())), c));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);

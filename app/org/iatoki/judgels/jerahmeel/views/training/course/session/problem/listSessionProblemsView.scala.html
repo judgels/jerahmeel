@@ -3,12 +3,11 @@
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.play.Page
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.SessionProblemProgress
 @import org.iatoki.judgels.jerahmeel.ProblemProgress
 
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionProblemsProgress: Page[SessionProblemProgress], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionProblemsProgress: Page[SessionProblemProgress], orderBy: String, orderDir: String, filterString: String, problemTitlesMap: Map[String, String])
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
@@ -21,7 +20,7 @@
 @for(sessionProblemProgress <- pageOfSessionProblemsProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @JidCacheServiceImpl.getInstance().getDisplayName(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
+            <a href="@routes.TrainingProblemController.viewProblem(curriculumId, curriculumCourseId, courseSessionId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @problemTitlesMap.get(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
             @if(!JerahmeelUtils.isGuest) {
                 <div class="pull-right">
                     @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {

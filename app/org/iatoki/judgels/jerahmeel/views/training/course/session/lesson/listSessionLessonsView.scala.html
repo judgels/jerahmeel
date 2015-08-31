@@ -1,14 +1,13 @@
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.SessionLessonProgress
 @import org.iatoki.judgels.jerahmeel.LessonProgress
 
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionLessonsProgress: Page[SessionLessonProgress], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionLessonsProgress: Page[SessionLessonProgress], orderBy: String, orderDir: String, filterString: String, lessonTitlesMap: Map[String, String])
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
@@ -21,7 +20,7 @@
 @for(sessionLessonProgress <- pageOfSessionLessonsProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @JidCacheServiceImpl.getInstance().getDisplayName(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
+            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @lessonTitlesMap.get(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
             @if(!JerahmeelUtils.isGuest) {
                 <div class="pull-right">
                     @if(sessionLessonProgress.getLessonProgress.equals(LessonProgress.VIEWED)) {

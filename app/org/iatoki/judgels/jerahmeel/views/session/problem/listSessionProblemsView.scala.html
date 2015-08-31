@@ -3,12 +3,11 @@
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.searchView
 @import org.iatoki.judgels.play.views.html.table.paginationView
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.SessionProblem
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@(sessionId: Long, pageOfSessionProblems: Page[SessionProblem], orderBy: String, orderDir: String, filterString: String)
+@(sessionId: Long, pageOfSessionProblems: Page[SessionProblem], orderBy: String, orderDir: String, filterString: String, problemSlugsMap: Map[String, String])
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionProblemController.listSessionProblems(sessionId, newPageIndex, newOrderBy, newOrderDir)}
 
@@ -20,7 +19,7 @@
     @tableHeadersView(pageOfSessionProblems.getPageIndex, orderBy, orderDir, filterString, listFunc)(
         "id" -> Messages.get("commons.id"),
         "alias" -> Messages.get("session.problem.alias"),
-        "" -> Messages.get("session.problem.name"),
+        "" -> Messages.get("session.problem.slug"),
         "status" -> Messages.get("session.problem.status")
     )
 
@@ -29,7 +28,7 @@
         <tr>
             <td>@sessionProblem.getId</td>
             <td>@sessionProblem.getAlias</td>
-            <td>@JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid)</td>
+            <td>@problemSlugsMap.get(sessionProblem.getProblemJid)</td>
             <td>@sessionProblem.getStatus.name()</td>
             <td class="text-center">
                 <a href="@routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
