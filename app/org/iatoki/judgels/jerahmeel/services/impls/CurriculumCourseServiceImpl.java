@@ -125,7 +125,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
                     List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.getBySessionJid(courseSessionModel.sessionJid);
                     Set<String> dependencyJids = sessionDependencyModels.stream().map(m -> m.dependedSessionJid).collect(Collectors.toSet());
                     dependencyJids.removeAll(completedJids);
-                    if (dependencyJids.isEmpty()) {
+                    if (dependencyJids.isEmpty() && progress.equals(CourseProgress.LOCKED)) {
                         progress = CourseProgress.AVAILABLE;
                         break;
                     }

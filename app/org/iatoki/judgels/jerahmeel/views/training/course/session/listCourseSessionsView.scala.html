@@ -40,9 +40,17 @@
                                     [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
                                 </span>
                             } else {
-                                <span class="alert alert-warning">
-                                    @Messages.get("training.session.available") [@courseSessionProgress.getTotalScores]
-                                </span>
+                                @if(courseSessionProgress.getCourseSession.isCompleteable) {
+                                    <span class="alert alert-warning">
+                                        @Messages.get("training.session.available")
+                                        [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
+                                    </span>
+                                } else {
+                                    <span class="alert alert-warning">
+                                        @Messages.get("training.session.totalPoints"):
+                                        @courseSessionProgress.getTotalScores
+                                    </span>
+                                }
                             }
                         }
                     }

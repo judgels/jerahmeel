@@ -123,11 +123,13 @@ training.course.completed=Completed
 training.course.inProgress=In Progress
 training.course.available=Available
 training.course.locked=Locked
+training.course.totalPoints=Total Points
 
 training.session.completed=Completed
 training.session.inProgress=In Progress
 training.session.available=Available
 training.session.locked=Submissions Locked
+training.session.totalPoints=Total Points
 
 training.lesson.viewed=Viewed
 training.lesson.notViewed=Not Viewed

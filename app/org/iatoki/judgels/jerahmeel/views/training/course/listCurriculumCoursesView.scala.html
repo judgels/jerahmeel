@@ -40,9 +40,17 @@
                                     [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
                                 </span>
                             } else {
-                                <span class="alert alert-warning">
-                                    @Messages.get("training.course.available") [@curriculumCourseProgress.getTotalScores]
-                                </span>
+                                @if(curriculumCourseProgress.getCurriculumCourse.isCompleteable) {
+                                    <span class="alert alert-warning">
+                                        @Messages.get("training.course.available")
+                                        [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
+                                    </span>
+                                } else {
+                                    <span class="alert alert-warning">
+                                        @Messages.get("training.course.totalPoints"):
+                                        @curriculumCourseProgress.getTotalScores
+                                    </span>
+                                }
                             }
                         }
                     }
