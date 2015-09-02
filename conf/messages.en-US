@@ -134,8 +134,12 @@ training.session.totalPoints=Total Points
 training.lesson.viewed=Viewed
 training.lesson.notViewed=Not Viewed
 
+training.problem.tried=Tried
+training.problem.notTried=Not Tried
 training.problem.viewed=Viewed
 training.problem.notViewed=Not Viewed
+training.problem.inProgress=In Progress
+training.problem.points=Points
 training.problem.completed=Completed
 
 error.system.sandalphon.connection=Sandalphon Connection has problem.

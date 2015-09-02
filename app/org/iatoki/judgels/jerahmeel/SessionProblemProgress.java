@@ -4,10 +4,12 @@ public class SessionProblemProgress {
 
     private final SessionProblem sessionProblem;
     private final ProblemProgress problemProgress;
+    private final double scores;
 
-    public SessionProblemProgress(SessionProblem sessionProblem, ProblemProgress problemProgress) {
+    public SessionProblemProgress(SessionProblem sessionProblem, ProblemProgress problemProgress, double scores) {
         this.sessionProblem = sessionProblem;
         this.problemProgress = problemProgress;
+        this.scores = scores;
     }
 
     public SessionProblem getSessionProblem() {
@@ -16,5 +18,9 @@ public class SessionProblemProgress {
 
     public ProblemProgress getProblemProgress() {
         return problemProgress;
+    }
+
+    public double getScores() {
+        return scores;
     }
 }

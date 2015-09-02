@@ -3,6 +3,14 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.ProblemProgress;
@@ -18,6 +26,7 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
+import org.iatoki.judgels.sandalphon.ProblemType;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -30,11 +39,19 @@ import java.util.stream.Collectors;
 @Named("sessionProblemService")
 public final class SessionProblemServiceImpl implements SessionProblemService {
 
+    private final BundleSubmissionDao bundleSubmissionDao;
+    private final BundleGradingDao bundleGradingDao;
+    private final ProgrammingSubmissionDao programmingSubmissionDao;
+    private final ProgrammingGradingDao programmingGradingDao;
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public SessionProblemServiceImpl(SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+    public SessionProblemServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+        this.bundleSubmissionDao = bundleSubmissionDao;
+        this.bundleGradingDao = bundleGradingDao;
+        this.programmingSubmissionDao = programmingSubmissionDao;
+        this.programmingGradingDao = programmingGradingDao;
         this.sessionProblemDao = sessionProblemDao;
         this.userItemDao = userItemDao;
     }
@@ -82,7 +99,30 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
                 }
             }
 
-            sessionProblemProgressBuilder.add(new SessionProblemProgress(createFromModel(sessionProblemModel), progress));
+            double maxScore = -1;
+            if (!progress.equals(ProblemProgress.NOT_VIEWED)) {
+                if (sessionProblemModel.type.equals(ProblemType.BUNDLE.name())) {
+                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                    Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.getBySubmissionJids(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                    for (String submissionJid : bundleGradingModels.keySet()) {
+                        double submissionScore = bundleGradingModels.get(submissionJid).get(bundleGradingModels.get(submissionJid).size() - 1).score;
+                        if (submissionScore > maxScore) {
+                            maxScore = submissionScore;
+                        }
+                    }
+                } else if (sessionProblemModel.type.equals(ProblemType.PROGRAMMING.name())) {
+                    List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
+                    Map<String, List<ProgrammingGradingModel>> gradingModels = programmingGradingDao.getBySubmissionJids(programmingSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
+                    for (String submissionJid : gradingModels.keySet()) {
+                        double submissionScore = gradingModels.get(submissionJid).get(gradingModels.get(submissionJid).size() - 1).score;
+                        if (submissionScore > maxScore) {
+                            maxScore = submissionScore;
+                        }
+                    }
+                }
+            }
+
+            sessionProblemProgressBuilder.add(new SessionProblemProgress(createFromModel(sessionProblemModel), progress, maxScore));
         }
 
         return new Page<>(sessionProblemProgressBuilder.build(), totalPages, pageIndex, pageSize);

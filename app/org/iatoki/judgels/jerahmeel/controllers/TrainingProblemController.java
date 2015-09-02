@@ -186,7 +186,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
     }
 
     private Result showListProblems(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionProblemProgress> pageOfSessionProblemsProgress, String orderBy, String orderDir, String filterString, Map<String, String> problemTitlesMap) {
-        LazyHtml content = new LazyHtml(listSessionProblemsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionProblemsProgress, orderBy, orderDir, filterString, problemTitlesMap));
+        LazyHtml content = new LazyHtml(listSessionProblemsView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblemsProgress, orderBy, orderDir, filterString, problemTitlesMap));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
