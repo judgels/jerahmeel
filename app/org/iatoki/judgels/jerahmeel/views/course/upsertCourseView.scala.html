@@ -3,5 +3,7 @@
 
 @(courseUpsertForm: Form[CourseUpsertForm])(implicit fieldConstructor: b3.B3FieldConstructor)
 
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/ckeditor.js")"></script>
+
 @b3.text(courseUpsertForm("name"), '_label -> Messages.get("course.name"))
-@b3.textarea(courseUpsertForm("description"), '_label -> Messages.get("course.description"))
+@b3.textarea(courseUpsertForm("description"), '_label -> Messages.get("course.description"), 'class -> "ckeditor form-control")

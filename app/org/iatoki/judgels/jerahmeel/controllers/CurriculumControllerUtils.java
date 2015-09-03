@@ -5,8 +5,8 @@ import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
-import org.iatoki.judgels.jerahmeel.views.html.training.headingWithBackLayout;
-import org.iatoki.judgels.jerahmeel.views.html.training.headingWithActionAndBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.tabLayout;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
@@ -19,7 +19,9 @@ public final class CurriculumControllerUtils {
     }
 
     static void appendViewLayout(LazyHtml content, Curriculum curriculum) {
-        content.appendLayout(c -> descriptionLayout.render(curriculum.getDescription(), c));
+        if (curriculum.getDescription().isEmpty()) {
+            content.appendLayout(c -> descriptionLayout.render(curriculum.getDescription(), c));
+        }
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(),

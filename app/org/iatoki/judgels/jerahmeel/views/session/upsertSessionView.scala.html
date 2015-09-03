@@ -3,5 +3,7 @@
 
 @(sessionUpsertForm: Form[SessionUpsertForm])(implicit fieldConstructor: b3.B3FieldConstructor)
 
+<script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/ckeditor.js")"></script>
+
 @b3.text(sessionUpsertForm("name"), '_label -> Messages.get("session.name"))
-@b3.textarea(sessionUpsertForm("description"), '_label -> Messages.get("session.description"))
+@b3.textarea(sessionUpsertForm("description"), '_label -> Messages.get("session.description"), 'class -> "ckeditor form-control")

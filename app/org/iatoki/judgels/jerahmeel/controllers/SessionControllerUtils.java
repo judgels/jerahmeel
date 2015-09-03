@@ -6,8 +6,8 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
-import org.iatoki.judgels.jerahmeel.views.html.training.headingWithBackLayout;
-import org.iatoki.judgels.jerahmeel.views.html.training.headingWithActionAndBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.tabLayout;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.Curriculum;
@@ -31,7 +31,9 @@ public final class SessionControllerUtils {
             tabLinksBuilder.add(new InternalLink(Messages.get("session.submissions"), routes.TrainingController.jumpToSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         }
         content.appendLayout(c -> tabLayout.render(tabLinksBuilder.build(), c));
-        content.appendLayout(c -> descriptionLayout.render(session.getDescription(), c));
+        if (session.getDescription().isEmpty()) {
+            content.appendLayout(c -> descriptionLayout.render(session.getDescription(), c));
+        }
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(),
