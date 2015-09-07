@@ -1,5 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
+import org.iatoki.judgels.api.sealtiel.SealtielAPI;
 import org.iatoki.judgels.gabriel.GradingResult;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
@@ -14,7 +15,6 @@ import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractProgrammingSubmissionServiceImpl;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sealtiel.Sealtiel;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,8 +31,8 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
     private final UserItemDao userItemDao;
 
     @Inject
-    public ProgrammingSubmissionServiceImpl(ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, Sealtiel sealtiel, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
-        super(programmingSubmissionDao, programmingGradingDao, sealtiel, gabrielClientJid);
+    public ProgrammingSubmissionServiceImpl(ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielAPI sealtielAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+        super(programmingSubmissionDao, programmingGradingDao, sealtielAPI, gabrielClientJid);
         this.programmingSubmissionDao = programmingSubmissionDao;
         this.programmingGradingDao = programmingGradingDao;
         this.sessionProblemDao = sessionProblemDao;

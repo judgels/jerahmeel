@@ -6,6 +6,8 @@ import com.google.inject.util.Providers;
 import org.iatoki.judgels.AWSFileSystemProvider;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.LocalFileSystemProvider;
+import org.iatoki.judgels.api.sealtiel.SealtielAPI;
+import org.iatoki.judgels.api.sealtiel.SealtielFactory;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
 import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
@@ -13,7 +15,6 @@ import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
 import org.iatoki.judgels.sandalphon.Sandalphon;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
-import org.iatoki.judgels.sealtiel.Sealtiel;
 
 public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
@@ -21,7 +22,7 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
     protected void manualBinding() {
         bind(Jophiel.class).toInstance(jophiel());
         bind(Sandalphon.class).toInstance(sandalphon());
-        bind(Sealtiel.class).toInstance(sealtiel());
+        bind(SealtielAPI.class).toInstance(sealtielAPI());
 
         bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFileSystemProvider.class).toInstance(bundleSubmissionLocalFileSystemProvider());
 
@@ -68,8 +69,12 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         return new Sandalphon(jerahmeelProperties().getSandalphonBaseUrl(), jerahmeelProperties().getSandalphonClientJid(), jerahmeelProperties().getSandalphonClientSecret());
     }
 
-    private Sealtiel sealtiel() {
-        return new Sealtiel(jerahmeelProperties().getSealtielBaseUrl(), jerahmeelProperties().getSealtielClientJid(), jerahmeelProperties().getSealtielClientSecret());
+    private SealtielAPI sealtielAPI() {
+        String baseUrl = jerahmeelProperties().getSealtielBaseUrl();
+        String clientJid = jerahmeelProperties().getSealtielClientJid();
+        String clientSecret = jerahmeelProperties().getSealtielClientSecret();
+
+        return SealtielFactory.createSealtiel(baseUrl).connectWithBasicAuth(clientJid, clientSecret);
     }
 
     private FileSystemProvider bundleSubmissionRemoteFileSystemProvider() {

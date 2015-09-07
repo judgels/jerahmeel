@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel;
 
 import akka.actor.Scheduler;
+import org.iatoki.judgels.api.sealtiel.SealtielAPI;
 import org.iatoki.judgels.jerahmeel.controllers.JerahmeelControllerUtils;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
@@ -16,7 +17,6 @@ import org.iatoki.judgels.play.AbstractGlobal;
 import org.iatoki.judgels.play.services.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.runnables.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
-import org.iatoki.judgels.sealtiel.Sealtiel;
 import play.Application;
 import play.inject.Injector;
 import play.libs.Akka;
@@ -55,7 +55,7 @@ public final class Global extends AbstractGlobal {
         Scheduler scheduler = Akka.system().scheduler();
         ExecutionContextExecutor context = Akka.system().dispatcher();
 
-        GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, injector.instanceOf(ProgrammingSubmissionService.class), injector.instanceOf(Sealtiel.class), TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
+        GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, injector.instanceOf(ProgrammingSubmissionService.class), injector.instanceOf(SealtielAPI.class), TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
         UserActivityMessagePusher userActivityMessagePusher = new UserActivityMessagePusher(injector.instanceOf(Jophiel.class), injector.instanceOf(UserService.class), UserActivityMessageServiceImpl.getInstance());
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
