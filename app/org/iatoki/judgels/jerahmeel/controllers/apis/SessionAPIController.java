@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
 
-import static org.iatoki.judgels.play.controllers.api.JudgelsAPIControllerUtils.createJsonPResponse;
+import static org.iatoki.judgels.play.controllers.apis.JudgelsAPIControllerUtils.createJsonPResponse;
 
 @Named
 public final class SessionAPIController extends Controller {
