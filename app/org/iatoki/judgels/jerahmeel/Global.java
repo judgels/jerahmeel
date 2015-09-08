@@ -9,10 +9,9 @@ import org.iatoki.judgels.jerahmeel.services.UserService;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.services.impls.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.jophiel.Jophiel;
 import org.iatoki.judgels.jophiel.runnables.UserActivityMessagePusher;
-import org.iatoki.judgels.jophiel.services.impls.DefaultUserActivityMessageServiceImpl;
+import org.iatoki.judgels.jophiel.services.impls.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.play.AbstractGlobal;
 import org.iatoki.judgels.play.services.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.runnables.GradingResponsePoller;
@@ -45,7 +44,7 @@ public final class Global extends AbstractGlobal {
         JidCacheServiceImpl.buildInstance(injector.instanceOf(JidCacheDao.class));
         AvatarCacheServiceImpl.buildInstance(injector.instanceOf(Jophiel.class), injector.instanceOf(AvatarCacheDao.class));
         JerahmeelControllerUtils.buildInstance(injector.instanceOf(Jophiel.class));
-        DefaultUserActivityMessageServiceImpl.buildInstance(injector.instanceOf(Jophiel.class));
+        UserActivityMessageServiceImpl.buildInstance();
     }
 
     private void buildUtils(Injector injector) {
