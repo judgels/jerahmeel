@@ -6,20 +6,18 @@ import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.data.DynamicForm;
 import play.db.jpa.Transactional;
 import play.libs.Json;
-import play.mvc.Controller;
 import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.List;
 
-import static org.iatoki.judgels.play.controllers.apis.JudgelsAPIControllerUtils.createJsonPResponse;
-
 @Named
-public final class CourseAPIController extends Controller {
+public final class CourseAPIController extends AbstractJudgelsAPIController {
 
     private final CourseService courseService;
 
