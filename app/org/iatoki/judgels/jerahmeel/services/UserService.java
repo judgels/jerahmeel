@@ -1,5 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services;
 
+import org.iatoki.judgels.api.jophiel.JophielUser;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.User;
 import org.iatoki.judgels.jerahmeel.UserNotFoundException;
@@ -21,7 +22,7 @@ public interface UserService extends BaseUserService {
 
     Page<User> getPageOfUsers(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void upsertUserFromJophielUserJid(String userJid);
+    void upsertUserFromJophielUser(JophielUser jophielUser);
 
-    void upsertUserFromJophielUserJid(String userJid, List<String> roles);
+    void upsertUserFromJophielUser(JophielUser jophielUser, List<String> roles);
 }

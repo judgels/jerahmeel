@@ -6,12 +6,15 @@ import com.google.inject.util.Providers;
 import org.iatoki.judgels.AWSFileSystemProvider;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.LocalFileSystemProvider;
-import org.iatoki.judgels.api.sealtiel.SealtielAPI;
+import org.iatoki.judgels.api.jophiel.JophielClientAPI;
+import org.iatoki.judgels.api.jophiel.JophielFactory;
+import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
+import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielFactory;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
 import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
-import org.iatoki.judgels.jophiel.Jophiel;
+import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
 import org.iatoki.judgels.sandalphon.Sandalphon;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
@@ -20,9 +23,11 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
     @Override
     protected void manualBinding() {
-        bind(Jophiel.class).toInstance(jophiel());
+        bind(JophielAuthAPI.class).toInstance(jophielAuthAPI());
+        bind(JophielClientAPI.class).toInstance(jophielClientAPI());
+        bind(JophielPublicAPI.class).toInstance(jophielPublicAPI());
         bind(Sandalphon.class).toInstance(sandalphon());
-        bind(SealtielAPI.class).toInstance(sealtielAPI());
+        bind(SealtielClientAPI.class).toInstance(sealtielClientAPI());
 
         bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFileSystemProvider.class).toInstance(bundleSubmissionLocalFileSystemProvider());
 
@@ -61,20 +66,24 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         return JerahmeelProperties.getInstance();
     }
 
-    private Jophiel jophiel() {
-        return new Jophiel(jerahmeelProperties().getJophielBaseUrl(), jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
+    private JophielAuthAPI jophielAuthAPI() {
+        return new JophielAuthAPI(jerahmeelProperties().getJophielBaseUrl(), jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
+    }
+
+    private JophielClientAPI jophielClientAPI() {
+        return JophielFactory.createJophiel(jerahmeelProperties().getJophielBaseUrl()).connectToClientAPI(jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
+    }
+
+    private JophielPublicAPI jophielPublicAPI() {
+        return JophielFactory.createJophiel(jerahmeelProperties().getJophielBaseUrl()).connectToPublicAPI();
     }
 
     private Sandalphon sandalphon() {
         return new Sandalphon(jerahmeelProperties().getSandalphonBaseUrl(), jerahmeelProperties().getSandalphonClientJid(), jerahmeelProperties().getSandalphonClientSecret());
     }
 
-    private SealtielAPI sealtielAPI() {
-        String baseUrl = jerahmeelProperties().getSealtielBaseUrl();
-        String clientJid = jerahmeelProperties().getSealtielClientJid();
-        String clientSecret = jerahmeelProperties().getSealtielClientSecret();
-
-        return SealtielFactory.createSealtiel(baseUrl).connectWithBasicAuth(clientJid, clientSecret);
+    private SealtielClientAPI sealtielClientAPI() {
+        return SealtielFactory.createSealtiel(jerahmeelProperties().getSealtielBaseUrl()).connectToClientAPI(jerahmeelProperties().getSealtielClientJid(), jerahmeelProperties().getSealtielClientSecret());
     }
 
     private FileSystemProvider bundleSubmissionRemoteFileSystemProvider() {

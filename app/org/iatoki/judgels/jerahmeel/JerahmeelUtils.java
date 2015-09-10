@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
-import org.iatoki.judgels.jophiel.PublicUser;
+import org.iatoki.judgels.api.jophiel.JophielUser;
 import org.iatoki.judgels.play.IdentityUtils;
 import play.mvc.Http;
 
@@ -43,12 +43,12 @@ public final class JerahmeelUtils {
         putInSession("realAvatar", getFromSession("avatar"));
     }
 
-    public static void setUserSession(PublicUser publicUser, User urielUser) {
-        putInSession("userJid", publicUser.getJid());
-        putInSession("name", publicUser.getName());
-        putInSession("username", publicUser.getUsername());
+    public static void setUserSession(JophielUser jophielUser, User urielUser) {
+        putInSession("userJid", jophielUser.getJid());
+        putInSession("name", jophielUser.getName());
+        putInSession("username", jophielUser.getUsername());
         saveRolesInSession(urielUser.getRoles());
-        putInSession("avatar", publicUser.getProfilePictureUrl().toString());
+        putInSession("avatar", jophielUser.getProfilePictureUrl());
     }
 
     public static void restoreSession() {
