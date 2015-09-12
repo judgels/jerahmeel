@@ -1,6 +1,8 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonProblemStatementRenderRequestParam;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSession;
@@ -35,9 +37,7 @@ import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.sandalphon.LanguageRestriction;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
-import org.iatoki.judgels.sandalphon.Sandalphon;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.data.DynamicForm;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
@@ -46,7 +46,6 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,19 +60,19 @@ public final class TrainingProblemController extends AbstractJudgelsController {
     private final CourseSessionService courseSessionService;
     private final CurriculumCourseService curriculumCourseService;
     private final CurriculumService curriculumService;
-    private final Sandalphon sandalphon;
+    private final SandalphonClientAPI sandalphonClientAPI;
     private final SessionDependencyService sessionDependencyService;
     private final SessionProblemService sessionProblemService;
     private final SessionService sessionService;
     private final UserItemService userItemService;
 
     @Inject
-    public TrainingProblemController(CourseService courseService, CourseSessionService courseSessionService, CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, Sandalphon sandalphon, SessionDependencyService sessionDependencyService, SessionProblemService sessionProblemService, SessionService sessionService, UserItemService userItemService) {
+    public TrainingProblemController(CourseService courseService, CourseSessionService courseSessionService, CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, SandalphonClientAPI sandalphonClientAPI, SessionDependencyService sessionDependencyService, SessionProblemService sessionProblemService, SessionService sessionService, UserItemService userItemService) {
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.curriculumCourseService = curriculumCourseService;
         this.curriculumService = curriculumService;
-        this.sandalphon = sandalphon;
+        this.sandalphonClientAPI = sandalphonClientAPI;
         this.sessionDependencyService = sessionDependencyService;
         this.sessionProblemService = sessionProblemService;
         this.sessionService = sessionService;
@@ -101,7 +100,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
         Page<SessionProblemProgress> pageOfSessionProblemsProgress = sessionProblemService.getPageOfSessionProblemsProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         List<String> problemJids = pageOfSessionProblemsProgress.getData().stream().map(cp -> cp.getSessionProblem().getProblemJid()).collect(Collectors.toList());
-        Map<String, String> problemTitlesMap = ResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
 
         if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
@@ -131,15 +130,25 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         } else if (!sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             reasonNotAllowedToSubmit = Messages.get("training.session.isLocked");
         }
-        String postSubmitUri = null;
+        String postSubmitUrl = null;
         if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
-            postSubmitUri = routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            postSubmitUrl = routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
         } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
-            postSubmitUri = routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            postSubmitUrl = routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
         }
 
-        String requestUrl = sandalphon.getProblemStatementRenderUri().toString();
-        String requestBody = sandalphon.getProblemStatementRenderRequestBody(sessionProblem.getProblemJid(), sessionProblem.getProblemSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), postSubmitUri, routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()), reasonNotAllowedToSubmit, LanguageRestriction.defaultRestriction());
+        SandalphonProblemStatementRenderRequestParam param = new SandalphonProblemStatementRenderRequestParam();
+
+        param.setProblemSecret(sessionProblem.getProblemSecret());
+        param.setCurrentMillis(System.currentTimeMillis());
+        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+        param.setPostSubmitUrl(postSubmitUrl);
+        param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
+        param.setAllowedGradingLanguages("");
+
+        String requestUrl = sandalphonClientAPI.getProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+        String requestBody = sandalphonClientAPI.constructProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -180,9 +189,9 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
-        URI uri = sandalphon.getProblemMediaRenderUri(sessionProblem.getProblemJid(), filename);
+        String mediaUrl = sandalphonClientAPI.getProblemStatementMediaRenderAPIEndpoint(sessionProblem.getProblemJid(), filename);
 
-        return redirect(uri.toString());
+        return redirect(mediaUrl);
     }
 
     private Result showListProblems(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionProblemProgress> pageOfSessionProblemsProgress, String orderBy, String orderDir, String filterString, Map<String, String> problemTitlesMap) {

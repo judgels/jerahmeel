@@ -28,7 +28,7 @@ import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.programming.listSubmissionsView;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionUtils;
 import org.iatoki.judgels.sandalphon.adapters.GradingEngineAdapterRegistry;
@@ -137,7 +137,7 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), submission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = ResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
+        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
         LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));

@@ -9,6 +9,8 @@ import org.iatoki.judgels.LocalFileSystemProvider;
 import org.iatoki.judgels.api.jophiel.JophielClientAPI;
 import org.iatoki.judgels.api.jophiel.JophielFactory;
 import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonFactory;
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielFactory;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
@@ -16,7 +18,7 @@ import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
 import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
-import org.iatoki.judgels.sandalphon.Sandalphon;
+import org.iatoki.judgels.sandalphon.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 
 public class JerahmeelModule extends AbstractJudgelsPlayModule {
@@ -26,7 +28,7 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         bind(JophielAuthAPI.class).toInstance(jophielAuthAPI());
         bind(JophielClientAPI.class).toInstance(jophielClientAPI());
         bind(JophielPublicAPI.class).toInstance(jophielPublicAPI());
-        bind(Sandalphon.class).toInstance(sandalphon());
+        bind(SandalphonClientAPI.class).toInstance(sandalphonClientAPI());
         bind(SealtielClientAPI.class).toInstance(sealtielClientAPI());
 
         bind(FileSystemProvider.class).annotatedWith(BundleSubmissionLocalFileSystemProvider.class).toInstance(bundleSubmissionLocalFileSystemProvider());
@@ -49,7 +51,7 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
         bindConstant().annotatedWith(GabrielClientJid.class).to(gabrielClientJid());
         bind(BaseUserService.class).to(UserServiceImpl.class);
-        bind(BundleProblemGrader.class).to(Sandalphon.class);
+        bind(BundleProblemGrader.class).to(SandalphonBundleProblemGrader.class);
     }
 
     @Override
@@ -78,8 +80,8 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         return JophielFactory.createJophiel(jerahmeelProperties().getJophielBaseUrl()).connectToPublicAPI();
     }
 
-    private Sandalphon sandalphon() {
-        return new Sandalphon(jerahmeelProperties().getSandalphonBaseUrl(), jerahmeelProperties().getSandalphonClientJid(), jerahmeelProperties().getSandalphonClientSecret());
+    private SandalphonClientAPI sandalphonClientAPI() {
+        return SandalphonFactory.createSandalphon(jerahmeelProperties().getSandalphonBaseUrl()).connectToClientAPI(jerahmeelProperties().getSandalphonClientJid(), jerahmeelProperties().getSandalphonClientSecret());
     }
 
     private SealtielClientAPI sealtielClientAPI() {

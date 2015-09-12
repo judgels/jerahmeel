@@ -1,6 +1,8 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonLessonStatementRenderRequestParam;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSession;
@@ -34,15 +36,13 @@ import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
-import org.iatoki.judgels.sandalphon.Sandalphon;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,7 +53,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
-    private final Sandalphon sandalphon;
+    private final SandalphonClientAPI sandalphonClientAPI;
     private final CurriculumCourseService curriculumCourseService;
     private final CurriculumService curriculumService;
     private final CourseService courseService;
@@ -64,8 +64,8 @@ public final class TrainingLessonController extends AbstractJudgelsController {
     private final UserItemService userItemService;
 
     @Inject
-    public TrainingLessonController(Sandalphon sandalphon, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionDependencyService sessionDependencyService, SessionLessonService sessionLessonService, SessionService sessionService, UserItemService userItemService) {
-        this.sandalphon = sandalphon;
+    public TrainingLessonController(SandalphonClientAPI sandalphonClientAPI, CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, SessionDependencyService sessionDependencyService, SessionLessonService sessionLessonService, SessionService sessionService, UserItemService userItemService) {
+        this.sandalphonClientAPI = sandalphonClientAPI;
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
@@ -97,7 +97,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
         Page<SessionLessonProgress> pageOfSessionLessonProgress = sessionLessonService.getPageOfSessionLessonsProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         List<String> lessonJids = pageOfSessionLessonProgress.getData().stream().map(cp -> cp.getSessionLesson().getLessonJid()).collect(Collectors.toList());
-        Map<String, String> lessonTitlesMap = ResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+        Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
 
         if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
@@ -123,8 +123,15 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
-        String requestUrl = sandalphon.getLessonStatementRenderUri().toString();
-        String requestBody = sandalphon.getLessonStatementRenderRequestBody(sessionLesson.getLessonJid(), sessionLesson.getLessonSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+        SandalphonLessonStatementRenderRequestParam param = new SandalphonLessonStatementRenderRequestParam();
+
+        param.setLessonSecret(sessionLesson.getLessonSecret());
+        param.setCurrentMillis(System.currentTimeMillis());
+        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setSwitchStatementLanguageUrl(routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+
+        String requestUrl = sandalphonClientAPI.getLessonStatementRenderAPIEndpoint(sessionLesson.getLessonJid());
+        String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
         LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
@@ -157,9 +164,9 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
-        URI uri = sandalphon.getLessonMediaRenderUri(sessionLesson.getLessonJid(), filename);
+        String mediaUrl = sandalphonClientAPI.getLessonStatementMediaRenderAPIEndpoint(sessionLesson.getLessonJid(), filename);
 
-        return redirect(uri.toString());
+        return redirect(mediaUrl);
     }
 
     private Result showListLessons(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionLessonProgress> pageOfSessionLessonsProgress, String orderBy, String orderDir, String filterString, Map<String, String> lessonTitlesMap) {

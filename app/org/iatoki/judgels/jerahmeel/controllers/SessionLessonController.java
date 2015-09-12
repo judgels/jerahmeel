@@ -1,6 +1,10 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.JudgelsAPIClientException;
+import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonLesson;
+import org.iatoki.judgels.api.sandalphon.SandalphonLessonStatementRenderRequestParam;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -25,8 +29,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.lesson.createLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.updateSessionLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
-import org.iatoki.judgels.sandalphon.Sandalphon;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -38,8 +41,6 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,13 +53,13 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
-    private final Sandalphon sandalphon;
+    private final SandalphonClientAPI sandalphonClientAPI;
     private final SessionLessonService sessionLessonService;
     private final SessionService sessionService;
 
     @Inject
-    public SessionLessonController(Sandalphon sandalphon, SessionLessonService sessionLessonService, SessionService sessionService) {
-        this.sandalphon = sandalphon;
+    public SessionLessonController(SandalphonClientAPI sandalphonClientAPI, SessionLessonService sessionLessonService, SessionService sessionService) {
+        this.sandalphonClientAPI = sandalphonClientAPI;
         this.sessionLessonService = sessionLessonService;
         this.sessionService = sessionService;
     }
@@ -74,7 +75,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
         Page<SessionLesson> pageOfSessionLessons = sessionLessonService.getPageOfSessionLessons(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         List<String> lessonJids = pageOfSessionLessons.getData().stream().map(cp -> cp.getLessonJid()).collect(Collectors.toList());
-        Map<String, String> lessonSlugsMap = ResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids));
+        Map<String, String> lessonSlugsMap = SandalphonResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids));
 
         return showListSessionLessons(session, pageOfSessionLessons, orderBy, orderDir, filterString, lessonSlugsMap);
     }
@@ -88,8 +89,15 @@ public final class SessionLessonController extends AbstractJudgelsController {
             return forbidden();
         }
 
-        String requestUrl = sandalphon.getLessonStatementRenderUri().toString();
-        String requestBody = sandalphon.getLessonStatementRenderRequestBody(sessionLesson.getLessonJid(), sessionLesson.getLessonSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+        SandalphonLessonStatementRenderRequestParam param = new SandalphonLessonStatementRenderRequestParam();
+
+        param.setLessonSecret(sessionLesson.getLessonSecret());
+        param.setCurrentMillis(System.currentTimeMillis());
+        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setSwitchStatementLanguageUrl(routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
+
+        String requestUrl = sandalphonClientAPI.getLessonStatementRenderAPIEndpoint(sessionLesson.getLessonJid());
+        String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
         LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
         SessionControllerUtils.appendUpdateLayout(content, session);
@@ -112,9 +120,9 @@ public final class SessionLessonController extends AbstractJudgelsController {
             return notFound();
         }
 
-        URI imageUri = sandalphon.getLessonMediaRenderUri(sessionLesson.getLessonJid(), imageFilename);
+        String imageUrl = sandalphonClientAPI.getLessonStatementMediaRenderAPIEndpoint(sessionLesson.getLessonJid(), imageFilename);
 
-        return redirect(imageUri.toString());
+        return redirect(imageUrl);
     }
 
     public Result switchLanguage() {
@@ -144,16 +152,16 @@ public final class SessionLessonController extends AbstractJudgelsController {
         }
 
         SessionLessonCreateForm sessionLessonCreateData = sessionLessonCreateForm.get();
-        String lessonName = null;
+        SandalphonLesson sandalphonLesson;
         try {
-            lessonName = sandalphon.verifyLessonJid(sessionLessonCreateData.lessonJid);
-        } catch (IOException e) {
+            sandalphonLesson = sandalphonClientAPI.findLessonByJid(sessionLessonCreateData.lessonJid);
+        } catch (JudgelsAPIClientException e) {
             sessionLessonCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
 
             return showCreateLesson(session, sessionLessonCreateForm);
         }
 
-        if (lessonName == null) {
+        if (sandalphonLesson == null) {
             sessionLessonCreateForm.reject(Messages.get("error.lesson.invalidJid"));
 
             return showCreateLesson(session, sessionLessonCreateForm);
@@ -166,7 +174,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
         }
 
         sessionLessonService.addSessionLesson(session.getJid(), sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret, sessionLessonCreateData.alias, SessionLessonStatus.valueOf(sessionLessonCreateData.status));
-        JidCacheServiceImpl.getInstance().putDisplayName(sessionLessonCreateData.lessonJid, lessonName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        JidCacheServiceImpl.getInstance().putDisplayName(sessionLessonCreateData.lessonJid, sandalphonLesson.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }

@@ -1,6 +1,10 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.JudgelsAPIClientException;
+import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonProblem;
+import org.iatoki.judgels.api.sandalphon.SandalphonProblemStatementRenderRequestParam;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -26,9 +30,7 @@ import org.iatoki.judgels.jerahmeel.views.html.session.problem.createProblemView
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.updateSessionProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
-import org.iatoki.judgels.sandalphon.Sandalphon;
-import org.iatoki.judgels.sandalphon.LanguageRestriction;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -40,8 +42,6 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,13 +54,13 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
 
-    private final Sandalphon sandalphon;
+    private final SandalphonClientAPI sandalphonClientAPI;
     private final SessionProblemService sessionProblemService;
     private final SessionService sessionService;
 
     @Inject
-    public SessionProblemController(Sandalphon sandalphon, SessionProblemService sessionProblemService, SessionService sessionService) {
-        this.sandalphon = sandalphon;
+    public SessionProblemController(SandalphonClientAPI sandalphonClientAPI, SessionProblemService sessionProblemService, SessionService sessionService) {
+        this.sandalphonClientAPI = sandalphonClientAPI;
         this.sessionProblemService = sessionProblemService;
         this.sessionService = sessionService;
     }
@@ -76,7 +76,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
         Page<SessionProblem> pageOfSessionProblems = sessionProblemService.getPageOfSessionProblems(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
         List<String> problemJids = pageOfSessionProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
-        Map<String, String> problemSlugsMap = ResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids));
+        Map<String, String> problemSlugsMap = SandalphonResourceDisplayNameUtils.buildSlugsMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids));
 
         return showListSessionProblems(session, pageOfSessionProblems, orderBy, orderDir, filterString, problemSlugsMap);
     }
@@ -90,15 +90,25 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return forbidden();
         }
 
-        String submitUrl = "";
+        String postSubmitUrl = "";
         if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
-            submitUrl = routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            postSubmitUrl = routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
         } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
-            submitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            postSubmitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
         }
 
-        String requestUrl = sandalphon.getProblemStatementRenderUri().toString();
-        String requestBody = sandalphon.getProblemStatementRenderRequestBody(sessionProblem.getProblemJid(), sessionProblem.getProblemSecret(), System.currentTimeMillis(), SessionControllerUtils.getCurrentStatementLanguage(), submitUrl, routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()), null, LanguageRestriction.defaultRestriction());
+        SandalphonProblemStatementRenderRequestParam param = new SandalphonProblemStatementRenderRequestParam();
+
+        param.setProblemSecret(sessionProblem.getProblemSecret());
+        param.setCurrentMillis(System.currentTimeMillis());
+        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setSwitchStatementLanguageUrl(routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+        param.setPostSubmitUrl(postSubmitUrl);
+        param.setReasonNotAllowedToSubmit(null);
+        param.setAllowedGradingLanguages("");
+
+        String requestUrl = sandalphonClientAPI.getProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+        String requestBody = sandalphonClientAPI.constructProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
         SessionControllerUtils.appendUpdateLayout(content, session);
@@ -121,9 +131,9 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return notFound();
         }
 
-        URI imageUri = sandalphon.getProblemMediaRenderUri(sessionProblem.getProblemJid(), imageFilename);
+        String imageUrl = sandalphonClientAPI.getProblemStatementMediaRenderAPIEndpoint(sessionProblem.getProblemJid(), imageFilename);
 
-        return redirect(imageUri.toString());
+        return redirect(imageUrl);
     }
 
     public Result switchLanguage() {
@@ -153,15 +163,15 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         SessionProblemCreateForm sessionProblemCreateData = sessionProblemCreateForm.get();
-        String problemName = null;
+        SandalphonProblem sandalphonProblem;
         try {
-            problemName = sandalphon.verifyProblemJid(sessionProblemCreateData.problemJid);
-        } catch (IOException e) {
+            sandalphonProblem = sandalphonClientAPI.findProblemByJid(sessionProblemCreateData.problemJid);
+        } catch (JudgelsAPIClientException e) {
             sessionProblemCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
 
             return showCreateProblem(session, sessionProblemCreateForm);
         }
-        if (problemName == null) {
+        if (sandalphonProblem == null) {
             sessionProblemCreateForm.reject(Messages.get("error.problem.invalidJid"));
 
             return showCreateProblem(session, sessionProblemCreateForm);
@@ -174,7 +184,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         sessionProblemService.addSessionProblem(session.getJid(), sessionProblemCreateData.problemJid, sessionProblemCreateData.problemSecret, sessionProblemCreateData.alias, SessionProblemType.valueOf(sessionProblemCreateData.type), SessionProblemStatus.valueOf(sessionProblemCreateData.status));
-        JidCacheServiceImpl.getInstance().putDisplayName(sessionProblemCreateData.problemJid, problemName, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        JidCacheServiceImpl.getInstance().putDisplayName(sessionProblemCreateData.problemJid, sandalphonProblem.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }

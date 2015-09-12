@@ -32,7 +32,7 @@ import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.BundleDetailResult;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
-import org.iatoki.judgels.sandalphon.ResourceDisplayNameUtils;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.views.html.problem.bundle.submission.bundleSubmissionView;
 import play.data.DynamicForm;
@@ -129,7 +129,7 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = ResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
+        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
 
         LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
         appendSubtabLayout(content, session);
