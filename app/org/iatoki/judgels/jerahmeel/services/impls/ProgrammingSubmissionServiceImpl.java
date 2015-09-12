@@ -31,8 +31,8 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
     private final UserItemDao userItemDao;
 
     @Inject
-    public ProgrammingSubmissionServiceImpl(ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
-        super(programmingSubmissionDao, programmingGradingDao, sealtielAPI, gabrielClientJid);
+    public ProgrammingSubmissionServiceImpl(ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+        super(programmingSubmissionDao, programmingGradingDao, sealtielClientAPI, gabrielClientJid);
         this.programmingSubmissionDao = programmingSubmissionDao;
         this.programmingGradingDao = programmingGradingDao;
         this.sessionProblemDao = sessionProblemDao;
