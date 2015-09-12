@@ -71,7 +71,7 @@ public final class TrainingSessionController extends AbstractJudgelsController {
         Page<CourseSessionProgress> pageOfCourseSessionsProgress = courseSessionService.getPageOfCourseSessionsProgress(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
         if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED)) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED);
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), course.getJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return showListSessions(curriculum, curriculumCourse, course, pageOfCourseSessionsProgress, orderBy, orderDir, filterString);

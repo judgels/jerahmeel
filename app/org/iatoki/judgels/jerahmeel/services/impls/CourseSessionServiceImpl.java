@@ -79,7 +79,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     public CourseSession findCourseSessionById(long courseSessionId) throws CourseSessionNotFoundException {
         CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
         if (courseSessionModel != null) {
-            return createFromModel(courseSessionModel);
+            return CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel);
         } else {
             throw new CourseSessionNotFoundException("Course Session Not Found.");
         }
@@ -90,7 +90,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
         long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<CourseSession> courseSessions = courseSessionModels.stream().map(m -> createFromModel(m)).collect(Collectors.toList());
+        List<CourseSession> courseSessions = courseSessionModels.stream().map(m -> CourseSessionServiceUtils.createFromModel(sessionDao, m)).collect(Collectors.toList());
 
         return new Page<>(courseSessions, totalPages, pageIndex, pageSize);
     }
@@ -153,47 +153,37 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
                     progress = SessionProgress.AVAILABLE;
                 }
             }
-            courseSessionProgressBuilder.add(new CourseSessionProgress(createFromModel(courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
+            courseSessionProgressBuilder.add(new CourseSessionProgress(CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
         }
 
         return new Page<>(courseSessionProgressBuilder.build(), totalPages, pageIndex, pageSize);
     }
 
     @Override
-    public void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable) {
+    public void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable, String userJid, String userIpAddress) {
         CourseSessionModel courseSessionModel = new CourseSessionModel();
         courseSessionModel.courseJid = courseJid;
         courseSessionModel.sessionJid = sessionJid;
         courseSessionModel.alias = alias;
         courseSessionModel.completeable = completeable;
 
-        courseSessionDao.persist(courseSessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        courseSessionDao.persist(courseSessionModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateCourseSession(long courseSessionId, String alias, boolean completeable) throws CourseSessionNotFoundException {
+    public void updateCourseSession(long courseSessionId, String alias, boolean completeable, String userJid, String userIpAddress) {
         CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
-        if (courseSessionModel != null) {
-            courseSessionModel.alias = alias;
-            courseSessionModel.completeable = completeable;
+        courseSessionModel.alias = alias;
+        courseSessionModel.completeable = completeable;
 
-            courseSessionDao.edit(courseSessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        } else {
-            throw new CourseSessionNotFoundException("Course Session Not Found.");
-        }
+        courseSessionDao.edit(courseSessionModel, userJid, userIpAddress);
     }
 
     @Override
-    public void removeCourseSession(long courseSessionId) throws CourseSessionNotFoundException {
+    public void removeCourseSession(long courseSessionId) {
         CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
-        if (courseSessionModel != null) {
-            courseSessionDao.remove(courseSessionModel);
-        } else {
-            throw new CourseSessionNotFoundException("Course Session Not Found.");
-        }
+
+        courseSessionDao.remove(courseSessionModel);
     }
 
-    private CourseSession createFromModel(CourseSessionModel model) {
-        return new CourseSession(model.id, model.courseJid, model.sessionJid, model.alias, sessionDao.findByJid(model.sessionJid).name, model.completeable);
-    }
 }

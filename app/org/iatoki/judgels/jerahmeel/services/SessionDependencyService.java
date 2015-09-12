@@ -14,7 +14,7 @@ public interface SessionDependencyService {
 
     Page<SessionDependency> getPageOfSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addSessionDependency(String sessionJid, String dependedSessionJid);
+    void addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress);
 
-    void removeSessionDependency(long sessionDependencyId) throws SessionDependencyNotFoundException;
+    void removeSessionDependency(long sessionDependencyId);
 }

@@ -2,8 +2,6 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.LessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
@@ -14,6 +12,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionLessonModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionLessonModel_;
 import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
+import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +42,7 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     public SessionLesson findSessionLessonById(long sessionLessonId) throws SessionLessonNotFoundException {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
         if (sessionLessonModel != null) {
-            return createFromModel(sessionLessonModel);
+            return SessionLessonServiceUtils.createFromModel(sessionLessonModel);
         } else {
             throw new SessionLessonNotFoundException("Session Lesson Not Found");
         }
@@ -54,7 +53,7 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
         long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<SessionLesson> sessionLessons = sessionLessonModels.stream().map(m -> createFromModel(m)).collect(Collectors.toList());
+        List<SessionLesson> sessionLessons = sessionLessonModels.stream().map(m -> SessionLessonServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
         return new Page<>(sessionLessons, totalPages, pageIndex, pageSize);
     }
@@ -70,14 +69,14 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
             if (userItemDao.existsByUserJidAndItemJid(userJid, sessionLessonModel.lessonJid)) {
                 progress = LessonProgress.VIEWED;
             }
-            sessionLessonProgressBuilder.add(new SessionLessonProgress(createFromModel(sessionLessonModel), progress));
+            sessionLessonProgressBuilder.add(new SessionLessonProgress(SessionLessonServiceUtils.createFromModel(sessionLessonModel), progress));
         }
 
         return new Page<>(sessionLessonProgressBuilder.build(), totalPages, pageIndex, pageSize);
     }
 
     @Override
-    public void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status) {
+    public void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status, String userJid, String userIpAddress) {
         SessionLessonModel sessionLessonModel = new SessionLessonModel();
         sessionLessonModel.sessionJid = sessionJid;
         sessionLessonModel.lessonJid = lessonJid;
@@ -85,29 +84,22 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
         sessionLessonModel.alias = alias;
         sessionLessonModel.status = status.name();
 
-        sessionLessonDao.persist(sessionLessonModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionLessonDao.persist(sessionLessonModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status) {
+    public void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status, String userJid, String userIpAddress) {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
         sessionLessonModel.alias = alias;
         sessionLessonModel.status = status.name();
 
-        sessionLessonDao.edit(sessionLessonModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionLessonDao.edit(sessionLessonModel, userJid, userIpAddress);
     }
 
     @Override
-    public void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException {
+    public void removeSessionLesson(long sessionLessonId) {
         SessionLessonModel sessionLessonModel = sessionLessonDao.findById(sessionLessonId);
-        if (sessionLessonModel != null) {
-            sessionLessonDao.remove(sessionLessonModel);
-        } else {
-            throw new SessionLessonNotFoundException("Session Lesson Not Found");
-        }
-    }
 
-    private SessionLesson createFromModel(SessionLessonModel model) {
-        return new SessionLesson(model.id, model.sessionJid, model.lessonJid, model.lessonSecret, model.alias, SessionLessonStatus.valueOf(model.status));
+        sessionLessonDao.remove(sessionLessonModel);
     }
 }

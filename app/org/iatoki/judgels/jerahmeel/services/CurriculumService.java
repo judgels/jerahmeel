@@ -10,7 +10,7 @@ public interface CurriculumService {
 
     Curriculum findCurriculumById(long curriculumId) throws CurriculumNotFoundException;
 
-    void createCurriculum(String name, String description);
+    void createCurriculum(String name, String description, String userJid, String userIpAddress);
 
-    void updateCurriculum(long curriculumId, String name, String description) throws CurriculumNotFoundException;
+    void updateCurriculum(String curriculumJid, String name, String description, String userJid, String userIpAddress);
 }

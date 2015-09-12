@@ -105,7 +105,7 @@ public final class SessionController extends AbstractJudgelsController {
         }
 
         SessionUpsertForm sessionUpsertData = sessionUpsertForm.get();
-        sessionService.createSession(sessionUpsertData.name, sessionUpsertData.description);
+        sessionService.createSession(sessionUpsertData.name, sessionUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionController.viewSessions());
     }
@@ -121,7 +121,7 @@ public final class SessionController extends AbstractJudgelsController {
         Form<SessionUpsertForm> sessionUpsertForm = Form.form(SessionUpsertForm.class).fill(sessionUpsertData);
 
         if (!userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED)) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return showUpdateSessionGeneral(sessionUpsertForm, session);
@@ -138,7 +138,7 @@ public final class SessionController extends AbstractJudgelsController {
         }
 
         SessionUpsertForm sessionUpsertData = sessionUpsertForm.get();
-        sessionService.updateSession(session.getId(), sessionUpsertData.name, sessionUpsertData.description);
+        sessionService.updateSession(session.getJid(), sessionUpsertData.name, sessionUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionController.viewSessions());
     }

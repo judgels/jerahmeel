@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
@@ -101,7 +102,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
             return showListCreateSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
         }
 
-        courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable);
+        courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
@@ -145,7 +146,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
             return showUpdateSession(course, courseSession, courseSessionUpdateForm);
         }
 
-        courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateData.alias, courseSessionUpdateData.completeable);
+        courseSessionService.updateCourseSession(courseSession.getId(), courseSessionUpdateData.alias, courseSessionUpdateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }

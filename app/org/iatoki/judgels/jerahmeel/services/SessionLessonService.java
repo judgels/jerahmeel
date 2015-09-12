@@ -16,9 +16,9 @@ public interface SessionLessonService {
 
     Page<SessionLessonProgress> getPageOfSessionLessonsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status);
+    void addSessionLesson(String sessionJid, String lessonJid, String lessonSecret, String alias, SessionLessonStatus status, String userJid, String userIpAddress);
 
-    void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status);
+    void updateSessionLesson(long sessionLessonId, String alias, SessionLessonStatus status, String userJid, String userIpAddress);
 
-    void removeSessionLesson(long sessionLessonId) throws SessionLessonNotFoundException;
+    void removeSessionLesson(long sessionLessonId);
 }

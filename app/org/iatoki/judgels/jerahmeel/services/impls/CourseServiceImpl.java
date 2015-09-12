@@ -3,13 +3,12 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseModel;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,7 +37,7 @@ public final class CourseServiceImpl implements CourseService {
         ImmutableList.Builder<Course> courseBuilder = ImmutableList.builder();
 
         for (CourseModel course : courses) {
-            courseBuilder.add(createCourseFromModel(course));
+            courseBuilder.add(CourseServiceUtils.createCourseFromModel(course));
         }
 
         return courseBuilder.build();
@@ -49,50 +48,43 @@ public final class CourseServiceImpl implements CourseService {
         long totalPages = courseDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
         List<CourseModel> courseModels = courseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<Course> courses = Lists.transform(courseModels, m -> createCourseFromModel(m));
+        List<Course> courses = Lists.transform(courseModels, m -> CourseServiceUtils.createCourseFromModel(m));
 
         return new Page<>(courses, totalPages, pageIndex, pageSize);
-    }
-
-    @Override
-    public Course findCourseByJid(String courseJid) {
-        CourseModel courseModel = courseDao.findByJid(courseJid);
-        return createCourseFromModel(courseModel);
     }
 
     @Override
     public Course findCourseById(long courseId) throws CourseNotFoundException {
         CourseModel courseModel = courseDao.findById(courseId);
         if (courseModel != null) {
-            return createCourseFromModel(courseModel);
+            return CourseServiceUtils.createCourseFromModel(courseModel);
         } else {
             throw new CourseNotFoundException("Course not found.");
         }
     }
 
     @Override
-    public void createCourse(String name, String description) {
+    public Course findCourseByJid(String courseJid) {
+        CourseModel courseModel = courseDao.findByJid(courseJid);
+
+        return CourseServiceUtils.createCourseFromModel(courseModel);
+    }
+
+    @Override
+    public void createCourse(String name, String description, String userJid, String userIpAddress) {
         CourseModel courseModel = new CourseModel();
         courseModel.name = name;
         courseModel.description = description;
 
-        courseDao.persist(courseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        courseDao.persist(courseModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateCourse(long courseId, String name, String description) throws CourseNotFoundException {
-        CourseModel courseModel = courseDao.findById(courseId);
-        if (courseModel != null) {
-            courseModel.name = name;
-            courseModel.description = description;
+    public void updateCourse(String courseJid, String name, String description, String userJid, String userIpAddress) {
+        CourseModel courseModel = courseDao.findByJid(courseJid);
+        courseModel.name = name;
+        courseModel.description = description;
 
-            courseDao.edit(courseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        } else {
-            throw new CourseNotFoundException("Course not found.");
-        }
-    }
-
-    private Course createCourseFromModel(CourseModel courseModel) {
-        return new Course(courseModel.id, courseModel.jid, courseModel.name, courseModel.description);
+        courseDao.edit(courseModel, userJid, userIpAddress);
     }
 }

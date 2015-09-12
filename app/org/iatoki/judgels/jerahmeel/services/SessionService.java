@@ -18,7 +18,7 @@ public interface SessionService {
 
     Session findSessionById(long sessionId) throws SessionNotFoundException;
 
-    void createSession(String name, String description);
+    void createSession(String name, String description, String userJid, String userIpAddress);
 
-    void updateSession(long sessionId, String name, String description) throws SessionNotFoundException;
+    void updateSession(String sessionJid, String name, String description, String userJid, String userIpAddress);
 }

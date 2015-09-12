@@ -84,7 +84,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     public CurriculumCourse findCurriculumCourseByCurriculumCourseId(long curriculumCourseId) throws CurriculumCourseNotFoundException {
         CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
         if (curriculumCourseModel != null) {
-            return createFromModel(curriculumCourseModel);
+            return CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel);
         } else {
             throw new CurriculumCourseNotFoundException("Curriculum Course Not Found.");
         }
@@ -95,7 +95,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
         long totalPages = curriculumCourseDao.countByFilters(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of());
         List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<CurriculumCourse> curriculumCourses = curriculumCourseModels.stream().map(m -> createFromModel(m)).collect(Collectors.toList());
+        List<CurriculumCourse> curriculumCourses = curriculumCourseModels.stream().map(m -> CurriculumCourseServiceUtils.createFromModel(courseDao, m)).collect(Collectors.toList());
 
         return new Page<>(curriculumCourses, totalPages, pageIndex, pageSize);
     }
@@ -167,47 +167,36 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
                 }
             }
 
-            curriculumCourseProgressBuilder.add(new CurriculumCourseProgress(createFromModel(curriculumCourseModel), progress, completed, courseSessionModels.size(), totalScore));
+            curriculumCourseProgressBuilder.add(new CurriculumCourseProgress(CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel), progress, completed, courseSessionModels.size(), totalScore));
         }
 
         return new Page<>(curriculumCourseProgressBuilder.build(), totalPages, pageIndex, pageSize);
     }
 
     @Override
-    public void addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable) {
+    public void addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable, String userJid, String userIpAddress) {
         CurriculumCourseModel curriculumCourseModel = new CurriculumCourseModel();
         curriculumCourseModel.curriculumJid = curriculumJid;
         curriculumCourseModel.courseJid = courseJid;
         curriculumCourseModel.alias = alias;
         curriculumCourseModel.completeable = completeable;
 
-        curriculumCourseDao.persist(curriculumCourseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        curriculumCourseDao.persist(curriculumCourseModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateCurriculumCourse(long curriculumCourseId, String alias, boolean completeable) throws CurriculumCourseNotFoundException {
+    public void updateCurriculumCourse(long curriculumCourseId, String alias, boolean completeable, String userJid, String userIpAddress) {
         CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
-        if (curriculumCourseModel != null) {
-            curriculumCourseModel.alias = alias;
-            curriculumCourseModel.completeable = completeable;
+        curriculumCourseModel.alias = alias;
+        curriculumCourseModel.completeable = completeable;
 
-            curriculumCourseDao.edit(curriculumCourseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        } else {
-            throw new CurriculumCourseNotFoundException("Curriculum Course Not Found.");
-        }
+        curriculumCourseDao.edit(curriculumCourseModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
     }
 
     @Override
-    public void removeCurriculumCourse(long curriculumCourseId) throws CurriculumCourseNotFoundException {
+    public void removeCurriculumCourse(long curriculumCourseId) {
         CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
-        if (curriculumCourseModel != null) {
-            curriculumCourseDao.remove(curriculumCourseModel);
-        } else {
-            throw new CurriculumCourseNotFoundException("Curriculum Course Not Found.");
-        }
-    }
 
-    private CurriculumCourse createFromModel(CurriculumCourseModel model) {
-        return new CurriculumCourse(model.id, model.curriculumJid, model.courseJid, model.alias, courseDao.findByJid(model.courseJid).name, model.completeable);
+        curriculumCourseDao.remove(curriculumCourseModel);
     }
 }

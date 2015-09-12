@@ -3,13 +3,12 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionModel;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,7 +37,7 @@ public final class SessionServiceImpl implements SessionService {
         ImmutableList.Builder<Session> sessionBuilder = ImmutableList.builder();
 
         for (SessionModel session : sessions) {
-            sessionBuilder.add(createSessionFromModel(session));
+            sessionBuilder.add(SessionServiceUtils.createSessionFromModel(session));
         }
 
         return sessionBuilder.build();
@@ -49,7 +48,7 @@ public final class SessionServiceImpl implements SessionService {
         long totalPages = sessionDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
         List<SessionModel> sessionModels = sessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<Session> sessions = Lists.transform(sessionModels, m -> createSessionFromModel(m));
+        List<Session> sessions = Lists.transform(sessionModels, m -> SessionServiceUtils.createSessionFromModel(m));
 
         return new Page<>(sessions, totalPages, pageIndex, pageSize);
     }
@@ -65,35 +64,27 @@ public final class SessionServiceImpl implements SessionService {
     public Session findSessionById(long sessionId) throws SessionNotFoundException {
         SessionModel sessionModel = sessionDao.findById(sessionId);
         if (sessionModel != null) {
-            return createSessionFromModel(sessionModel);
+            return SessionServiceUtils.createSessionFromModel(sessionModel);
         } else {
             throw new SessionNotFoundException("Session not found.");
         }
     }
 
     @Override
-    public void createSession(String name, String description) {
+    public void createSession(String name, String description, String userJid, String userIpAddress) {
         SessionModel sessionModel = new SessionModel();
         sessionModel.name = name;
         sessionModel.description = description;
 
-        sessionDao.persist(sessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionDao.persist(sessionModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateSession(long sessionId, String name, String description) throws SessionNotFoundException {
-        SessionModel sessionModel = sessionDao.findById(sessionId);
-        if (sessionModel != null) {
-            sessionModel.name = name;
-            sessionModel.description = description;
+    public void updateSession(String sessionJid, String name, String description, String userJid, String userIpAddress) {
+        SessionModel sessionModel = sessionDao.findByJid(sessionJid);
+        sessionModel.name = name;
+        sessionModel.description = description;
 
-            sessionDao.edit(sessionModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        } else {
-            throw new SessionNotFoundException("Session not found.");
-        }
-    }
-
-    private Session createSessionFromModel(SessionModel sessionModel) {
-        return new Session(sessionModel.id, sessionModel.jid, sessionModel.name, sessionModel.description);
+        sessionDao.edit(sessionModel, userJid, userIpAddress);
     }
 }

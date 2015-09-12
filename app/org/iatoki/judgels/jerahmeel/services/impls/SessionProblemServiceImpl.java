@@ -65,7 +65,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     public SessionProblem findSessionProblemById(long sessionProblemId) throws SessionProblemNotFoundException {
         SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
         if (sessionProblemModel != null) {
-            return createFromModel(sessionProblemModel);
+            return SessionProblemServiceUtils.createFromModel(sessionProblemModel);
         } else {
             throw new SessionProblemNotFoundException("Session Problem Not Found");
         }
@@ -76,7 +76,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<SessionProblem> sessionProblems = sessionProblemModels.stream().map(m -> createFromModel(m)).collect(Collectors.toList());
+        List<SessionProblem> sessionProblems = sessionProblemModels.stream().map(m -> SessionProblemServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
         return new Page<>(sessionProblems, totalPages, pageIndex, pageSize);
 
@@ -122,14 +122,14 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
                 }
             }
 
-            sessionProblemProgressBuilder.add(new SessionProblemProgress(createFromModel(sessionProblemModel), progress, maxScore));
+            sessionProblemProgressBuilder.add(new SessionProblemProgress(SessionProblemServiceUtils.createFromModel(sessionProblemModel), progress, maxScore));
         }
 
         return new Page<>(sessionProblemProgressBuilder.build(), totalPages, pageIndex, pageSize);
     }
 
     @Override
-    public void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status) {
+    public void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status, String userJid, String userIpAddress) {
         SessionProblemModel sessionProblemModel = new SessionProblemModel();
         sessionProblemModel.sessionJid = sessionJid;
         sessionProblemModel.problemJid = problemJid;
@@ -138,26 +138,23 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         sessionProblemModel.type = type.name();
         sessionProblemModel.status = status.name();
 
-        sessionProblemDao.persist(sessionProblemModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionProblemDao.persist(sessionProblemModel, userJid, userIpAddress);
     }
 
     @Override
-    public void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status) {
+    public void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status, String userJid, String userIpAddress) {
         SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
         sessionProblemModel.alias = alias;
         sessionProblemModel.status = status.name();
 
-        sessionProblemDao.edit(sessionProblemModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionProblemDao.edit(sessionProblemModel, userJid, userIpAddress);
     }
 
     @Override
-    public void removeSessionProblem(long sessionProblemId) throws SessionProblemNotFoundException {
+    public void removeSessionProblem(long sessionProblemId) {
         SessionProblemModel sessionProblemModel = sessionProblemDao.findById(sessionProblemId);
-        if (sessionProblemModel != null) {
-            sessionProblemDao.remove(sessionProblemModel);
-        } else {
-            throw new SessionProblemNotFoundException("Session Problem Not Found");
-        }
+
+        sessionProblemDao.remove(sessionProblemModel);
     }
 
     @Override
@@ -192,10 +189,6 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public SessionProblem findSessionProblemBySessionJidAndProblemJid(String sessionJid, String problemJid) {
-        return createFromModel(sessionProblemDao.findBySesssionJidAndProblemJid(sessionJid, problemJid));
-    }
-
-    private SessionProblem createFromModel(SessionProblemModel model) {
-        return new SessionProblem(model.id, model.sessionJid, model.problemJid, model.problemSecret, model.alias, SessionProblemType.valueOf(model.type), SessionProblemStatus.valueOf(model.status));
+        return SessionProblemServiceUtils.createFromModel(sessionProblemDao.findBySesssionJidAndProblemJid(sessionJid, problemJid));
     }
 }

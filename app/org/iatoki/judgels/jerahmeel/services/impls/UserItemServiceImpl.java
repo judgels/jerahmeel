@@ -1,6 +1,5 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.jerahmeel.UserItem;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
@@ -35,33 +34,29 @@ public final class UserItemServiceImpl implements UserItemService {
     }
 
     @Override
-    public void upsertUserItem(String userJid, String itemJid, UserItemStatus status) {
+    public void upsertUserItem(String userJid, String itemJid, UserItemStatus status, String upsertUserJid, String upsertUserIpAddress) {
         if (userItemDao.existsByUserJidAndItemJid(userJid, itemJid)) {
             UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, itemJid);
             userItemModel.status = status.name();
 
-            userItemDao.edit(userItemModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            userItemDao.edit(userItemModel, upsertUserJid, upsertUserIpAddress);
         } else {
             UserItemModel userItemModel = new UserItemModel();
             userItemModel.userJid = userJid;
             userItemModel.itemJid = itemJid;
             userItemModel.status = status.name();
 
-            userItemDao.persist(userItemModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            userItemDao.persist(userItemModel, upsertUserJid, upsertUserIpAddress);
         }
     }
 
     @Override
     public List<UserItem> getUserItemsByUserJid(String userJid) {
-        return userItemDao.getByUserJid(userJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
+        return userItemDao.getByUserJid(userJid).stream().map(u -> UserItemServiceUtils.createFromModel(u)).collect(Collectors.toList());
     }
 
     @Override
     public List<UserItem> getUserItemsByItemJid(String itemJid) {
-        return userItemDao.getByItemJid(itemJid).stream().map(u -> createFromModel(u)).collect(Collectors.toList());
-    }
-
-    private UserItem createFromModel(UserItemModel u) {
-        return new UserItem(u.userJid, u.itemJid, UserItemStatus.valueOf(u.status));
+        return userItemDao.getByItemJid(itemJid).stream().map(u -> UserItemServiceUtils.createFromModel(u)).collect(Collectors.toList());
     }
 }

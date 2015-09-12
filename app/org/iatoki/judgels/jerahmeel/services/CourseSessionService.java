@@ -17,9 +17,9 @@ public interface CourseSessionService {
 
     Page<CourseSessionProgress> getPageOfCourseSessionsProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable);
+    void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable, String userJid, String userIpAddress);
 
-    void updateCourseSession(long courseSessionId, String alias, boolean completeable) throws CourseSessionNotFoundException;
+    void updateCourseSession(long courseSessionId, String alias, boolean completeable, String userJid, String userIpAddress);
 
-    void removeCourseSession(long courseSessionId) throws CourseSessionNotFoundException;
+    void removeCourseSession(long courseSessionId);
 }

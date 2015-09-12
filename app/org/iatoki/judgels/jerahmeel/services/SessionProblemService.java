@@ -19,11 +19,11 @@ public interface SessionProblemService {
 
     Page<SessionProblemProgress> getPageOfSessionProblemsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status);
+    void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status, String userJid, String userIpAddress);
 
-    void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status);
+    void updateSessionProblem(long sessionProblemId, String alias, SessionProblemStatus status, String userJid, String userIpAddress);
 
-    void removeSessionProblem(long sessionProblemId) throws SessionProblemNotFoundException;
+    void removeSessionProblem(long sessionProblemId);
 
     Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid);
 

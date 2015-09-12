@@ -100,7 +100,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
 
         if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED);
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         return showListLessons(curriculum, curriculumCourse, course, courseSession, session, pageOfSessionLessonProgress, orderBy, orderDir, filterString, lessonTitlesMap);
@@ -141,7 +141,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         );
 
         if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), sessionLesson.getLessonJid(), UserItemStatus.COMPLETED)) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionLesson.getLessonJid(), UserItemStatus.COMPLETED);
+            userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionLesson.getLessonJid(), UserItemStatus.COMPLETED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");

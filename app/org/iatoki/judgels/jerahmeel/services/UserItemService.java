@@ -11,7 +11,7 @@ public interface UserItemService {
 
     boolean userItemExistsByUserJidAndItemJidAndStatus(String userJid, String itemJid, UserItemStatus status);
 
-    void upsertUserItem(String userJid, String itemJid, UserItemStatus status);
+    void upsertUserItem(String userJid, String itemJid, UserItemStatus status, String upsertUserJid, String upsertUserIpAddress);
 
     List<UserItem> getUserItemsByUserJid(String userJid);
 

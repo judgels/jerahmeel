@@ -173,7 +173,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
             return showCreateLesson(session, sessionLessonCreateForm);
         }
 
-        sessionLessonService.addSessionLesson(session.getJid(), sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret, sessionLessonCreateData.alias, SessionLessonStatus.valueOf(sessionLessonCreateData.status));
+        sessionLessonService.addSessionLesson(session.getJid(), sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret, sessionLessonCreateData.alias, SessionLessonStatus.valueOf(sessionLessonCreateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         JidCacheServiceImpl.getInstance().putDisplayName(sessionLessonCreateData.lessonJid, sandalphonLesson.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
@@ -234,7 +234,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
             return showUpdateLesson(session, sessionLesson, sessionLessonUpdateForm);
         }
 
-        sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonUpdateData.alias, SessionLessonStatus.valueOf(sessionLessonUpdateData.status));
+        sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonUpdateData.alias, SessionLessonStatus.valueOf(sessionLessonUpdateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }

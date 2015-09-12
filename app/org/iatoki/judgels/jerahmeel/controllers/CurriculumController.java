@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
@@ -84,7 +85,7 @@ public final class CurriculumController extends AbstractJudgelsController {
         }
 
         CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
-        curriculumService.createCurriculum(curriculumUpsertData.name, curriculumUpsertData.description);
+        curriculumService.createCurriculum(curriculumUpsertData.name, curriculumUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CurriculumController.viewCurriculums());
     }
@@ -113,7 +114,7 @@ public final class CurriculumController extends AbstractJudgelsController {
         }
 
         CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
-        curriculumService.updateCurriculum(curriculum.getId(), curriculumUpsertData.name, curriculumUpsertData.description);
+        curriculumService.updateCurriculum(curriculum.getJid(), curriculumUpsertData.name, curriculumUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CurriculumController.viewCurriculums());
     }

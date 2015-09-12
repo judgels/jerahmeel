@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
@@ -89,7 +90,7 @@ public final class SessionDependencyController extends AbstractJudgelsController
             return showListCreateDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
         }
 
-        sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyCreateData.sessionJid);
+        sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyCreateData.sessionJid, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
     }

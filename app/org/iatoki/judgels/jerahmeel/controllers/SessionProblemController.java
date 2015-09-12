@@ -183,7 +183,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return showCreateProblem(session, sessionProblemCreateForm);
         }
 
-        sessionProblemService.addSessionProblem(session.getJid(), sessionProblemCreateData.problemJid, sessionProblemCreateData.problemSecret, sessionProblemCreateData.alias, SessionProblemType.valueOf(sessionProblemCreateData.type), SessionProblemStatus.valueOf(sessionProblemCreateData.status));
+        sessionProblemService.addSessionProblem(session.getJid(), sessionProblemCreateData.problemJid, sessionProblemCreateData.problemSecret, sessionProblemCreateData.alias, SessionProblemType.valueOf(sessionProblemCreateData.type), SessionProblemStatus.valueOf(sessionProblemCreateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         JidCacheServiceImpl.getInstance().putDisplayName(sessionProblemCreateData.problemJid, sandalphonProblem.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
@@ -244,7 +244,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return showUpdateProblem(session, sessionProblem, sessionProblemUpdateForm);
         }
 
-        sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemUpdateData.alias, SessionProblemStatus.valueOf(sessionProblemUpdateData.status));
+        sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemUpdateData.alias, SessionProblemStatus.valueOf(sessionProblemUpdateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }

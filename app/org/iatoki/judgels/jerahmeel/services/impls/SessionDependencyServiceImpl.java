@@ -1,8 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableMap;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.SessionDependency;
 import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
@@ -13,6 +11,7 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
+import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -74,21 +73,18 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
     }
 
     @Override
-    public void addSessionDependency(String sessionJid, String dependedSessionJid) {
+    public void addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress) {
         SessionDependencyModel sessionDependencyModel = new SessionDependencyModel();
         sessionDependencyModel.sessionJid = sessionJid;
         sessionDependencyModel.dependedSessionJid = dependedSessionJid;
 
-        sessionDependencyDao.persist(sessionDependencyModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionDependencyDao.persist(sessionDependencyModel, userJid, userIpAddress);
     }
 
     @Override
-    public void removeSessionDependency(long sessionDependencyId) throws SessionDependencyNotFoundException {
+    public void removeSessionDependency(long sessionDependencyId) {
         SessionDependencyModel sessionDependencyModel = sessionDependencyDao.findById(sessionDependencyId);
-        if (sessionDependencyModel != null) {
-            sessionDependencyDao.remove(sessionDependencyModel);
-        } else {
-            throw new SessionDependencyNotFoundException("Session Dependency Not Found.");
-        }
+
+        sessionDependencyDao.remove(sessionDependencyModel);
     }
 }

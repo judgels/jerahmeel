@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
@@ -84,7 +85,7 @@ public final class CourseController extends AbstractJudgelsController {
         }
 
         CourseUpsertForm courseUpsertData = courseUpsertForm.get();
-        courseService.createCourse(courseUpsertData.name, courseUpsertData.description);
+        courseService.createCourse(courseUpsertData.name, courseUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CourseController.viewCourses());
     }
@@ -113,7 +114,7 @@ public final class CourseController extends AbstractJudgelsController {
         }
 
         CourseUpsertForm courseUpsertData = courseUpsertForm.get();
-        courseService.updateCourse(course.getId(), courseUpsertData.name, courseUpsertData.description);
+        courseService.updateCourse(course.getJid(), courseUpsertData.name, courseUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CourseController.viewCourses());
     }
