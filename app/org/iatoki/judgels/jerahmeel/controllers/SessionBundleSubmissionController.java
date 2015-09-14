@@ -101,7 +101,7 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.findBundleProblemJidToAliasMapBySessionJid(session.getJid());
+        Map<String, String> problemJidToAliasMap = sessionProblemService.getBundleProblemJidToAliasMapBySessionJid(session.getJid());
         List<UserItem> userItems = userItemService.getUserItemsByItemJid(session.getJid());
         List<String> userJids = Lists.transform(userItems, u -> u.getUserJid());
 

@@ -14,7 +14,7 @@ import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import play.i18n.Messages;
 
-public final class CourseControllerUtils {
+final class CourseControllerUtils {
 
     private CourseControllerUtils() {
         // prevent instantiation

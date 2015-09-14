@@ -12,7 +12,7 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import play.i18n.Messages;
 
-public final class CurriculumControllerUtils {
+final class CurriculumControllerUtils {
 
     private CurriculumControllerUtils() {
         // prevent instantiation

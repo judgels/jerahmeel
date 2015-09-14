@@ -1,10 +1,12 @@
 package org.iatoki.judgels.jerahmeel.services;
 
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.play.Page;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public interface SessionService {
 
@@ -17,6 +19,8 @@ public interface SessionService {
     Session findSessionByJid(String sessionJid);
 
     Session findSessionById(long sessionId) throws SessionNotFoundException;
+
+    Map<String, String> getSessionJidToNameMapBySessionJids(Collection<String> sessionJids);
 
     void createSession(String name, String description, String userJid, String userIpAddress);
 

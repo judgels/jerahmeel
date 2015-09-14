@@ -112,7 +112,7 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
         Page<ProgrammingSubmission> pageOfSubmissions = submissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.findProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
+        Map<String, String> problemJidToAliasMap = sessionProblemService.getProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
         List<UserItem> userItems = userItemService.getUserItemsByItemJid(session.getJid());
         List<String> userJids = Lists.transform(userItems, u -> u.getUserJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();

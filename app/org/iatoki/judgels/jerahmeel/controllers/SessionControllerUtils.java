@@ -17,7 +17,7 @@ import org.iatoki.judgels.jerahmeel.Session;
 import play.i18n.Messages;
 import play.mvc.Controller;
 
-public final class SessionControllerUtils {
+final class SessionControllerUtils {
 
     private SessionControllerUtils() {
         // prevent instantiation

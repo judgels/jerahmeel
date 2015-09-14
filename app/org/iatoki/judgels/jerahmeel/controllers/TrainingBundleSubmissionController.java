@@ -129,15 +129,15 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.findBundleProblemJidToAliasMapBySessionJid(session.getJid());
+        Map<String, String> problemJidToAliasMap = sessionProblemService.getBundleProblemJidToAliasMapBySessionJid(session.getJid());
 
         LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfBundleSubmissions, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Bundle Submissions");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
@@ -168,31 +168,23 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
         String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
 
         LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(bundleSubmission.getId() + "", routes.TrainingBundleSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), bundleSubmission.getId()))
         );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions - View");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Bundle Submissions - View");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
-    }
-
-    private void appendSubtabLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession) {
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
-                ), c)
-        );
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
         breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())));
         breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())));
-        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
-        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingLessonController.viewLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingBundleSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         breadcrumbsBuilder.add(lastLinks);
 
         JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());

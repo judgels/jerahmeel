@@ -1,0 +1,58 @@
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.table.tableView
+@import org.iatoki.judgels.play.views.html.table.tableHeadersView
+@import org.iatoki.judgels.play.views.html.table.paginationView
+@import scala.collection.JavaConversions
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+@import org.iatoki.judgels.play.IdentityUtils
+@import org.iatoki.judgels.play.JudgelsPlayUtils
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
+@import org.iatoki.judgels.play.Page
+@import org.iatoki.judgels.sandalphon.ProgrammingSubmission
+
+@(pageOfProgrammingSubmissions: Page[ProgrammingSubmission], sessionJidToNameMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, viewable: Boolean)
+
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ProgrammingSubmissionController.listSubmissions(newPageIndex, newOrderBy, newOrderDir)}
+
+<div class="clearfix"></div>
+
+<br />
+
+@tableView() {
+    @tableHeadersView(pageOfProgrammingSubmissions.getPageIndex, orderBy, orderDir, "", listFunc)(
+        "id" -> Messages.get("commons.id"),
+        "" -> Messages.get("submission.author"),
+        "" -> Messages.get("submission.sessionName"),
+        "" -> Messages.get("submission.prob"),
+        "gradingLanguage" -> Messages.get("submission.lang"),
+        "" -> Messages.get("submission.verdict"),
+        "" -> Messages.get("submission.pts"),
+        "timeCreate" -> Messages.get("submission.time")
+    )
+
+    <tbody>
+    @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfProgrammingSubmissions.getData.map(s => s.getAuthorJid).toSeq))) { authorDisplayNamesMap =>
+        @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfProgrammingSubmissions.getData.map(s => s.getProblemJid).toSeq))) { problemDisplayNamesMap =>
+            @for(submission <- pageOfProgrammingSubmissions.getData) {
+                <tr>
+                    <td><small>@submission.getId</small></td>
+                    <td><small>@authorDisplayNamesMap.get(submission.getAuthorJid)</small></td>
+                    <td><small>@sessionJidToNameMap.get(submission.getContainerJid)</small></td>
+                    <td><small>@problemDisplayNamesMap.get(submission.getProblemJid)</small></td>
+                    <td><small>@gradingLanguageToNameMap.get(submission.getGradingLanguage)</small></td>
+                    <td><small>@submission.getLatestVerdict.getName</small></td>
+                    <td><small>@submission.getLatestScore</small></td>
+                    <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
+                    <td class="text-center">
+                        @if(viewable || submission.getAuthorJid.equals(IdentityUtils.getUserJid)) {
+                            <a href="@routes.ProgrammingSubmissionController.viewSubmission(submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    }
+    </tbody>
+}
+
+@paginationView(pageOfProgrammingSubmissions, orderBy, orderDir, "", listFunc)

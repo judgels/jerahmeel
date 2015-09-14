@@ -142,4 +142,10 @@ training.problem.inProgress=In Progress
 training.problem.points=Points
 training.problem.completed=Completed
 
+submission.own=My Submissions
+submission.all=All Submissions
+submission.sessionName=Session Name
+submission.programming=Programming Submissions
+submission.bundle=Non Programming Submissions
+
 error.system.sandalphon.connection=Sandalphon Connection has problem.

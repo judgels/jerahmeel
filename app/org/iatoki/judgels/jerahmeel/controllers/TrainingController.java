@@ -61,14 +61,6 @@ public final class TrainingController extends AbstractJudgelsController {
     }
 
     public Result jumpToSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingController.jumpToProgrammingSubmissions(curriculumId, curriculumCourseId, courseSessionId));
-    }
-
-    public Result jumpToBundleSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingBundleSubmissionController.viewSubmissions(curriculumId, curriculumCourseId, courseSessionId));
-    }
-
-    public Result jumpToProgrammingSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
         return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculumId, curriculumCourseId, courseSessionId));
     }
 }

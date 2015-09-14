@@ -2,41 +2,40 @@ package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.FileSystemProvider;
+import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.SubmissionSource;
+import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CourseSession;
+import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.Curriculum;
+import org.iatoki.judgels.jerahmeel.CurriculumCourse;
+import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblem;
+import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
+import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
-import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
-import org.iatoki.judgels.jerahmeel.Course;
-import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.CourseSession;
-import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
-import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.CurriculumCourse;
-import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
-import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionException;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionNotFoundException;
@@ -140,12 +139,12 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
         Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.findProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
+        Map<String, String> problemJidToAliasMap = sessionProblemService.getProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
         LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
@@ -177,7 +176,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
         LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
+        TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
@@ -188,20 +187,12 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private void appendSubtabLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession) {
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                        new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingController.jumpToBundleSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
-                ), c)
-        );
-    }
-
     private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
         breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())));
         breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())));
         breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingController.jumpToSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
-        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingController.jumpToProgrammingSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         breadcrumbsBuilder.add(lastLinks);
 
         JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());

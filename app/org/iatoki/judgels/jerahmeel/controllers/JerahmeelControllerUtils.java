@@ -44,6 +44,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     public void appendSidebarLayout(LazyHtml content) {
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
         internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.jumpToCurriculums()));
+        internalLinkBuilder.add(new InternalLink(Messages.get("submission.submissions"), routes.SubmissionController.jumpToSubmissions()));
         if (isAdmin()) {
             internalLinkBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()));
             internalLinkBuilder.add(new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()));

@@ -158,7 +158,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid) {
+    public Map<String, String> getProgrammingProblemJidToAliasMapBySessionJid(String sessionJid) {
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
 
         Map<String, String> map = Maps.newLinkedHashMap();
@@ -173,7 +173,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public Map<String, String> findBundleProblemJidToAliasMapBySessionJid(String sessionJid) {
+    public Map<String, String> getBundleProblemJidToAliasMapBySessionJid(String sessionJid) {
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
 
         Map<String, String> map = Maps.newLinkedHashMap();

@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.play.InternalLink;
 import play.i18n.Messages;
 
-public final class TrainingControllerUtils {
+final class TrainingControllerUtils {
 
     private TrainingControllerUtils() {
         // prevent instantiation

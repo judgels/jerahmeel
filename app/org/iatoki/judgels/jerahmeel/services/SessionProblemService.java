@@ -25,9 +25,9 @@ public interface SessionProblemService {
 
     void removeSessionProblem(long sessionProblemId);
 
-    Map<String, String> findProgrammingProblemJidToAliasMapBySessionJid(String sessionJid);
+    Map<String, String> getProgrammingProblemJidToAliasMapBySessionJid(String sessionJid);
 
-    Map<String, String> findBundleProblemJidToAliasMapBySessionJid(String sessionJid);
+    Map<String, String> getBundleProblemJidToAliasMapBySessionJid(String sessionJid);
 
     SessionProblem findSessionProblemBySessionJidAndProblemJid(String sessionJid, String problemJid);
 }
