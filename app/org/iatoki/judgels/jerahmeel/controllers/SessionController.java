@@ -20,7 +20,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.session.createSessionView;
 import org.iatoki.judgels.jerahmeel.views.html.session.listSessionsView;
-import org.iatoki.judgels.jerahmeel.views.html.session.updateSessionGeneralView;
+import org.iatoki.judgels.jerahmeel.views.html.session.editSessionGeneralView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -112,7 +112,7 @@ public final class SessionController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateSessionGeneral(long sessionId) throws SessionNotFoundException {
+    public Result editSessionGeneral(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         SessionUpsertForm sessionUpsertData = new SessionUpsertForm();
         sessionUpsertData.name = session.getName();
@@ -124,17 +124,17 @@ public final class SessionController extends AbstractJudgelsController {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
 
-        return showUpdateSessionGeneral(sessionUpsertForm, session);
+        return showEditSessionGeneral(sessionUpsertForm, session);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateSessionGeneral(long sessionId) throws SessionNotFoundException {
+    public Result postEditSessionGeneral(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         Form<SessionUpsertForm> sessionUpsertForm = Form.form(SessionUpsertForm.class).bindFromRequest();
 
         if (formHasErrors(sessionUpsertForm)) {
-            return showUpdateSessionGeneral(sessionUpsertForm, session);
+            return showEditSessionGeneral(sessionUpsertForm, session);
         }
 
         SessionUpsertForm sessionUpsertData = sessionUpsertForm.get();
@@ -154,12 +154,12 @@ public final class SessionController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateSessionGeneral(Form<SessionUpsertForm> sessionUpsertForm, Session session) {
-        LazyHtml content = new LazyHtml(updateSessionGeneralView.render(sessionUpsertForm, session.getId()));
+    private Result showEditSessionGeneral(Form<SessionUpsertForm> sessionUpsertForm, Session session) {
+        LazyHtml content = new LazyHtml(editSessionGeneralView.render(sessionUpsertForm, session.getId()));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
-                new InternalLink(Messages.get("session.update"), routes.SessionController.updateSessionGeneral(session.getId()))
+                new InternalLink(Messages.get("session.update"), routes.SessionController.editSessionGeneral(session.getId()))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Session - Update");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);

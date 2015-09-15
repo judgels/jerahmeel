@@ -9,18 +9,18 @@ import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
-import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseCreateForm;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseAddForm;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
-import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseUpdateForm;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseEditForm;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.listCreateCurriculumCoursesView;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.updateCurriculumCourseView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.listAddCurriculumCoursesView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.editCurriculumCourseView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -54,52 +54,52 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewCourses(long curriculumId) throws CurriculumNotFoundException {
-        return listCreateCourses(curriculumId, 0, "alias", "asc", "");
+        return listAddCourses(curriculumId, 0, "alias", "asc", "");
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result listCreateCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
+    public Result listAddCourses(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
 
         Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        Form<CurriculumCourseCreateForm> curriculumCourseCreateForm = Form.form(CurriculumCourseCreateForm.class);
+        Form<CurriculumCourseAddForm> curriculumCourseAddForm = Form.form(CurriculumCourseAddForm.class);
 
-        return showListCreateCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+        return showListAddCourses(curriculum, curriculumCourseAddForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postCreateCourse(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
+    public Result postAddCourse(long curriculumId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
-        Form<CurriculumCourseCreateForm> curriculumCourseCreateForm = Form.form(CurriculumCourseCreateForm.class).bindFromRequest();
+        Form<CurriculumCourseAddForm> curriculumCourseCreateForm = Form.form(CurriculumCourseAddForm.class).bindFromRequest();
 
         if (formHasErrors(curriculumCourseCreateForm)) {
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
-        CurriculumCourseCreateForm curriculumCourseCreateData = curriculumCourseCreateForm.get();
+        CurriculumCourseAddForm curriculumCourseCreateData = curriculumCourseCreateForm.get();
         if (!courseService.courseExistsByJid(curriculumCourseCreateData.courseJid)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.invalidJid"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
         if (curriculumCourseService.existsByCurriculumJidAndAlias(curriculum.getJid(), curriculumCourseCreateData.alias)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.course.duplicateAlias"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
         if (curriculumCourseService.existsByCurriculumJidAndCourseJid(curriculum.getJid(), curriculumCourseCreateData.courseJid)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.courseExist"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
         curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, curriculumCourseCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
@@ -109,7 +109,7 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
+    public Result editCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
@@ -117,18 +117,18 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
             return notFound();
         }
 
-        CurriculumCourseUpdateForm curriculumCourseUpdateData = new CurriculumCourseUpdateForm();
-        curriculumCourseUpdateData.alias = curriculumCourse.getAlias();
-        curriculumCourseUpdateData.completeable = curriculumCourse.isCompleteable();
+        CurriculumCourseEditForm curriculumCourseEditData = new CurriculumCourseEditForm();
+        curriculumCourseEditData.alias = curriculumCourse.getAlias();
+        curriculumCourseEditData.completeable = curriculumCourse.isCompleteable();
 
-        Form<CurriculumCourseUpdateForm> curriculumCourseUpdateForm = Form.form(CurriculumCourseUpdateForm.class).fill(curriculumCourseUpdateData);
+        Form<CurriculumCourseEditForm> curriculumCourseEditForm = Form.form(CurriculumCourseEditForm.class).fill(curriculumCourseEditData);
 
-        return showUpdateCourse(curriculum, curriculumCourse, curriculumCourseUpdateForm);
+        return showEditCourse(curriculum, curriculumCourse, curriculumCourseEditForm);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
+    public Result postEditCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
@@ -136,25 +136,25 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
             return notFound();
         }
 
-        Form<CurriculumCourseUpdateForm> curriculumCourseUpdateForm = Form.form(CurriculumCourseUpdateForm.class).bindFromRequest();
-        if (formHasErrors(curriculumCourseUpdateForm)) {
-            return showUpdateCourse(curriculum, curriculumCourse, curriculumCourseUpdateForm);
+        Form<CurriculumCourseEditForm> curriculumCourseEditForm = Form.form(CurriculumCourseEditForm.class).bindFromRequest();
+        if (formHasErrors(curriculumCourseEditForm)) {
+            return showEditCourse(curriculum, curriculumCourse, curriculumCourseEditForm);
         }
 
-        CurriculumCourseUpdateForm curriculumCourseUpdateData = curriculumCourseUpdateForm.get();
-        if (!curriculumCourseUpdateData.alias.equals(curriculumCourse.getAlias()) && curriculumCourseService.existsByCurriculumJidAndAlias(curriculum.getJid(), curriculumCourseUpdateData.alias)) {
-            curriculumCourseUpdateForm.reject(Messages.get("error.curriculum.course.duplicateAlias"));
+        CurriculumCourseEditForm curriculumCourseEditData = curriculumCourseEditForm.get();
+        if (!curriculumCourseEditData.alias.equals(curriculumCourse.getAlias()) && curriculumCourseService.existsByCurriculumJidAndAlias(curriculum.getJid(), curriculumCourseEditData.alias)) {
+            curriculumCourseEditForm.reject(Messages.get("error.curriculum.course.duplicateAlias"));
 
-            return showUpdateCourse(curriculum, curriculumCourse, curriculumCourseUpdateForm);
+            return showEditCourse(curriculum, curriculumCourse, curriculumCourseEditForm);
         }
 
-        curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseUpdateData.alias, curriculumCourseUpdateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseEditData.alias, curriculumCourseEditData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
 
     @Transactional
-    public Result deleteCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
+    public Result removeCourse(long curriculumId, long curriculumCourseId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
 
@@ -167,8 +167,8 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
 
-    private Result showListCreateCourses(Curriculum curriculum, Form<CurriculumCourseCreateForm> curriculumCourseCreateForm, Page<CurriculumCourse> pageOfCurriculumCourses, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listCreateCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, orderBy, orderDir, filterString, curriculumCourseCreateForm));
+    private Result showListAddCourses(Curriculum curriculum, Form<CurriculumCourseAddForm> curriculumCourseAddForm, Page<CurriculumCourse> pageOfCurriculumCourses, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listAddCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, orderBy, orderDir, filterString, curriculumCourseAddForm));
         CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum);
@@ -177,12 +177,12 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateCourse(Curriculum curriculum, CurriculumCourse curriculumCourse, Form<CurriculumCourseUpdateForm> curriculumCourseUpdateForm) {
-        LazyHtml content = new LazyHtml(updateCurriculumCourseView.render(curriculumCourseUpdateForm, curriculum.getId(), curriculumCourse.getId()));
+    private Result showEditCourse(Curriculum curriculum, CurriculumCourse curriculumCourse, Form<CurriculumCourseEditForm> curriculumCourseEditForm) {
+        LazyHtml content = new LazyHtml(editCurriculumCourseView.render(curriculumCourseEditForm, curriculum.getId(), curriculumCourse.getId()));
         CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum,
-                new InternalLink(Messages.get("commons.update"), routes.CurriculumCourseController.updateCourse(curriculum.getId(), curriculumCourse.getId()))
+                new InternalLink(Messages.get("commons.update"), routes.CurriculumCourseController.editCourse(curriculum.getId(), curriculumCourse.getId()))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
 

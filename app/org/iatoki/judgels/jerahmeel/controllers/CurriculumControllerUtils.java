@@ -25,7 +25,7 @@ final class CurriculumControllerUtils {
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(),
-                    new InternalLink(Messages.get("commons.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())),
+                    new InternalLink(Messages.get("commons.update"), routes.CurriculumController.editCurriculumGeneral(curriculum.getId())),
                     new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
                     c)
             );
@@ -39,7 +39,7 @@ final class CurriculumControllerUtils {
 
     static void appendUpdateLayout(LazyHtml content, Curriculum curriculum) {
         content.appendLayout(c -> tabLayout.render(ImmutableList.of(
-                    new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId())),
+                    new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.editCurriculumGeneral(curriculum.getId())),
                     new InternalLink(Messages.get("curriculum.courses"), routes.CurriculumController.jumpToCourses(curriculum.getId()))
               ), c)
         );

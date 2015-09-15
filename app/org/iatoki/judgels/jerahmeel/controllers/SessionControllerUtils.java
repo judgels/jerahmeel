@@ -37,7 +37,7 @@ final class SessionControllerUtils {
         if (JerahmeelUtils.hasRole("admin")) {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(),
-                    new InternalLink(Messages.get("commons.update"), routes.SessionController.updateSessionGeneral(session.getId())),
+                    new InternalLink(Messages.get("commons.update"), routes.SessionController.editSessionGeneral(session.getId())),
                     new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );
@@ -58,7 +58,7 @@ final class SessionControllerUtils {
 
     static void appendUpdateLayout(LazyHtml content, Session session) {
         content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                    new InternalLink(Messages.get("session.update"), routes.SessionController.updateSessionGeneral(session.getId())),
+                    new InternalLink(Messages.get("session.update"), routes.SessionController.editSessionGeneral(session.getId())),
                     new InternalLink(Messages.get("session.lessons"), routes.SessionController.jumpToLessons(session.getId())),
                     new InternalLink(Messages.get("session.problems"), routes.SessionController.jumpToProblems(session.getId())),
                     new InternalLink(Messages.get("session.dependencies"), routes.SessionDependencyController.viewDependencies(session.getId())),

@@ -1,0 +1,21 @@
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.formErrorView
+@import org.iatoki.judgels.jerahmeel.forms.CourseSessionEditForm
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(courseSessionEditForm: Form[CourseSessionEditForm], courseId: Long, courseSessionId: Long)
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-2", "col-md-10") }
+
+@formErrorView(courseSessionEditForm)
+
+@b3.form(routes.CourseSessionController.postEditSession(courseId, courseSessionId)) {
+
+    @helper.CSRF.formField
+
+    @b3.text(courseSessionEditForm("alias"), '_label -> Messages.get("session.alias"), 'class -> "form-control")
+
+    @b3.checkbox(courseSessionEditForm("completeable"), '_label -> Messages.get("session.completeable"))
+
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
+}

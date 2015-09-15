@@ -2,19 +2,16 @@ package org.iatoki.judgels.jerahmeel.forms;
 
 import play.data.validation.Constraints;
 
-public final class SessionProblemCreateForm {
+public final class SessionLessonAddForm {
 
     @Constraints.Required
     public String alias;
 
     @Constraints.Required
-    public String problemJid;
+    public String lessonJid;
 
     @Constraints.Required
-    public String problemSecret;
-
-    @Constraints.Required
-    public String type;
+    public String lessonSecret;
 
     @Constraints.Required
     public String status;

@@ -1,19 +1,19 @@
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.formErrorView
-@import org.iatoki.judgels.jerahmeel.forms.CourseUpsertForm
+@import org.iatoki.judgels.jerahmeel.forms.SessionUpsertForm
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@(courseUpsertForm: Form[CourseUpsertForm], courseId: Long)
+@(sessionUpsertForm: Form[SessionUpsertForm], sessionId: Long)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-2", "col-md-10") }
 
-@formErrorView(courseUpsertForm)
+@formErrorView(sessionUpsertForm)
 
-@b3.form(routes.CourseController.postUpdateCourseGeneral(courseId)) {
+@b3.form(routes.SessionController.postEditSessionGeneral(sessionId)) {
 
     @helper.CSRF.formField
 
-    @upsertCourseView(courseUpsertForm)
+    @upsertSessionView(sessionUpsertForm)
 
     @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
 }

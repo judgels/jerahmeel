@@ -1,8 +1,9 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.sandalphon.SandalphonBundleProblemStatementRenderRequestParam;
 import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
-import org.iatoki.judgels.api.sandalphon.SandalphonProblemStatementRenderRequestParam;
+import org.iatoki.judgels.api.sandalphon.SandalphonProgrammingProblemStatementRenderRequestParam;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSession;
@@ -130,25 +131,38 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         } else if (!sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             reasonNotAllowedToSubmit = Messages.get("training.session.isLocked");
         }
-        String postSubmitUrl = null;
+
+        String requestUrl;
+        String requestBody;
+
         if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
-            postSubmitUrl = routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            SandalphonBundleProblemStatementRenderRequestParam param = new SandalphonBundleProblemStatementRenderRequestParam();
+
+            param.setProblemSecret(sessionProblem.getProblemSecret());
+            param.setCurrentMillis(System.currentTimeMillis());
+            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+            param.setPostSubmitUrl(routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
+            param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
+
+            requestUrl = sandalphonClientAPI.getBundleProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+            requestBody = sandalphonClientAPI.constructBundleProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
         } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
-            postSubmitUrl = routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            SandalphonProgrammingProblemStatementRenderRequestParam param = new SandalphonProgrammingProblemStatementRenderRequestParam();
+
+            param.setProblemSecret(sessionProblem.getProblemSecret());
+            param.setCurrentMillis(System.currentTimeMillis());
+            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+            param.setPostSubmitUrl(routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
+            param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
+            param.setAllowedGradingLanguages("");
+
+            requestUrl = sandalphonClientAPI.getProgrammingProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+            requestBody = sandalphonClientAPI.constructProgrammingProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
+        } else {
+            throw new IllegalStateException();
         }
-
-        SandalphonProblemStatementRenderRequestParam param = new SandalphonProblemStatementRenderRequestParam();
-
-        param.setProblemSecret(sessionProblem.getProblemSecret());
-        param.setCurrentMillis(System.currentTimeMillis());
-        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
-        param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
-        param.setPostSubmitUrl(postSubmitUrl);
-        param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
-        param.setAllowedGradingLanguages("");
-
-        String requestUrl = sandalphonClientAPI.getProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
-        String requestBody = sandalphonClientAPI.constructProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);

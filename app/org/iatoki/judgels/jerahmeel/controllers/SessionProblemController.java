@@ -2,21 +2,22 @@ package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.api.JudgelsAPIClientException;
+import org.iatoki.judgels.api.sandalphon.SandalphonBundleProblemStatementRenderRequestParam;
 import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonProblem;
-import org.iatoki.judgels.api.sandalphon.SandalphonProblemStatementRenderRequestParam;
+import org.iatoki.judgels.api.sandalphon.SandalphonProgrammingProblemStatementRenderRequestParam;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.jerahmeel.forms.SessionProblemUpdateForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionProblemEditForm;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.forms.SessionProblemCreateForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionProblemAddForm;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
@@ -26,8 +27,8 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.createProblemView;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.updateSessionProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.addProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.editSessionProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
@@ -90,25 +91,36 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return forbidden();
         }
 
-        String postSubmitUrl = "";
+        String requestUrl;
+        String requestBody;
+
         if (SessionProblemType.BUNDLE.equals(sessionProblem.getType())) {
-            postSubmitUrl = routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            SandalphonBundleProblemStatementRenderRequestParam param = new SandalphonBundleProblemStatementRenderRequestParam();
+
+            param.setProblemSecret(sessionProblem.getProblemSecret());
+            param.setCurrentMillis(System.currentTimeMillis());
+            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+            param.setPostSubmitUrl(routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
+
+            requestUrl = sandalphonClientAPI.getBundleProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+            requestBody = sandalphonClientAPI.constructBundleProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
         } else if (SessionProblemType.PROGRAMMING.equals(sessionProblem.getType())) {
-            postSubmitUrl = routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure());
+            SandalphonProgrammingProblemStatementRenderRequestParam param = new SandalphonProgrammingProblemStatementRenderRequestParam();
+
+            param.setProblemSecret(sessionProblem.getProblemSecret());
+            param.setCurrentMillis(System.currentTimeMillis());
+            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
+            param.setPostSubmitUrl(routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
+            param.setReasonNotAllowedToSubmit("");
+            param.setAllowedGradingLanguages("");
+
+            requestUrl = sandalphonClientAPI.getProgrammingProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
+            requestBody = sandalphonClientAPI.constructProgrammingProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
+        } else {
+            throw new IllegalStateException();
         }
-
-        SandalphonProblemStatementRenderRequestParam param = new SandalphonProblemStatementRenderRequestParam();
-
-        param.setProblemSecret(sessionProblem.getProblemSecret());
-        param.setCurrentMillis(System.currentTimeMillis());
-        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
-        param.setSwitchStatementLanguageUrl(routes.SessionProblemController.switchLanguage().absoluteURL(request(), request().secure()));
-        param.setPostSubmitUrl(postSubmitUrl);
-        param.setReasonNotAllowedToSubmit(null);
-        param.setAllowedGradingLanguages("");
-
-        String requestUrl = sandalphonClientAPI.getProblemStatementRenderAPIEndpoint(sessionProblem.getProblemJid());
-        String requestBody = sandalphonClientAPI.constructProblemStatementRenderAPIRequestBody(sessionProblem.getProblemJid(), param);
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
         SessionControllerUtils.appendUpdateLayout(content, session);
@@ -145,42 +157,42 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result createProblem(long sessionId) throws SessionNotFoundException {
+    public Result addProblem(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
-        Form<SessionProblemCreateForm> sessionProblemCreateForm = Form.form(SessionProblemCreateForm.class);
+        Form<SessionProblemAddForm> sessionProblemAddForm = Form.form(SessionProblemAddForm.class);
 
-        return showCreateProblem(session, sessionProblemCreateForm);
+        return showAddProblem(session, sessionProblemAddForm);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postCreateProblem(long sessionId) throws SessionNotFoundException {
+    public Result postAddProblem(long sessionId) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
-        Form<SessionProblemCreateForm> sessionProblemCreateForm = Form.form(SessionProblemCreateForm.class).bindFromRequest();
+        Form<SessionProblemAddForm> sessionProblemAddForm = Form.form(SessionProblemAddForm.class).bindFromRequest();
 
-        if (formHasErrors(sessionProblemCreateForm)) {
-            return showCreateProblem(session, sessionProblemCreateForm);
+        if (formHasErrors(sessionProblemAddForm)) {
+            return showAddProblem(session, sessionProblemAddForm);
         }
 
-        SessionProblemCreateForm sessionProblemCreateData = sessionProblemCreateForm.get();
+        SessionProblemAddForm sessionProblemCreateData = sessionProblemAddForm.get();
         SandalphonProblem sandalphonProblem;
         try {
             sandalphonProblem = sandalphonClientAPI.findProblemByJid(sessionProblemCreateData.problemJid);
         } catch (JudgelsAPIClientException e) {
-            sessionProblemCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
+            sessionProblemAddForm.reject(Messages.get("error.system.sandalphon.connection"));
 
-            return showCreateProblem(session, sessionProblemCreateForm);
+            return showAddProblem(session, sessionProblemAddForm);
         }
         if (sandalphonProblem == null) {
-            sessionProblemCreateForm.reject(Messages.get("error.problem.invalidJid"));
+            sessionProblemAddForm.reject(Messages.get("error.problem.invalidJid"));
 
-            return showCreateProblem(session, sessionProblemCreateForm);
+            return showAddProblem(session, sessionProblemAddForm);
         }
 
         if (sessionProblemService.aliasExistsInSession(session.getJid(), sessionProblemCreateData.alias)) {
-            sessionProblemCreateForm.reject(Messages.get("error.session.problemExist"));
+            sessionProblemAddForm.reject(Messages.get("error.session.problemExist"));
 
-            return showCreateProblem(session, sessionProblemCreateForm);
+            return showAddProblem(session, sessionProblemAddForm);
         }
 
         sessionProblemService.addSessionProblem(session.getJid(), sessionProblemCreateData.problemJid, sessionProblemCreateData.problemSecret, sessionProblemCreateData.alias, SessionProblemType.valueOf(sessionProblemCreateData.type), SessionProblemStatus.valueOf(sessionProblemCreateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
@@ -190,7 +202,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
     }
 
     @Transactional
-    public Result deleteProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
+    public Result removeProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
 
@@ -205,7 +217,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
+    public Result editProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
 
@@ -213,18 +225,18 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return notFound();
         }
 
-        SessionProblemUpdateForm sessionProblemUpdateData = new SessionProblemUpdateForm();
-        sessionProblemUpdateData.alias = sessionProblem.getAlias();
-        sessionProblemUpdateData.status = sessionProblem.getStatus().name();
+        SessionProblemEditForm sessionProblemEditData = new SessionProblemEditForm();
+        sessionProblemEditData.alias = sessionProblem.getAlias();
+        sessionProblemEditData.status = sessionProblem.getStatus().name();
 
-        Form<SessionProblemUpdateForm> sessionProblemUpdateForm = Form.form(SessionProblemUpdateForm.class).fill(sessionProblemUpdateData);
+        Form<SessionProblemEditForm> sessionProblemEditForm = Form.form(SessionProblemEditForm.class).fill(sessionProblemEditData);
 
-        return showUpdateProblem(session, sessionProblem, sessionProblemUpdateForm);
+        return showEditProblem(session, sessionProblem, sessionProblemEditForm);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
+    public Result postEditProblem(long sessionId, long sessionProblemId) throws SessionNotFoundException, SessionProblemNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
 
@@ -232,26 +244,26 @@ public final class SessionProblemController extends AbstractJudgelsController {
             return notFound();
         }
 
-        Form<SessionProblemUpdateForm> sessionProblemUpdateForm = Form.form(SessionProblemUpdateForm.class).bindFromRequest();
-        if (formHasErrors(sessionProblemUpdateForm)) {
-            return showUpdateProblem(session, sessionProblem, sessionProblemUpdateForm);
+        Form<SessionProblemEditForm> sessionProblemEditForm = Form.form(SessionProblemEditForm.class).bindFromRequest();
+        if (formHasErrors(sessionProblemEditForm)) {
+            return showEditProblem(session, sessionProblem, sessionProblemEditForm);
         }
 
-        SessionProblemUpdateForm sessionProblemUpdateData = sessionProblemUpdateForm.get();
-        if (!sessionProblemUpdateData.alias.equals(sessionProblem.getAlias()) && !sessionProblemService.aliasExistsInSession(session.getJid(), sessionProblemUpdateData.alias)) {
-            sessionProblemUpdateForm.reject(Messages.get("error.session.problem.duplicateAlias"));
+        SessionProblemEditForm sessionProblemEditData = sessionProblemEditForm.get();
+        if (!sessionProblemEditData.alias.equals(sessionProblem.getAlias()) && !sessionProblemService.aliasExistsInSession(session.getJid(), sessionProblemEditData.alias)) {
+            sessionProblemEditForm.reject(Messages.get("error.session.problem.duplicateAlias"));
 
-            return showUpdateProblem(session, sessionProblem, sessionProblemUpdateForm);
+            return showEditProblem(session, sessionProblem, sessionProblemEditForm);
         }
 
-        sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemUpdateData.alias, SessionProblemStatus.valueOf(sessionProblemUpdateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemEditData.alias, SessionProblemStatus.valueOf(sessionProblemEditData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }
 
     private Result showListSessionProblems(Session session, Page<SessionProblem> pageOfSessionProblems, String orderBy, String orderDir, String filterString, Map<String, String> problemSlugsMap) {
         LazyHtml content = new LazyHtml(listSessionProblemsView.render(session.getId(), pageOfSessionProblems, orderBy, orderDir, filterString, problemSlugsMap));
-        content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.problems"), new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.createProblem(session.getId())), c));
+        content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.problems"), new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.addProblem(session.getId())), c));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
@@ -260,24 +272,24 @@ public final class SessionProblemController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showCreateProblem(Session session, Form<SessionProblemCreateForm> sessionProblemCreateForm) {
-        LazyHtml content = new LazyHtml(createProblemView.render(session.getId(), sessionProblemCreateForm));
+    private Result showAddProblem(Session session, Form<SessionProblemAddForm> sessionProblemAddForm) {
+        LazyHtml content = new LazyHtml(addProblemView.render(session.getId(), sessionProblemAddForm));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
-                new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.createProblem(session.getId()))
+                new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.addProblem(session.getId()))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Problems - Create");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateProblem(Session session, SessionProblem sessionProblem, Form<SessionProblemUpdateForm> sessionProblemUpdateForm) {
-        LazyHtml content = new LazyHtml(updateSessionProblemView.render(sessionProblemUpdateForm, session.getId(), sessionProblem));
+    private Result showEditProblem(Session session, SessionProblem sessionProblem, Form<SessionProblemEditForm> sessionProblemEditForm) {
+        LazyHtml content = new LazyHtml(editSessionProblemView.render(sessionProblemEditForm, session.getId(), sessionProblem));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
-                new InternalLink(Messages.get("commons.update"), routes.SessionProblemController.updateProblem(session.getId(), sessionProblem.getId()))
+                new InternalLink(Messages.get("commons.update"), routes.SessionProblemController.editProblem(session.getId(), sessionProblem.getId()))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Problems - Update");
 

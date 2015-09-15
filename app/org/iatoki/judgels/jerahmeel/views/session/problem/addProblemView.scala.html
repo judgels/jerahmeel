@@ -1,0 +1,25 @@
+@import play.i18n.Messages
+@import org.iatoki.judgels.play.views.html.formErrorView
+@import org.iatoki.judgels.jerahmeel.SessionProblemType
+@import org.iatoki.judgels.jerahmeel.SessionProblemStatus
+@import org.iatoki.judgels.jerahmeel.forms.SessionProblemAddForm
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(sessionId: Long, sessionProblemAddForm: Form[SessionProblemAddForm])
+
+@implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
+
+@formErrorView(sessionProblemAddForm)
+
+@b3.form(routes.SessionProblemController.postAddProblem(sessionId)) {
+
+    @helper.CSRF.formField
+
+    @b3.text(sessionProblemAddForm("alias"), '_label -> Messages.get("session.problem.alias"), 'class -> "form-control")
+    @b3.text(sessionProblemAddForm("problemJid"), '_label -> Messages.get("session.problem.jid"), 'class -> "form-control")
+    @b3.text(sessionProblemAddForm("lessonSecret"), '_label -> Messages.get("session.problem.secret"), 'class -> "form-control")
+    @b3.select(sessionProblemAddForm("type"), SessionProblemType.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.type"), 'class -> "form-control selectpicker")
+    @b3.select(sessionProblemAddForm("status"), SessionProblemStatus.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.status"), 'class -> "form-control selectpicker")
+
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.add") }
+}

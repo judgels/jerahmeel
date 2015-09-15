@@ -7,7 +7,7 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.forms.SessionDependencyCreateForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionDependencyAddForm;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.SessionDependency;
@@ -17,7 +17,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.dependency.listCreateDependenciesView;
+import org.iatoki.judgels.jerahmeel.views.html.session.dependency.listAddDependenciesView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -49,54 +49,54 @@ public final class SessionDependencyController extends AbstractJudgelsController
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result viewDependencies(long sessionId) throws SessionNotFoundException {
-        return listCreateDependencies(sessionId, 0, "id", "asc", "");
+        return listAddDependencies(sessionId, 0, "id", "asc", "");
     }
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result listCreateDependencies(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
+    public Result listAddDependencies(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
 
         Page<SessionDependency> pageOfSessionDependencies = sessionDependencyService.getPageOfSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        Form<SessionDependencyCreateForm> sessionDependencyCreateForm = Form.form(SessionDependencyCreateForm.class);
+        Form<SessionDependencyAddForm> sessionDependencyAddForm = Form.form(SessionDependencyAddForm.class);
 
-        return showListCreateDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
+        return showListAddDependencies(session, sessionDependencyAddForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postCreateDependency(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
+    public Result postAddDependency(long sessionId, long page, String orderBy, String orderDir, String filterString) throws SessionNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
-        Form<SessionDependencyCreateForm> sessionDependencyCreateForm = Form.form(SessionDependencyCreateForm.class).bindFromRequest();
+        Form<SessionDependencyAddForm> sessionDependencyCreateForm = Form.form(SessionDependencyAddForm.class).bindFromRequest();
 
         if (formHasErrors(sessionDependencyCreateForm)) {
             Page<SessionDependency> pageOfSessionDependencies = sessionDependencyService.getPageOfSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
+            return showListAddDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
         }
 
-        SessionDependencyCreateForm sessionDependencyCreateData = sessionDependencyCreateForm.get();
-        if (!sessionService.sessionExistsByJid(sessionDependencyCreateData.sessionJid)) {
+        SessionDependencyAddForm sessionDependencyAddData = sessionDependencyCreateForm.get();
+        if (!sessionService.sessionExistsByJid(sessionDependencyAddData.sessionJid)) {
             sessionDependencyCreateForm.reject(Messages.get("error.session.invalidJid"));
             Page<SessionDependency> pageOfSessionDependencies = sessionDependencyService.getPageOfSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
+            return showListAddDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
         }
 
-        if (sessionDependencyService.existsBySessionJidAndDependencyJid(session.getJid(), sessionDependencyCreateData.sessionJid)) {
+        if (sessionDependencyService.existsBySessionJidAndDependencyJid(session.getJid(), sessionDependencyAddData.sessionJid)) {
             sessionDependencyCreateForm.reject(Messages.get("error.session.existSession"));
             Page<SessionDependency> pageOfSessionDependencies = sessionDependencyService.getPageOfSessionDependencies(session.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            return showListCreateDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
+            return showListAddDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
         }
 
-        sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyCreateData.sessionJid, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyAddData.sessionJid, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
     }
 
     @Transactional
-    public Result deleteDependency(long sessionId, long sessionDependencyId) throws SessionNotFoundException, SessionDependencyNotFoundException {
+    public Result removeDependency(long sessionId, long sessionDependencyId) throws SessionNotFoundException, SessionDependencyNotFoundException {
         Session session = sessionService.findSessionById(sessionId);
         SessionDependency sessionDependency = sessionDependencyService.findSessionDependencyById(sessionDependencyId);
 
@@ -109,8 +109,8 @@ public final class SessionDependencyController extends AbstractJudgelsController
         return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
     }
 
-    private Result showListCreateDependencies(Session session, Form<SessionDependencyCreateForm> sessionDependencyCreateForm, Page<SessionDependency> pageOfSessionDependencies, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listCreateDependenciesView.render(session.getId(), pageOfSessionDependencies, orderBy, orderDir, filterString, sessionDependencyCreateForm));
+    private Result showListAddDependencies(Session session, Form<SessionDependencyAddForm> sessionDependencyAddForm, Page<SessionDependency> pageOfSessionDependencies, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listAddDependenciesView.render(session.getId(), pageOfSessionDependencies, orderBy, orderDir, filterString, sessionDependencyAddForm));
         SessionControllerUtils.appendUpdateLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);

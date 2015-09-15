@@ -18,7 +18,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.curriculum.createCurriculumView;
 import org.iatoki.judgels.jerahmeel.views.html.curriculum.listCurriculumsView;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.updateCurriculumGeneralView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.editCurriculumGeneralView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -92,7 +92,7 @@ public final class CurriculumController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
+    public Result editCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumUpsertForm curriculumUpsertData = new CurriculumUpsertForm();
         curriculumUpsertData.name = curriculum.getName();
@@ -100,17 +100,17 @@ public final class CurriculumController extends AbstractJudgelsController {
 
         Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class).fill(curriculumUpsertData);
 
-        return showUpdateCurriculumGeneral(curriculumUpsertForm, curriculum);
+        return showEditCurriculumGeneral(curriculumUpsertForm, curriculum);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
+    public Result postEditCurriculumGeneral(long curriculumId) throws CurriculumNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         Form<CurriculumUpsertForm> curriculumUpsertForm = Form.form(CurriculumUpsertForm.class).bindFromRequest();
 
         if (formHasErrors(curriculumUpsertForm)) {
-            return showUpdateCurriculumGeneral(curriculumUpsertForm, curriculum);
+            return showEditCurriculumGeneral(curriculumUpsertForm, curriculum);
         }
 
         CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
@@ -130,12 +130,12 @@ public final class CurriculumController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateCurriculumGeneral(Form<CurriculumUpsertForm> curriculumUpsertForm, Curriculum curriculum) {
-        LazyHtml content = new LazyHtml(updateCurriculumGeneralView.render(curriculumUpsertForm, curriculum.getId()));
+    private Result showEditCurriculumGeneral(Form<CurriculumUpsertForm> curriculumUpsertForm, Curriculum curriculum) {
+        LazyHtml content = new LazyHtml(editCurriculumGeneralView.render(curriculumUpsertForm, curriculum.getId()));
         CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
-                new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.updateCurriculumGeneral(curriculum.getId()))
+                new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.editCurriculumGeneral(curriculum.getId()))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculum - Update");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);

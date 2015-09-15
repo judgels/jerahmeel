@@ -18,7 +18,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.views.html.course.createCourseView;
 import org.iatoki.judgels.jerahmeel.views.html.course.listCoursesView;
-import org.iatoki.judgels.jerahmeel.views.html.course.updateCourseGeneralView;
+import org.iatoki.judgels.jerahmeel.views.html.course.editCourseGeneralView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -92,7 +92,7 @@ public final class CourseController extends AbstractJudgelsController {
 
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateCourseGeneral(long courseId) throws CourseNotFoundException {
+    public Result editCourseGeneral(long courseId) throws CourseNotFoundException {
         Course course = courseService.findCourseById(courseId);
         CourseUpsertForm courseUpsertData = new CourseUpsertForm();
         courseUpsertData.name = course.getName();
@@ -100,17 +100,17 @@ public final class CourseController extends AbstractJudgelsController {
 
         Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class).fill(courseUpsertData);
 
-        return showUpdateCourseGeneral(courseUpsertForm, course);
+        return showEditCourseGeneral(courseUpsertForm, course);
     }
 
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateCourseGeneral(long courseId) throws CourseNotFoundException {
+    public Result postEditCourseGeneral(long courseId) throws CourseNotFoundException {
         Course course = courseService.findCourseById(courseId);
         Form<CourseUpsertForm> courseUpsertForm = Form.form(CourseUpsertForm.class).bindFromRequest();
 
         if (formHasErrors(courseUpsertForm)) {
-            return showUpdateCourseGeneral(courseUpsertForm, course);
+            return showEditCourseGeneral(courseUpsertForm, course);
         }
 
         CourseUpsertForm courseUpsertData = courseUpsertForm.get();
@@ -130,12 +130,12 @@ public final class CourseController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateCourseGeneral(Form<CourseUpsertForm> courseUpsertForm, Course course) {
-        LazyHtml content = new LazyHtml(updateCourseGeneralView.render(courseUpsertForm, course.getId()));
+    private Result showEditCourseGeneral(Form<CourseUpsertForm> courseUpsertForm, Course course) {
+        LazyHtml content = new LazyHtml(editCourseGeneralView.render(courseUpsertForm, course.getId()));
         CourseControllerUtils.appendUpdateLayout(content, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
-                new InternalLink(Messages.get("course.update"), routes.CourseController.updateCourseGeneral(course.getId()))
+                new InternalLink(Messages.get("course.update"), routes.CourseController.editCourseGeneral(course.getId()))
         );
         appendTemplateLayout(content, "Update");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
