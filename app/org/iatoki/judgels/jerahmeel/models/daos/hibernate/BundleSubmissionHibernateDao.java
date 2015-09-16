@@ -1,8 +1,8 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
-import org.iatoki.judgels.sandalphon.models.daos.impls.AbstractBundleSubmissionHibernateDao;
+import org.iatoki.judgels.sandalphon.models.daos.hibernate.AbstractBundleSubmissionHibernateDao;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

@@ -1,4 +1,4 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.play.models.daos.impls.AbstractJudgelsHibernateDao;

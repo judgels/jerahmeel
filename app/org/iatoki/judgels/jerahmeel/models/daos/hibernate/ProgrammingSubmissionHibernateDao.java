@@ -1,6 +1,6 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
-import org.iatoki.judgels.sandalphon.models.daos.impls.AbstractProgrammingSubmissionHibernateDao;
+import org.iatoki.judgels.sandalphon.models.daos.hibernate.AbstractProgrammingSubmissionHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 

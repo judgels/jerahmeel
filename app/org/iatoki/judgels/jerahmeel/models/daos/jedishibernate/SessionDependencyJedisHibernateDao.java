@@ -1,11 +1,13 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.jedishibernate;
 
-import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel_;
+import org.iatoki.judgels.play.models.daos.impls.AbstractJedisHibernateDao;
 import play.db.jpa.JPA;
+import redis.clients.jedis.JedisPool;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -15,10 +17,11 @@ import java.util.List;
 
 @Singleton
 @Named("sessionDependencyDao")
-public final class SessionDependencyHibernateDao extends AbstractHibernateDao<Long, SessionDependencyModel> implements SessionDependencyDao {
+public final class SessionDependencyJedisHibernateDao extends AbstractJedisHibernateDao<Long, SessionDependencyModel> implements SessionDependencyDao {
 
-    public SessionDependencyHibernateDao() {
-        super(SessionDependencyModel.class);
+    @Inject
+    public SessionDependencyJedisHibernateDao(JedisPool jedisPool) {
+        super(jedisPool, SessionDependencyModel.class);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
 import org.iatoki.judgels.play.models.daos.impls.AbstractJidCacheHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;

@@ -56,7 +56,7 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
     @Override
     protected String getDaosImplPackage() {
-        return "org.iatoki.judgels.jerahmeel.models.daos.impls";
+        return "org.iatoki.judgels.jerahmeel.models.daos.hibernate";
     }
 
     @Override

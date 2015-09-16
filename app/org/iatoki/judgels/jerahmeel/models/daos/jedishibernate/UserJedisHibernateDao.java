@@ -1,12 +1,14 @@
-package org.iatoki.judgels.jerahmeel.models.daos.impls;
+package org.iatoki.judgels.jerahmeel.models.daos.jedishibernate;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserDao;
 import org.iatoki.judgels.jerahmeel.models.entities.UserModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserModel_;
+import org.iatoki.judgels.play.models.daos.impls.AbstractJedisHibernateDao;
 import play.db.jpa.JPA;
+import redis.clients.jedis.JedisPool;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -17,10 +19,11 @@ import java.util.List;
 
 @Singleton
 @Named("userDao")
-public final class UserHibernateDao extends AbstractHibernateDao<Long, UserModel> implements UserDao {
+public final class UserJedisHibernateDao extends AbstractJedisHibernateDao<Long, UserModel> implements UserDao {
 
-    public UserHibernateDao() {
-        super(UserModel.class);
+    @Inject
+    public UserJedisHibernateDao(JedisPool jedisPool) {
+        super(jedisPool, UserModel.class);
     }
 
     @Override
