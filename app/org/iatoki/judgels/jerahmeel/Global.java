@@ -7,6 +7,9 @@ import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.jerahmeel.controllers.JerahmeelControllerUtils;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
+import org.iatoki.judgels.jerahmeel.runnables.StatisticUpdater;
+import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
+import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
@@ -17,6 +20,7 @@ import org.iatoki.judgels.jophiel.services.impls.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.play.AbstractGlobal;
 import org.iatoki.judgels.play.services.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.runnables.GradingResponsePoller;
+import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 import play.Application;
 import play.inject.Injector;
@@ -45,7 +49,7 @@ public final class Global extends AbstractGlobal {
     private void buildServices(Injector injector) {
         JidCacheServiceImpl.buildInstance(injector.instanceOf(JidCacheDao.class));
         AvatarCacheServiceImpl.buildInstance(injector.instanceOf(JophielAuthAPI.class), injector.instanceOf(AvatarCacheDao.class));
-        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class));
+        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
         UserActivityMessageServiceImpl.buildInstance();
     }
 
@@ -59,8 +63,10 @@ public final class Global extends AbstractGlobal {
 
         GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, injector.instanceOf(ProgrammingSubmissionService.class), injector.instanceOf(SealtielClientAPI.class), TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
         UserActivityMessagePusher userActivityMessagePusher = new UserActivityMessagePusher(injector.instanceOf(JophielClientAPI.class), UserActivityMessageServiceImpl.getInstance());
+        StatisticUpdater pointStatisticUpdater = new StatisticUpdater(injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityMessagePusher, context);
+        scheduler.schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(1, TimeUnit.HOURS), pointStatisticUpdater, context);
     }
 }

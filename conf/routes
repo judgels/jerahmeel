@@ -158,6 +158,12 @@ GET         /users/:userId/edit                                                 
 POST        /users/:userId                                                                                                                  @org.iatoki.judgels.jerahmeel.controllers.UserController.postEditUser(userId: Long)
 GET         /users/:userId/remove                                                                                                           @org.iatoki.judgels.jerahmeel.controllers.UserController.removeUser(userId: Long)
 
+GET         /statistics                                                                                                                     @org.iatoki.judgels.jerahmeel.controllers.StatisticController.index()
+GET         /statistics/point                                                                                                               @org.iatoki.judgels.jerahmeel.controllers.StatisticController.viewPointStatistics()
+GET         /statistics/point/                                                                                                              @org.iatoki.judgels.jerahmeel.controllers.StatisticController.listPointStatistics(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc")
+GET         /statistics/problem                                                                                                             @org.iatoki.judgels.jerahmeel.controllers.StatisticController.viewProblemStatistics()
+GET         /statistics/problem/                                                                                                            @org.iatoki.judgels.jerahmeel.controllers.StatisticController.listProblemStatistics(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc")
+
 
 # Internal API
 
