@@ -108,7 +108,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
 
         content.appendLayout(c -> sidebarLayout.render(sidebarContent.render(), c));
 
-        if (ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())) || ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()) + "/")) {
+        if (isInTrainingMainPage()) {
             addWidgets(content);
         }
 
@@ -138,6 +138,10 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
             throw new UnsupportedOperationException("ControllerUtils instance has already been built");
         }
         INSTANCE = new JerahmeelControllerUtils(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemStatisticService, programmingSubmissionService);
+    }
+
+    private boolean isInTrainingMainPage() {
+        return ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())) || ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()) + "/");
     }
 
     private void addWidgets(LazyHtml content) {
