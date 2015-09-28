@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.iatoki.judgels.api.jophiel.JophielUser;
 import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.JudgelsPlayUtils;
 import play.mvc.Http;
 
 import java.util.Arrays;
@@ -69,6 +70,22 @@ public final class JerahmeelUtils {
             return Arrays.asList(getFromSession("realRole").split(",")).contains(role);
         } else {
             return hasRole(role);
+        }
+    }
+
+    public static String getRealUserJid() {
+        if (JudgelsPlayUtils.hasViewPoint()) {
+            return getFromSession("realUserJid");
+        } else {
+            return IdentityUtils.getUserJid();
+        }
+    }
+
+    public static String getRealUsername() {
+        if (JudgelsPlayUtils.hasViewPoint()) {
+            return getFromSession("realUsername");
+        } else {
+            return IdentityUtils.getUsername();
         }
     }
 
