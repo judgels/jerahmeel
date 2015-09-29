@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.iatoki.judgels.FileSystemProvider;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
@@ -39,6 +40,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -123,9 +125,11 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     @Transactional(readOnly = true)
     public Result listSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, null, null, null);
+        List<String> problemJids = pageOfBundleSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
         Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, sessionJidToNameMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, sessionJidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
         SubmissionControllerUtils.appendAllSubtabLayout(content);
         if (!JerahmeelUtils.isGuest()) {
             SubmissionControllerUtils.appendTabLayout(content);

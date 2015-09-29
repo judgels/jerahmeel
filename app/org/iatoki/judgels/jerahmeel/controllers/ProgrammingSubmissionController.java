@@ -2,6 +2,7 @@ package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.FileSystemProvider;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.SubmissionSource;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
@@ -37,6 +38,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -121,10 +123,13 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     @Transactional(readOnly = true)
     public Result listSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<ProgrammingSubmission> pageOfProgrammingSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, null, null, null);
+
+        List<String> problemJids = pageOfProgrammingSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
         Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfProgrammingSubmissions, sessionJidToNameMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfProgrammingSubmissions, sessionJidToNameMap, problemTitlesMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
         SubmissionControllerUtils.appendAllSubtabLayout(content);
         if (!JerahmeelUtils.isGuest()) {
             SubmissionControllerUtils.appendTabLayout(content);

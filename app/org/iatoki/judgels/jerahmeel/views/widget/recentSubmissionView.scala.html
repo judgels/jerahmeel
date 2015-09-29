@@ -4,7 +4,7 @@
 @import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.play.JudgelsPlayUtils
 
-@(submissionEntries: List[SubmissionEntry])
+@(submissionEntries: List[SubmissionEntry], problemTitlesMap: Map[String, String])
 
 <div class="box clearfix">
     <div class="col-md-12">
@@ -16,15 +16,13 @@
                 <th><small>@Messages.get("widget.submission.score")</small></th>
             </tr>
             @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(submissionEntries.map(s => s.getAuthorJid).toSeq))) { userDisplayNamesMap =>
-                @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(submissionEntries.map(s => s.getProblemJid).toSeq))) { problemDisplayNamesMap =>
-                    @for((submissionEntry, i) <- submissionEntries.zipWithIndex) {
-                        @if(i < 5) {
-                            <tr>
-                                <td><small>@userDisplayNamesMap.get(submissionEntry.getAuthorJid)</small></td>
-                                <td><small>@problemDisplayNamesMap.get(submissionEntry.getProblemJid)</small></td>
-                                <td><small>@submissionEntry.getScore</small></td>
-                            </tr>
-                        }
+                @for((submissionEntry, i) <- submissionEntries.zipWithIndex) {
+                    @if(i < 5) {
+                        <tr>
+                            <td><small>@userDisplayNamesMap.get(submissionEntry.getAuthorJid)</small></td>
+                            <td><small>@problemTitlesMap.get(submissionEntry.getProblemJid)</small></td>
+                            <td><small>@submissionEntry.getScore</small></td>
+                        </tr>
                     }
                 }
             }

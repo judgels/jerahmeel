@@ -4,12 +4,14 @@ import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.api.jophiel.JophielClientAPI;
 import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.PointStatistic;
 import org.iatoki.judgels.jerahmeel.ProblemStatistic;
 import org.iatoki.judgels.jerahmeel.SubmissionEntry;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.widget.pointStatisticView;
 import org.iatoki.judgels.jerahmeel.views.html.widget.problemStatisticView;
 import org.iatoki.judgels.jerahmeel.views.html.widget.recentSubmissionView;
@@ -46,6 +48,8 @@ import play.mvc.Http;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUtils {
 
@@ -168,9 +172,13 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         for (ProgrammingSubmission programmingSubmission : pageOfProgrammingSubmissions.getData()) {
             submissionEntries.add(new SubmissionEntry(programmingSubmission.getAuthorJid(), programmingSubmission.getProblemJid(), programmingSubmission.getLatestScore(), programmingSubmission.getTime().getTime()));
         }
+
+        List<String> problemJids = submissionEntries.stream().map(e -> e.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
+
         Collections.sort(submissionEntries);
 
-        content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic), recentSubmissionView.render(submissionEntries), c));
+        content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
     }
 
     static JerahmeelControllerUtils getInstance() {

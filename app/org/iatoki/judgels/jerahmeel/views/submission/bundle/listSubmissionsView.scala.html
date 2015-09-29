@@ -10,7 +10,7 @@
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.sandalphon.BundleSubmission
 
-@(pageOfBundleSubmissions: Page[BundleSubmission], sessionJidToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, viewable: Boolean)
+@(pageOfBundleSubmissions: Page[BundleSubmission], sessionJidToNameMap: Map[String, String], problemTitlesMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, viewable: Boolean)
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.BundleSubmissionController.listSubmissions(newPageIndex, newOrderBy, newOrderDir)}
 
@@ -30,22 +30,20 @@
 
     <tbody>
     @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfBundleSubmissions.getData.map(s => s.getAuthorJid).toSeq))) { authorDisplayNamesMap =>
-        @defining(JidCacheServiceImpl.getInstance().getDisplayNames(JavaConversions.seqAsJavaList(pageOfBundleSubmissions.getData.map(s => s.getProblemJid).toSeq))) { problemDisplayNamesMap =>
-            @for(submission <- pageOfBundleSubmissions.getData) {
-                <tr>
-                    <td><small>@submission.getId</small></td>
-                    <td><small>@authorDisplayNamesMap.get(submission.getAuthorJid)</small></td>
-                    <td><small>@sessionJidToNameMap.get(submission.getContainerJid)</small></td>
-                    <td><small>@problemDisplayNamesMap.get(submission.getProblemJid)</small></td>
-                    <td><small>@submission.getLatestScore</small></td>
-                    <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
-                    <td class="text-center">
-                        @if(viewable || submission.getAuthorJid.equals(IdentityUtils.getUserJid)) {
-                            <a href="@routes.BundleSubmissionController.viewSubmission(submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
-                        }
-                    </td>
-                </tr>
-            }
+        @for(submission <- pageOfBundleSubmissions.getData) {
+            <tr>
+                <td><small>@submission.getId</small></td>
+                <td><small>@authorDisplayNamesMap.get(submission.getAuthorJid)</small></td>
+                <td><small>@sessionJidToNameMap.get(submission.getContainerJid)</small></td>
+                <td><small>@problemTitlesMap.get(submission.getProblemJid)</small></td>
+                <td><small>@submission.getLatestScore</small></td>
+                <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
+                <td class="text-center">
+                    @if(viewable || submission.getAuthorJid.equals(IdentityUtils.getUserJid)) {
+                        <a href="@routes.BundleSubmissionController.viewSubmission(submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                    }
+                </td>
+            </tr>
         }
     }
     </tbody>
