@@ -172,20 +172,20 @@ widget.point=Hall of Fame
 widget.point.rank=Rank
 widget.point.user=User
 widget.point.totalPoints=Pts
-widget.point.totalProblems=Probs
+widget.point.totalProblems=# Probs
 widget.point.lastUpdated=Last updated
 widget.point.noStatisticYet=No statistic yet.
 
-widget.problem=Favorite Problem
-widget.problem.duration.week=Weekly
+widget.problem=Favorite Problems
+widget.problem.duration.week=Over Last 7 Days
 widget.problem.rank=Rank
 widget.problem.name=Name
-widget.problem.totalSubmissions=Subs
+widget.problem.totalSubmissions=# Subs
 widget.problem.lastUpdated=Last updated
 widget.problem.noStatisticYet=No statistic yet.
 
 widget.submission=Recent Submissions
-widget.submission.author=Author
+widget.submission.author=User
 widget.submission.problem=Problem
 widget.submission.score=Pts
 widget.submission.lastSubmitted=Last submitted
