@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.models.daos;
 
-import org.iatoki.judgels.play.models.daos.Dao;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
+import org.iatoki.judgels.play.models.daos.Dao;
 
 import java.util.List;
 

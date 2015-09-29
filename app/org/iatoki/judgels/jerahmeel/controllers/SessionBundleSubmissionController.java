@@ -5,34 +5,35 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.iatoki.judgels.FileSystemProvider;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.InternalLink;
-import org.iatoki.judgels.play.LazyHtml;
-import org.iatoki.judgels.play.forms.ListTableSelectionForm;
-import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
-import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
+import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.UserItem;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.session.submission.bundle.listSubmissionsView;
+import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.InternalLink;
+import org.iatoki.judgels.play.LazyHtml;
+import org.iatoki.judgels.play.Page;
+import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.forms.ListTableSelectionForm;
+import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
+import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.BundleDetailResult;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
-import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.views.html.problem.bundle.submission.bundleSubmissionView;
 import play.data.DynamicForm;
@@ -56,6 +57,10 @@ import java.util.Map;
 public final class SessionBundleSubmissionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String SUBMISSION = "submission";
+    private static final String BUNDLE_ANSWER = "bundle answer";
+    private static final String PROBLEM = "problem";
+    private static final String SESSION = "session";
 
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
@@ -84,6 +89,8 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
         BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, SessionControllerUtils.getCurrentStatementLanguage());
         String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), session.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, answer);
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(SESSION, session.getJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid())), SUBMISSION, submissionJid, BUNDLE_ANSWER));
 
         return redirect(routes.SessionBundleSubmissionController.viewSubmissions(sessionId));
     }
@@ -157,6 +164,8 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
         bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(SESSION, session.getJid(), session.getName(), PROBLEM, bundleSubmission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getProblemJid()), SUBMISSION, bundleSubmission.getJid(), bundleSubmission.getId() + ""));
+
         return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
@@ -183,6 +192,8 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
                 throw new RuntimeException(e);
             }
             bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+            JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(SESSION, session.getJid(), session.getName(), PROBLEM, bundleSubmission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getProblemJid()), SUBMISSION, bundleSubmission.getJid(), bundleSubmission.getId() + ""));
         }
 
         return redirect(routes.SessionBundleSubmissionController.listSubmissions(sessionId, pageIndex, orderBy, orderDir, userJid, problemJid));

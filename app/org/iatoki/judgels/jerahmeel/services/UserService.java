@@ -1,10 +1,10 @@
 package org.iatoki.judgels.jerahmeel.services;
 
 import org.iatoki.judgels.api.jophiel.JophielUser;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.User;
 import org.iatoki.judgels.jerahmeel.UserNotFoundException;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
+import org.iatoki.judgels.play.Page;
 
 import java.util.List;
 

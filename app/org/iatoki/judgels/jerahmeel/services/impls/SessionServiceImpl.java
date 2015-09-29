@@ -86,12 +86,14 @@ public final class SessionServiceImpl implements SessionService {
     }
 
     @Override
-    public void createSession(String name, String description, String userJid, String userIpAddress) {
+    public Session createSession(String name, String description, String userJid, String userIpAddress) {
         SessionModel sessionModel = new SessionModel();
         sessionModel.name = name;
         sessionModel.description = description;
 
         sessionDao.persist(sessionModel, userJid, userIpAddress);
+
+        return SessionServiceUtils.createSessionFromModel(sessionModel);
     }
 
     @Override

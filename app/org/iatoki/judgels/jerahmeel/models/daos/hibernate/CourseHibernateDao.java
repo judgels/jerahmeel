@@ -1,10 +1,10 @@
 package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.play.models.daos.impls.AbstractJudgelsHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseModel_;
+import org.iatoki.judgels.play.models.daos.impls.AbstractJudgelsHibernateDao;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

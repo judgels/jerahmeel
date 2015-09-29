@@ -11,19 +11,19 @@ import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
 import org.iatoki.judgels.play.IdentityUtils;
@@ -160,7 +160,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
-    public void addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable, String userJid, String userIpAddress) {
+    public CourseSession addCourseSession(String courseJid, String sessionJid, String alias, boolean completeable, String userJid, String userIpAddress) {
         CourseSessionModel courseSessionModel = new CourseSessionModel();
         courseSessionModel.courseJid = courseJid;
         courseSessionModel.sessionJid = sessionJid;
@@ -168,6 +168,8 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
         courseSessionModel.completeable = completeable;
 
         courseSessionDao.persist(courseSessionModel, userJid, userIpAddress);
+
+        return CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel);
     }
 
     @Override
@@ -185,5 +187,4 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
         courseSessionDao.remove(courseSessionModel);
     }
-
 }

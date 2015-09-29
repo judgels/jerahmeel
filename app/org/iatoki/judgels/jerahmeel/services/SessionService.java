@@ -22,7 +22,7 @@ public interface SessionService {
 
     Map<String, String> getSessionJidToNameMapBySessionJids(Collection<String> sessionJids);
 
-    void createSession(String name, String description, String userJid, String userIpAddress);
+    Session createSession(String name, String description, String userJid, String userIpAddress);
 
     void updateSession(String sessionJid, String name, String description, String userJid, String userIpAddress);
 }

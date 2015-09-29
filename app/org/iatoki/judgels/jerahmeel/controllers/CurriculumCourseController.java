@@ -1,26 +1,27 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Curriculum;
+import org.iatoki.judgels.jerahmeel.CurriculumCourse;
+import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseAddForm;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseEditForm;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.editCurriculumCourseView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.listAddCurriculumCoursesView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.CurriculumCourse;
-import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseAddForm;
-import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
-import org.iatoki.judgels.jerahmeel.forms.CurriculumCourseEditForm;
-import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.listAddCurriculumCoursesView;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.course.editCurriculumCourseView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -39,6 +40,8 @@ import javax.inject.Singleton;
 public final class CurriculumCourseController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String COURSE = "course";
+    private static final String CURRICULUM = "curriculum";
 
     private final CourseService courseService;
     private final CurriculumCourseService curriculumCourseService;
@@ -102,7 +105,9 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
             return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
-        curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, curriculumCourseCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        CurriculumCourse curriculumCourse = curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, curriculumCourseCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
@@ -150,6 +155,8 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
         curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseEditData.alias, curriculumCourseEditData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
+
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
 
@@ -163,6 +170,8 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
         }
 
         curriculumCourseService.removeCurriculumCourse(curriculumCourseId);
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }

@@ -1,6 +1,20 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.SessionUpsertForm;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.views.html.session.createSessionView;
+import org.iatoki.judgels.jerahmeel.views.html.session.editSessionGeneralView;
+import org.iatoki.judgels.jerahmeel.views.html.session.listSessionsView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -8,19 +22,6 @@ import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.forms.SessionUpsertForm;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.createSessionView;
-import org.iatoki.judgels.jerahmeel.views.html.session.listSessionsView;
-import org.iatoki.judgels.jerahmeel.views.html.session.editSessionGeneralView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -39,6 +40,7 @@ import javax.inject.Singleton;
 public final class SessionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String SESSION = "session";
 
     private final SessionService sessionService;
     private final UserItemService userItemService;
@@ -105,7 +107,9 @@ public final class SessionController extends AbstractJudgelsController {
         }
 
         SessionUpsertForm sessionUpsertData = sessionUpsertForm.get();
-        sessionService.createSession(sessionUpsertData.name, sessionUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        Session session = sessionService.createSession(sessionUpsertData.name, sessionUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.CREATE.construct(SESSION, session.getJid(), session.getName()));
 
         return redirect(routes.SessionController.viewSessions());
     }
@@ -139,6 +143,11 @@ public final class SessionController extends AbstractJudgelsController {
 
         SessionUpsertForm sessionUpsertData = sessionUpsertForm.get();
         sessionService.updateSession(session.getJid(), sessionUpsertData.name, sessionUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        if (!session.getName().equals(sessionUpsertData.name)) {
+            JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.RENAME.construct(SESSION, session.getJid(), session.getName(), sessionUpsertData.name));
+        }
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.CREATE.construct(SESSION, session.getJid(), sessionUpsertData.name));
 
         return redirect(routes.SessionController.viewSessions());
     }

@@ -1,8 +1,8 @@
 package org.iatoki.judgels.jerahmeel.services;
 
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.play.Page;
 
 import java.util.List;
 
@@ -18,7 +18,7 @@ public interface CourseService {
 
     Course findCourseByJid(String courseJid);
 
-    void createCourse(String name, String description, String userJid, String userIpAddress);
+    Course createCourse(String name, String description, String userJid, String userIpAddress);
 
     void updateCourse(String courseJid, String name, String description, String userJid, String userIpAddress);
 }

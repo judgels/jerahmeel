@@ -2,35 +2,35 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
-import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.CourseProgress;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CurriculumCourseDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
+import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel;
 import org.iatoki.judgels.jerahmeel.models.entities.CurriculumCourseModel_;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionDependencyModel;
+import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
+import org.iatoki.judgels.play.IdentityUtils;
+import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.sandalphon.ProblemType;
 
 import javax.inject.Inject;
@@ -174,7 +174,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     }
 
     @Override
-    public void addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable, String userJid, String userIpAddress) {
+    public CurriculumCourse addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable, String userJid, String userIpAddress) {
         CurriculumCourseModel curriculumCourseModel = new CurriculumCourseModel();
         curriculumCourseModel.curriculumJid = curriculumJid;
         curriculumCourseModel.courseJid = courseJid;
@@ -182,6 +182,8 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
         curriculumCourseModel.completeable = completeable;
 
         curriculumCourseDao.persist(curriculumCourseModel, userJid, userIpAddress);
+
+        return CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel);
     }
 
     @Override

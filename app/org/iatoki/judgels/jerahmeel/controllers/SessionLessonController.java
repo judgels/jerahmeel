@@ -5,31 +5,32 @@ import org.iatoki.judgels.api.JudgelsAPIClientException;
 import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonLesson;
 import org.iatoki.judgels.api.sandalphon.SandalphonLessonStatementRenderRequestParam;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
+import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.SessionLesson;
+import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
+import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.SessionLessonAddForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionLessonEditForm;
+import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.views.html.session.lesson.addLessonView;
+import org.iatoki.judgels.jerahmeel.views.html.session.lesson.editSessionLessonView;
+import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
+import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.jerahmeel.forms.SessionLessonEditForm;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionLesson;
-import org.iatoki.judgels.jerahmeel.forms.SessionLessonAddForm;
-import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
-import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.lesson.addLessonView;
-import org.iatoki.judgels.jerahmeel.views.html.session.lesson.editSessionLessonView;
-import org.iatoki.judgels.jerahmeel.views.html.session.lesson.listSessionLessonsView;
-import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
-import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -52,6 +53,8 @@ import java.util.stream.Collectors;
 public final class SessionLessonController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String LESSON = "lesson";
+    private static final String SESSION = "session";
 
     private final SandalphonClientAPI sandalphonClientAPI;
     private final SessionLessonService sessionLessonService;
@@ -176,6 +179,8 @@ public final class SessionLessonController extends AbstractJudgelsController {
         sessionLessonService.addSessionLesson(session.getJid(), sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret, sessionLessonCreateData.alias, SessionLessonStatus.valueOf(sessionLessonCreateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         JidCacheServiceImpl.getInstance().putDisplayName(sessionLessonCreateData.lessonJid, sandalphonLesson.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(SESSION, session.getJid(), session.getName(), LESSON, sandalphonLesson.getJid(), sandalphonLesson.getSlug()));
+
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }
 
@@ -189,6 +194,8 @@ public final class SessionLessonController extends AbstractJudgelsController {
         }
 
         sessionLessonService.removeSessionLesson(sessionLessonId);
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(SESSION, session.getJid(), session.getName(), LESSON, sessionLesson.getLessonJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionLesson.getLessonJid()))));
 
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }
@@ -235,6 +242,8 @@ public final class SessionLessonController extends AbstractJudgelsController {
         }
 
         sessionLessonService.updateSessionLesson(sessionLesson.getId(), sessionLessonEditData.alias, SessionLessonStatus.valueOf(sessionLessonEditData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(SESSION, session.getJid(), session.getName(), LESSON, sessionLesson.getLessonJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionLesson.getLessonJid()))));
 
         return redirect(routes.SessionLessonController.viewSessionLessons(session.getId()));
     }

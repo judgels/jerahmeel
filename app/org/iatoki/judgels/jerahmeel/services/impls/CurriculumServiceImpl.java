@@ -46,12 +46,14 @@ public final class CurriculumServiceImpl implements CurriculumService {
     }
 
     @Override
-    public void createCurriculum(String name, String description, String userJid, String userIpAddress) {
+    public Curriculum createCurriculum(String name, String description, String userJid, String userIpAddress) {
         CurriculumModel curriculumModel = new CurriculumModel();
         curriculumModel.name = name;
         curriculumModel.description = description;
 
         curriculumDao.persist(curriculumModel, userJid, userIpAddress);
+
+        return CurriculumServiceUtils.createCurriculumFromModel(curriculumModel);
     }
 
     @Override

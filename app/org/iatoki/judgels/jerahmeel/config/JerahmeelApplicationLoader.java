@@ -2,8 +2,8 @@ package org.iatoki.judgels.jerahmeel.config;
 
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
-import org.iatoki.judgels.play.JudgelsPlayProperties;
 import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
+import org.iatoki.judgels.play.JudgelsPlayProperties;
 import play.inject.guice.GuiceApplicationBuilder;
 import play.inject.guice.GuiceApplicationLoader;
 

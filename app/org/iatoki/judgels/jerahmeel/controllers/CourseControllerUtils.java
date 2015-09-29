@@ -1,17 +1,17 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.Curriculum;
+import org.iatoki.judgels.jerahmeel.CurriculumCourse;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
-import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.tabLayout;
-import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.Course;
-import org.iatoki.judgels.jerahmeel.CurriculumCourse;
-import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import play.i18n.Messages;
 
 final class CourseControllerUtils {

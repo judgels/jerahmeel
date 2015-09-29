@@ -1,8 +1,8 @@
 package org.iatoki.judgels.jerahmeel.services;
 
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.SessionDependency;
 import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
+import org.iatoki.judgels.play.Page;
 
 public interface SessionDependencyService {
 
@@ -14,7 +14,7 @@ public interface SessionDependencyService {
 
     Page<SessionDependency> getPageOfSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    void addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress);
+    SessionDependency addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress);
 
     void removeSessionDependency(long sessionDependencyId);
 }

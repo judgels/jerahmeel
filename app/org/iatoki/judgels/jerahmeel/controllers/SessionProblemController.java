@@ -6,32 +6,33 @@ import org.iatoki.judgels.api.sandalphon.SandalphonBundleProblemStatementRenderR
 import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonProblem;
 import org.iatoki.judgels.api.sandalphon.SandalphonProgrammingProblemStatementRenderRequestParam;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
+import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblem;
+import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
+import org.iatoki.judgels.jerahmeel.SessionProblemType;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.SessionProblemAddForm;
+import org.iatoki.judgels.jerahmeel.forms.SessionProblemEditForm;
+import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.addProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.editSessionProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
+import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.jerahmeel.forms.SessionProblemEditForm;
-import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.forms.SessionProblemAddForm;
-import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
-import org.iatoki.judgels.jerahmeel.SessionProblemType;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.addProblemView;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.editSessionProblemView;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.listSessionProblemsView;
-import org.iatoki.judgels.jerahmeel.views.html.session.problem.viewProblemView;
-import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -54,6 +55,8 @@ import java.util.stream.Collectors;
 public final class SessionProblemController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String PROBLEM = "problem";
+    private static final String SESSION = "session";
 
     private final SandalphonClientAPI sandalphonClientAPI;
     private final SessionProblemService sessionProblemService;
@@ -198,6 +201,8 @@ public final class SessionProblemController extends AbstractJudgelsController {
         sessionProblemService.addSessionProblem(session.getJid(), sessionProblemCreateData.problemJid, sessionProblemCreateData.problemSecret, sessionProblemCreateData.alias, SessionProblemType.valueOf(sessionProblemCreateData.type), SessionProblemStatus.valueOf(sessionProblemCreateData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         JidCacheServiceImpl.getInstance().putDisplayName(sessionProblemCreateData.problemJid, sandalphonProblem.getDisplayName(), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(SESSION, session.getJid(), session.getName(), PROBLEM, sandalphonProblem.getJid(), sandalphonProblem.getSlug()));
+
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }
 
@@ -211,6 +216,8 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         sessionProblemService.removeSessionProblem(sessionProblemId);
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(SESSION, session.getJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()))));
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }
@@ -257,6 +264,8 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         sessionProblemService.updateSessionProblem(sessionProblem.getId(), sessionProblemEditData.alias, SessionProblemStatus.valueOf(sessionProblemEditData.status), IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(SESSION, session.getJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()))));
 
         return redirect(routes.SessionProblemController.viewSessionProblems(session.getId()));
     }

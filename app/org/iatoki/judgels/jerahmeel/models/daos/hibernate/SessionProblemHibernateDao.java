@@ -1,9 +1,9 @@
 package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
-import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel_;
+import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
 import play.db.jpa.JPA;
 
 import javax.inject.Named;

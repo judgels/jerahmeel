@@ -108,8 +108,6 @@ public final class ApplicationController extends AbstractJudgelsController {
                     }
                     JudgelsPlayUtils.setViewPointInSession(jophielUser.getJid());
                     JerahmeelUtils.setUserSession(jophielUser, userService.findUserByJid(jophielUser.getJid()));
-
-                    JerahmeelControllerUtils.getInstance().addActivityLog("View as user " + viewpointData.username + ".");
                 }
             } catch (JudgelsAPIClientException e) {
                 // do nothing

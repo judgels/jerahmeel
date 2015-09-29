@@ -5,11 +5,13 @@ import org.iatoki.judgels.api.jophiel.JophielClientAPI;
 import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.jerahmeel.controllers.JerahmeelControllerUtils;
+import org.iatoki.judgels.jerahmeel.models.daos.ActivityLogDao;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
 import org.iatoki.judgels.jerahmeel.runnables.StatisticUpdater;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
+import org.iatoki.judgels.jerahmeel.services.impls.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
@@ -49,12 +51,13 @@ public final class Global extends AbstractGlobal {
     private void buildServices(Injector injector) {
         JidCacheServiceImpl.buildInstance(injector.instanceOf(JidCacheDao.class));
         AvatarCacheServiceImpl.buildInstance(injector.instanceOf(JophielAuthAPI.class), injector.instanceOf(AvatarCacheDao.class));
-        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
+        ActivityLogServiceImpl.buildInstance(injector.instanceOf(ActivityLogDao.class));
         UserActivityMessageServiceImpl.buildInstance();
     }
 
     private void buildUtils(Injector injector) {
         JophielClientControllerUtils.buildInstance(JerahmeelProperties.getInstance().getJophielBaseUrl());
+        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
     }
 
     private void scheduleThreads(Injector injector) {

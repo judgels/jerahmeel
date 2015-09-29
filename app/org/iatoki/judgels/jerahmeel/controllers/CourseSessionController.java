@@ -1,26 +1,27 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
+import org.iatoki.judgels.jerahmeel.CourseSession;
+import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.CourseSessionAddForm;
+import org.iatoki.judgels.jerahmeel.forms.CourseSessionEditForm;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.views.html.course.session.editCourseSessionView;
+import org.iatoki.judgels.jerahmeel.views.html.course.session.listAddCourseSessionsView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.jerahmeel.Course;
-import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.CourseSession;
-import org.iatoki.judgels.jerahmeel.forms.CourseSessionAddForm;
-import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
-import org.iatoki.judgels.jerahmeel.forms.CourseSessionEditForm;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.course.session.listAddCourseSessionsView;
-import org.iatoki.judgels.jerahmeel.views.html.course.session.editCourseSessionView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -39,6 +40,8 @@ import javax.inject.Singleton;
 public final class CourseSessionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String SESSION = "session";
+    private static final String COURSE = "course";
 
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
@@ -102,7 +105,9 @@ public final class CourseSessionController extends AbstractJudgelsController {
             return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
         }
 
-        courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        CourseSession courseSession = courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
@@ -148,6 +153,8 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
         courseSessionService.updateCourseSession(courseSession.getId(), courseSessionEditData.alias, courseSessionEditData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
+
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
 
@@ -161,6 +168,8 @@ public final class CourseSessionController extends AbstractJudgelsController {
         }
 
         courseSessionService.removeCourseSession(courseSessionId);
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }

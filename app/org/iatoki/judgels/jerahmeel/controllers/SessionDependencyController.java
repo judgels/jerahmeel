@@ -1,23 +1,24 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Session;
+import org.iatoki.judgels.jerahmeel.SessionDependency;
+import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.SessionDependencyAddForm;
+import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.views.html.session.dependency.listAddDependenciesView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.forms.SessionDependencyAddForm;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
-import org.iatoki.judgels.jerahmeel.SessionDependency;
-import org.iatoki.judgels.jerahmeel.SessionDependencyNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.session.dependency.listAddDependenciesView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -36,6 +37,8 @@ import javax.inject.Singleton;
 public final class SessionDependencyController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String DEPENDENCY = "dependency";
+    private static final String SESSION = "session";
 
     private final SessionDependencyService sessionDependencyService;
     private final SessionService sessionService;
@@ -90,7 +93,9 @@ public final class SessionDependencyController extends AbstractJudgelsController
             return showListAddDependencies(session, sessionDependencyCreateForm, pageOfSessionDependencies, orderBy, orderDir, filterString);
         }
 
-        sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyAddData.sessionJid, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        SessionDependency sessionDependency = sessionDependencyService.addSessionDependency(session.getJid(), sessionDependencyAddData.sessionJid, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(SESSION, session.getJid(), session.getName(), DEPENDENCY, sessionDependency.getDependedSessionJid(), sessionDependency.getDependedSessionName()));
 
         return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
     }
@@ -104,7 +109,7 @@ public final class SessionDependencyController extends AbstractJudgelsController
             return forbidden();
         }
 
-        sessionDependencyService.removeSessionDependency(sessionDependencyId);
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(SESSION, session.getJid(), session.getName(), DEPENDENCY, sessionDependency.getDependedSessionJid(), sessionDependency.getDependedSessionName()));
 
         return redirect(routes.SessionDependencyController.viewDependencies(session.getId()));
     }

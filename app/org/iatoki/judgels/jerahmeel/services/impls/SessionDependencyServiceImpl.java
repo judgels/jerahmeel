@@ -73,12 +73,14 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
     }
 
     @Override
-    public void addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress) {
+    public SessionDependency addSessionDependency(String sessionJid, String dependedSessionJid, String userJid, String userIpAddress) {
         SessionDependencyModel sessionDependencyModel = new SessionDependencyModel();
         sessionDependencyModel.sessionJid = sessionJid;
         sessionDependencyModel.dependedSessionJid = dependedSessionJid;
 
         sessionDependencyDao.persist(sessionDependencyModel, userJid, userIpAddress);
+
+        return new SessionDependency(sessionDependencyModel.id, sessionDependencyModel.sessionJid, sessionDependencyModel.dependedSessionJid, null);
     }
 
     @Override

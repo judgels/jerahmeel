@@ -1,8 +1,8 @@
 package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
-import org.iatoki.judgels.jophiel.models.daos.hibernate.AbstractAvatarCacheHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.entities.AvatarCacheModel;
+import org.iatoki.judgels.jophiel.models.daos.hibernate.AbstractAvatarCacheHibernateDao;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

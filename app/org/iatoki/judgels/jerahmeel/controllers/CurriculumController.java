@@ -1,6 +1,18 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Curriculum;
+import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.forms.CurriculumUpsertForm;
+import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.createCurriculumView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.editCurriculumGeneralView;
+import org.iatoki.judgels.jerahmeel.views.html.curriculum.listCurriculumsView;
+import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -8,17 +20,6 @@ import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
-import org.iatoki.judgels.jerahmeel.Curriculum;
-import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
-import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.forms.CurriculumUpsertForm;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
-import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
-import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
-import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.createCurriculumView;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.listCurriculumsView;
-import org.iatoki.judgels.jerahmeel.views.html.curriculum.editCurriculumGeneralView;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -37,6 +38,7 @@ import javax.inject.Singleton;
 public final class CurriculumController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String CURRICULUM = "curriculum";
 
     private final CurriculumService curriculumService;
 
@@ -85,7 +87,9 @@ public final class CurriculumController extends AbstractJudgelsController {
         }
 
         CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
-        curriculumService.createCurriculum(curriculumUpsertData.name, curriculumUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        Curriculum curriculum = curriculumService.createCurriculum(curriculumUpsertData.name, curriculumUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.CREATE.construct(CURRICULUM, curriculum.getJid(), curriculum.getName()));
 
         return redirect(routes.CurriculumController.viewCurriculums());
     }
@@ -115,6 +119,11 @@ public final class CurriculumController extends AbstractJudgelsController {
 
         CurriculumUpsertForm curriculumUpsertData = curriculumUpsertForm.get();
         curriculumService.updateCurriculum(curriculum.getJid(), curriculumUpsertData.name, curriculumUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        if (!curriculum.getName().equals(curriculumUpsertData.name)) {
+            JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.RENAME.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), curriculumUpsertData.name));
+        }
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT.construct(CURRICULUM, curriculum.getJid(), curriculumUpsertData.name));
 
         return redirect(routes.CurriculumController.viewCurriculums());
     }

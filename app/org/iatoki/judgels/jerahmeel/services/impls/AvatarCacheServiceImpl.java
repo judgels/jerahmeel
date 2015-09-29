@@ -1,9 +1,9 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import org.iatoki.judgels.jophiel.services.impls.AbstractBaseAvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.models.entities.AvatarCacheModel;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.models.daos.BaseAvatarCacheDao;
+import org.iatoki.judgels.jophiel.services.impls.AbstractBaseAvatarCacheServiceImpl;
 
 public final class AvatarCacheServiceImpl extends AbstractBaseAvatarCacheServiceImpl<AvatarCacheModel> {
 

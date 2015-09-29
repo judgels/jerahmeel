@@ -71,12 +71,14 @@ public final class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void createCourse(String name, String description, String userJid, String userIpAddress) {
+    public Course createCourse(String name, String description, String userJid, String userIpAddress) {
         CourseModel courseModel = new CourseModel();
         courseModel.name = name;
         courseModel.description = description;
 
         courseDao.persist(courseModel, userJid, userIpAddress);
+
+        return CourseServiceUtils.createCourseFromModel(courseModel);
     }
 
     @Override

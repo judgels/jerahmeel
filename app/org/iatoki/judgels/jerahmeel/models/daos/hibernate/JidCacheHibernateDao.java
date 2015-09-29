@@ -1,8 +1,8 @@
 package org.iatoki.judgels.jerahmeel.models.daos.hibernate;
 
-import org.iatoki.judgels.play.models.daos.impls.AbstractJidCacheHibernateDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
 import org.iatoki.judgels.jerahmeel.models.entities.JidCacheModel;
+import org.iatoki.judgels.play.models.daos.impls.AbstractJidCacheHibernateDao;
 
 import javax.inject.Named;
 import javax.inject.Singleton;

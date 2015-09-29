@@ -1,10 +1,10 @@
 package org.iatoki.judgels.jerahmeel.services;
 
-import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
+import org.iatoki.judgels.play.Page;
 
 public interface SessionLessonService {
 

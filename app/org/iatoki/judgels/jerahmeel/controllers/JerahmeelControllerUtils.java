@@ -11,10 +11,12 @@ import org.iatoki.judgels.jerahmeel.ProblemStatistic;
 import org.iatoki.judgels.jerahmeel.SubmissionEntry;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
+import org.iatoki.judgels.jerahmeel.services.impls.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.widget.pointStatisticView;
 import org.iatoki.judgels.jerahmeel.views.html.widget.problemStatisticView;
 import org.iatoki.judgels.jerahmeel.views.html.widget.recentSubmissionView;
+import org.iatoki.judgels.jophiel.ActivityKey;
 import org.iatoki.judgels.jophiel.UserActivityMessage;
 import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
 import org.iatoki.judgels.jophiel.forms.SearchProfileForm;
@@ -125,6 +127,22 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
 
     public boolean isAdmin() {
         return JerahmeelUtils.hasRole("admin");
+    }
+
+    public void addActivityLog(ActivityKey activityKey) {
+        if (!JerahmeelUtils.isGuest()) {
+            long time = System.currentTimeMillis();
+            ActivityLogServiceImpl.getInstance().addActivityLog(activityKey, JerahmeelUtils.getRealUsername(), time, JerahmeelUtils.getRealUserJid(), IdentityUtils.getIpAddress());
+            String log = JerahmeelUtils.getRealUsername() + " " + activityKey.toString();
+            try {
+                if (JudgelsPlayUtils.hasViewPoint()) {
+                    log += " view as " + IdentityUtils.getUsername();
+                }
+                UserActivityMessageServiceImpl.getInstance().addUserActivityMessage(new UserActivityMessage(System.currentTimeMillis(), JerahmeelUtils.getRealUserJid(), log, IdentityUtils.getIpAddress()));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void addActivityLog(String log) {
