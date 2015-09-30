@@ -96,7 +96,7 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     public Result viewOwnSubmission(long bundleSubmissionId) throws BundleSubmissionNotFoundException {
         BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
 
-        if (!JerahmeelControllerUtils.getInstance().isAdmin() && bundleSubmission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
+        if (!(JerahmeelControllerUtils.getInstance().isAdmin() || bundleSubmission.getAuthorJid().equals(IdentityUtils.getUserJid()))) {
             return notFound();
         }
 
@@ -150,7 +150,7 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     public Result viewSubmission(long bundleSubmissionId) throws BundleSubmissionNotFoundException {
         BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
 
-        if (!JerahmeelControllerUtils.getInstance().isAdmin() && bundleSubmission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
+        if (!(JerahmeelControllerUtils.getInstance().isAdmin() || bundleSubmission.getAuthorJid().equals(IdentityUtils.getUserJid()))) {
             return notFound();
         }
 

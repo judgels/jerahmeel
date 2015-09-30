@@ -95,7 +95,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     public Result viewOwnSubmission(long programmingSubmissionId) throws ProgrammingSubmissionNotFoundException {
         ProgrammingSubmission programmingSubmission = programmingSubmissionService.findProgrammingSubmissionById(programmingSubmissionId);
 
-        if (!JerahmeelControllerUtils.getInstance().isAdmin() && programmingSubmission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
+        if (!(JerahmeelControllerUtils.getInstance().isAdmin() || programmingSubmission.getAuthorJid().equals(IdentityUtils.getUserJid()))) {
             return notFound();
         }
 
@@ -150,7 +150,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     public Result viewSubmission(long programmingSubmissionId) throws ProgrammingSubmissionNotFoundException {
         ProgrammingSubmission programmingSubmission = programmingSubmissionService.findProgrammingSubmissionById(programmingSubmissionId);
 
-        if (!JerahmeelControllerUtils.getInstance().isAdmin() && programmingSubmission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
+        if (!(JerahmeelControllerUtils.getInstance().isAdmin() || programmingSubmission.getAuthorJid().equals(IdentityUtils.getUserJid()))) {
             return notFound();
         }
 
