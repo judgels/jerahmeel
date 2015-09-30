@@ -11,10 +11,10 @@ import javax.inject.Singleton;
 
 @Singleton
 @Named("problemStatisticEntryDao")
-public final class ProblemStatisticEntryHibernateDao extends AbstractJedisHibernateDao<Long, ProblemStatisticEntryModel> implements ProblemStatisticEntryDao {
+public final class ProblemStatisticEntryJedisHibernateDao extends AbstractJedisHibernateDao<Long, ProblemStatisticEntryModel> implements ProblemStatisticEntryDao {
 
     @Inject
-    public ProblemStatisticEntryHibernateDao(JedisPool jedisPool) {
+    public ProblemStatisticEntryJedisHibernateDao(JedisPool jedisPool) {
         super(jedisPool, ProblemStatisticEntryModel.class);
     }
 }

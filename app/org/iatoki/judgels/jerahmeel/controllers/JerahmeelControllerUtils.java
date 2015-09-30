@@ -7,13 +7,16 @@ import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.PointStatistic;
+import org.iatoki.judgels.jerahmeel.ProblemScoreStatistic;
 import org.iatoki.judgels.jerahmeel.ProblemStatistic;
 import org.iatoki.judgels.jerahmeel.SubmissionEntry;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
+import org.iatoki.judgels.jerahmeel.services.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.services.impls.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.widget.pointStatisticView;
+import org.iatoki.judgels.jerahmeel.views.html.widget.problemScoreStatisticLayout;
 import org.iatoki.judgels.jerahmeel.views.html.widget.problemStatisticView;
 import org.iatoki.judgels.jerahmeel.views.html.widget.recentSubmissionView;
 import org.iatoki.judgels.jophiel.ActivityKey;
@@ -61,14 +64,16 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     private final JophielPublicAPI jophielPublicAPI;
     private final BundleSubmissionService bundleSubmissionService;
     private final PointStatisticService pointStatisticService;
+    private final ProblemScoreStatisticService problemScoreStatisticService;
     private final ProblemStatisticService problemStatisticService;
     private final ProgrammingSubmissionService programmingSubmissionService;
 
-    public JerahmeelControllerUtils(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+    public JerahmeelControllerUtils(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
         this.jophielClientAPI = jophielClientAPI;
         this.jophielPublicAPI = jophielPublicAPI;
         this.bundleSubmissionService = bundleSubmissionService;
         this.pointStatisticService = pointStatisticService;
+        this.problemScoreStatisticService = problemScoreStatisticService;
         this.problemStatisticService = problemStatisticService;
         this.programmingSubmissionService = programmingSubmissionService;
     }
@@ -76,6 +81,13 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     @Override
     public void appendSidebarLayout(LazyHtml content) {
         content.appendLayout(c -> contentLayout.render(c));
+
+        if (Http.Context.current().session().containsKey("problemJid")) {
+            String problemJid = Http.Context.current().session().get("problemJid");
+            Http.Context.current().session().remove("problemJid");
+
+            addProblemWidget(content, problemJid);
+        }
 
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
         internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.jumpToCurriculums()));
@@ -155,15 +167,22 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         }
     }
 
-    public static synchronized void buildInstance(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+    public static synchronized void buildInstance(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
         if (INSTANCE != null) {
             throw new UnsupportedOperationException("ControllerUtils instance has already been built");
         }
-        INSTANCE = new JerahmeelControllerUtils(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemStatisticService, programmingSubmissionService);
+        INSTANCE = new JerahmeelControllerUtils(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
     }
 
     private boolean isInTrainingMainPage() {
         return ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())) || ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()) + "/");
+    }
+
+    private void addProblemWidget(LazyHtml content, String problemJid) {
+        if (problemScoreStatisticService.problemScoreStatisticExists(problemJid)) {
+            ProblemScoreStatistic problemScoreStatistic = problemScoreStatisticService.getLatestProblemScoreStatisticWithPagination(problemJid, 0, 5, "id", "asc", "");
+            content.appendLayout(c -> problemScoreStatisticLayout.render(problemScoreStatistic, c));
+        }
     }
 
     private void addWidgets(LazyHtml content) {

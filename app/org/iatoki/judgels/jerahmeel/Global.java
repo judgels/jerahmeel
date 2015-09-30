@@ -10,6 +10,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
 import org.iatoki.judgels.jerahmeel.runnables.StatisticUpdater;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
+import org.iatoki.judgels.jerahmeel.services.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.services.impls.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
@@ -57,7 +58,7 @@ public final class Global extends AbstractGlobal {
 
     private void buildUtils(Injector injector) {
         JophielClientControllerUtils.buildInstance(JerahmeelProperties.getInstance().getJophielBaseUrl());
-        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
+        JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemScoreStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
     }
 
     private void scheduleThreads(Injector injector) {
@@ -66,7 +67,7 @@ public final class Global extends AbstractGlobal {
 
         GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, injector.instanceOf(ProgrammingSubmissionService.class), injector.instanceOf(SealtielClientAPI.class), TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
         UserActivityMessagePusher userActivityMessagePusher = new UserActivityMessagePusher(injector.instanceOf(JophielClientAPI.class), UserActivityMessageServiceImpl.getInstance());
-        StatisticUpdater pointStatisticUpdater = new StatisticUpdater(injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
+        StatisticUpdater pointStatisticUpdater = new StatisticUpdater(injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemScoreStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityMessagePusher, context);

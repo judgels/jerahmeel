@@ -164,6 +164,8 @@ public final class TrainingProblemController extends AbstractJudgelsController {
             throw new IllegalStateException();
         }
 
+        session("problemJid", sessionProblem.getProblemJid());
+
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);

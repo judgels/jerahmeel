@@ -3,8 +3,10 @@ package org.iatoki.judgels.jerahmeel.runnables;
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import org.iatoki.judgels.jerahmeel.PointStatisticEntry;
+import org.iatoki.judgels.jerahmeel.ProblemScoreStatisticEntry;
 import org.iatoki.judgels.jerahmeel.ProblemStatisticEntry;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
+import org.iatoki.judgels.jerahmeel.services.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
@@ -21,12 +23,14 @@ public final class StatisticUpdater implements Runnable {
 
     private final BundleSubmissionService bundleSubmissionService;
     private final PointStatisticService pointStatisticService;
+    private final ProblemScoreStatisticService problemScoreStatisticService;
     private final ProblemStatisticService problemStatisticService;
     private final ProgrammingSubmissionService programmingSubmissionService;
 
-    public StatisticUpdater(BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+    public StatisticUpdater(BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
         this.bundleSubmissionService = bundleSubmissionService;
         this.pointStatisticService = pointStatisticService;
+        this.problemScoreStatisticService = problemScoreStatisticService;
         this.problemStatisticService = problemStatisticService;
         this.programmingSubmissionService = programmingSubmissionService;
     }
@@ -36,7 +40,8 @@ public final class StatisticUpdater implements Runnable {
         JPA.withTransaction(() -> {
                 long timeNow = System.currentTimeMillis();
                 Map<String, Map<String, Double>> userJidToMapProblemJidToPoints = Maps.newHashMap();
-                Map<String, Long> problemJidToSubmissions = Maps.newHashMap();
+                Map<String, Long> problemJidToTotalSubmissions = Maps.newHashMap();
+                Map<String, Map<String, PointAndTime>> problemJidToMapUserJidToPoints = Maps.newHashMap();
 
                 List<BundleSubmission> bundleSubmissions = bundleSubmissionService.getAllBundleSubmissions();
                 for (BundleSubmission bundleSubmission : bundleSubmissions) {
@@ -63,15 +68,34 @@ public final class StatisticUpdater implements Runnable {
 
                     if ((timeNow - bundleSubmission.getTime().getTime()) <= TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS)) {
                         long total;
-                        if (problemJidToSubmissions.containsKey(problemJid)) {
-                            total = problemJidToSubmissions.get(problemJid);
+                        if (problemJidToTotalSubmissions.containsKey(problemJid)) {
+                            total = problemJidToTotalSubmissions.get(problemJid);
                         } else {
                             total = 0;
                         }
 
                         total++;
-                        problemJidToSubmissions.put(problemJid, total);
+                        problemJidToTotalSubmissions.put(problemJid, total);
                     }
+
+
+                    Map<String, PointAndTime> userJidToPoints;
+                    if (problemJidToMapUserJidToPoints.containsKey(problemJid)) {
+                        userJidToPoints = problemJidToMapUserJidToPoints.get(problemJid);
+                    } else {
+                        userJidToPoints = Maps.newHashMap();
+                    }
+
+                    if (userJidToPoints.containsKey(userJid)) {
+                        point = userJidToPoints.get(userJid).point;
+                    } else {
+                        point = -1;
+                    }
+                    if (bundleSubmission.getLatestScore() > point) {
+                        userJidToPoints.put(userJid, new PointAndTime(bundleSubmission.getLatestScore(), bundleSubmission.getTime().getTime()));
+                    }
+
+                    problemJidToMapUserJidToPoints.put(problemJid, userJidToPoints);
                 }
 
                 List<ProgrammingSubmission> programmingSubmissions = programmingSubmissionService.getAllProgrammingSubmissions();
@@ -99,15 +123,33 @@ public final class StatisticUpdater implements Runnable {
 
                     if ((timeNow - programmingSubmission.getTime().getTime()) <= TimeUnit.MILLISECONDS.convert(7, TimeUnit.DAYS)) {
                         long total;
-                        if (problemJidToSubmissions.containsKey(problemJid)) {
-                            total = problemJidToSubmissions.get(problemJid);
+                        if (problemJidToTotalSubmissions.containsKey(problemJid)) {
+                            total = problemJidToTotalSubmissions.get(problemJid);
                         } else {
                             total = 0;
                         }
 
                         total++;
-                        problemJidToSubmissions.put(problemJid, total);
+                        problemJidToTotalSubmissions.put(problemJid, total);
                     }
+
+                    Map<String, PointAndTime> userJidToPoints;
+                    if (problemJidToMapUserJidToPoints.containsKey(problemJid)) {
+                        userJidToPoints = problemJidToMapUserJidToPoints.get(problemJid);
+                    } else {
+                        userJidToPoints = Maps.newHashMap();
+                    }
+
+                    if (userJidToPoints.containsKey(userJid)) {
+                        point = userJidToPoints.get(userJid).point;
+                    } else {
+                        point = -1;
+                    }
+                    if (programmingSubmission.getLatestScore() > point) {
+                        userJidToPoints.put(userJid, new PointAndTime((double) programmingSubmission.getLatestScore(), programmingSubmission.getTime().getTime()));
+                    }
+
+                    problemJidToMapUserJidToPoints.put(problemJid, userJidToPoints);
                 }
 
                 List<PointStatisticEntry> pointStatisticEntries = Lists.newArrayList();
@@ -119,13 +161,34 @@ public final class StatisticUpdater implements Runnable {
                 Collections.sort(pointStatisticEntries);
 
                 List<ProblemStatisticEntry> problemStatisticEntries = Lists.newArrayList();
-                for (String problemJid : problemJidToSubmissions.keySet()) {
-                    problemStatisticEntries.add(new ProblemStatisticEntry(problemJid, problemJidToSubmissions.get(problemJid)));
+                for (String problemJid : problemJidToTotalSubmissions.keySet()) {
+                    problemStatisticEntries.add(new ProblemStatisticEntry(problemJid, problemJidToTotalSubmissions.get(problemJid)));
                 }
                 Collections.sort(problemStatisticEntries);
 
                 pointStatisticService.updatePointStatistic(pointStatisticEntries, timeNow);
                 problemStatisticService.updateProblemStatistic(problemStatisticEntries, timeNow);
+
+                for (String problemJid : problemJidToMapUserJidToPoints.keySet()) {
+                    List<ProblemScoreStatisticEntry> problemScoreStatisticEntries = Lists.newArrayList();
+                    Map<String, PointAndTime> userJidToPoints = problemJidToMapUserJidToPoints.get(problemJid);
+                    for (String userJid : userJidToPoints.keySet()) {
+                        PointAndTime pointAndTime = userJidToPoints.get(userJid);
+                        problemScoreStatisticEntries.add(new ProblemScoreStatisticEntry(userJid, pointAndTime.point, pointAndTime.time));
+                    }
+                    Collections.sort(problemScoreStatisticEntries);
+                    problemScoreStatisticService.updateProblemStatistic(problemScoreStatisticEntries, problemJid, timeNow);
+                }
             });
+    }
+
+    private class PointAndTime {
+        private final double point;
+        private final long time;
+
+        public PointAndTime(double point, long time) {
+            this.point = point;
+            this.time = time;
+        }
     }
 }

@@ -190,3 +190,9 @@ widget.submission.problem=Problem
 widget.submission.score=Pts
 widget.submission.lastSubmitted=Last submitted
 
+widget.problemScore=Problem Leaderboard
+widget.problemScore.rank=Rank
+widget.problemScore.username=Username
+widget.problemScore.score=Score
+widget.problemScore.time=Time
+widget.problemScore.lastUpdated=Last updated

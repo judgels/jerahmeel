@@ -7,8 +7,9 @@ import javax.persistence.metamodel.SingularAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
 
 @Generated(value = "org.hibernate.jpamodelgen.JPAMetaModelEntityProcessor")
-@StaticMetamodel(ProblemStatisticModel.class)
-public abstract class ProblemStatisticModel_ extends AbstractJudgelsModel_ {
+@StaticMetamodel(ProblemScoreStatisticModel.class)
+public abstract class ProblemScoreStatisticModel_ extends AbstractJudgelsModel_ {
 
-	public static volatile SingularAttribute<ProblemStatisticModel, Long> time;
+	public static volatile SingularAttribute<ProblemScoreStatisticModel, String> problemJid;
+	public static volatile SingularAttribute<ProblemScoreStatisticModel, Long> time;
 }
