@@ -37,6 +37,7 @@ import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
 import play.filters.csrf.RequireCSRFCheck;
 import play.i18n.Messages;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -155,24 +156,22 @@ public final class SessionLessonController extends AbstractJudgelsController {
         }
 
         SessionLessonAddForm sessionLessonCreateData = sessionLessonCreateForm.get();
-        SandalphonLesson sandalphonLesson;
-        try {
-            sandalphonLesson = sandalphonClientAPI.findLessonByJid(sessionLessonCreateData.lessonJid);
-        } catch (JudgelsAPIClientException e) {
-            sessionLessonCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
-
-            return showAddLesson(session, sessionLessonCreateForm);
-        }
-
-        if (sandalphonLesson == null) {
-            sessionLessonCreateForm.reject(Messages.get("error.lesson.invalidJid"));
-
-            return showAddLesson(session, sessionLessonCreateForm);
-        }
 
         if (sessionLessonService.aliasExistsInSession(session.getJid(), sessionLessonCreateData.alias)) {
-            sessionLessonCreateForm.reject(Messages.get("error.session.lessonExist"));
+            sessionLessonCreateForm.reject(Messages.get("error.session.lesson.aliasExist"));
 
+            return showAddLesson(session, sessionLessonCreateForm);
+        }
+
+        SandalphonLesson sandalphonLesson;
+        try {
+            sandalphonLesson = sandalphonClientAPI.findClientLesson(sessionLessonCreateData.lessonJid, sessionLessonCreateData.lessonSecret);
+        } catch (JudgelsAPIClientException e) {
+            if (e.getStatusCode() >= Http.Status.INTERNAL_SERVER_ERROR) {
+                sessionLessonCreateForm.reject(Messages.get("error.system.sandalphon.connection"));
+            } else {
+                sessionLessonCreateForm.reject(Messages.get("error.lesson.invalid"));
+            }
             return showAddLesson(session, sessionLessonCreateForm);
         }
 

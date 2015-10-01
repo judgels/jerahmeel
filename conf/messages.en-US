@@ -64,7 +64,7 @@ session.lesson.create=Create
 
 error.session.lessonExist=Lesson Already Existed.
 error.session.lesson.duplicateAlias=Alias already Existed
-error.lesson.invalidJid=Invalid Lesson Jid.
+error.lesson.invalid=Invalid Lesson.
 
 session.problem=Problem
 session.problems=Problems
@@ -80,7 +80,7 @@ session.problem.create=Create
 
 error.session.problemExist=Problem Already Existed.
 error.session.problem.duplicateAlias=Alias already Existed
-error.problem.invalidJid=Invalid Problem Jid.
+error.problem.invalid=Invalid Problem
 
 session.submissions=Submissions
 session.submissions.bundle=Bundle Submissions
