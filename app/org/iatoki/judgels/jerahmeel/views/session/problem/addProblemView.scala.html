@@ -17,7 +17,7 @@
 
     @b3.text(sessionProblemAddForm("alias"), '_label -> Messages.get("session.problem.alias"), 'class -> "form-control")
     @b3.text(sessionProblemAddForm("problemJid"), '_label -> Messages.get("session.problem.jid"), 'class -> "form-control")
-    @b3.text(sessionProblemAddForm("lessonSecret"), '_label -> Messages.get("session.problem.secret"), 'class -> "form-control")
+    @b3.text(sessionProblemAddForm("problemSecret"), '_label -> Messages.get("session.problem.secret"), 'class -> "form-control")
     @b3.select(sessionProblemAddForm("type"), SessionProblemType.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.type"), 'class -> "form-control selectpicker")
     @b3.select(sessionProblemAddForm("status"), SessionProblemStatus.values.map(e => (e.name() -> e.name())).toSeq, '_label -> Messages.get("session.problem.status"), 'class -> "form-control selectpicker")
 
