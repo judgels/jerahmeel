@@ -84,8 +84,8 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public Page<SessionProblemProgress> getPageOfSessionProblemsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid, SessionProblemModel_.status, SessionProblemStatus.VISIBLE.name()), ImmutableMap.of());
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid, SessionProblemModel_.status, SessionProblemStatus.VISIBLE.name()), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<SessionProblemProgress> sessionProblemProgressBuilder = ImmutableList.builder();
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {

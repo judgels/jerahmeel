@@ -17,6 +17,7 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
+import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -114,7 +115,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionLesson.getSessionJid().equals(courseSession.getSessionJid())) {
+        if ((sessionLesson.getStatus() != SessionLessonStatus.VISIBLE) || !curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionLesson.getSessionJid().equals(courseSession.getSessionJid())) {
             return notFound();
         }
 
@@ -157,7 +158,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
         SessionLesson sessionLesson = sessionLessonService.findSessionLessonById(sessionLessonId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionLesson.getSessionJid().equals(courseSession.getSessionJid())) {
+        if ((sessionLesson.getStatus() != SessionLessonStatus.VISIBLE) || !curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionLesson.getSessionJid().equals(courseSession.getSessionJid())) {
             return notFound();
         }
 

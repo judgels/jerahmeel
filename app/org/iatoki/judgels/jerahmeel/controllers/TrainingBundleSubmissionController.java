@@ -18,6 +18,7 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -103,6 +104,10 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
         }
 
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
+
+        if (sessionProblem.getStatus() != SessionProblemStatus.VISIBLE) {
+            return notFound();
+        }
 
         DynamicForm dForm = DynamicForm.form().bindFromRequest();
 

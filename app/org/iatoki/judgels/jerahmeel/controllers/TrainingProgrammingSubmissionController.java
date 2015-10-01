@@ -18,6 +18,7 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -102,6 +103,10 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         }
 
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
+
+        if (sessionProblem.getStatus() != SessionProblemStatus.VISIBLE) {
+            return notFound();
+        }
 
         Http.MultipartFormData body = request().body().asMultipartFormData();
 

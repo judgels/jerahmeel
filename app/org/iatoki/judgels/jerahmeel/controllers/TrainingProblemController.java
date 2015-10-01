@@ -19,6 +19,7 @@ import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
+import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -118,7 +119,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionProblem.getSessionJid().equals(courseSession.getSessionJid())) {
+        if ((sessionProblem.getStatus() != SessionProblemStatus.VISIBLE) || !curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionProblem.getSessionJid().equals(courseSession.getSessionJid())) {
             return notFound();
         }
 
@@ -198,7 +199,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionProblem.getSessionJid().equals(courseSession.getSessionJid())) {
+        if ((sessionProblem.getStatus() != SessionProblemStatus.VISIBLE) || !curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionProblem.getSessionJid().equals(courseSession.getSessionJid())) {
             return notFound();
         }
 
