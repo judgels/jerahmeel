@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.tabLayout;
@@ -13,11 +14,13 @@ final class StatisticControllerUtils {
     }
 
     static void appendTabLayout(LazyHtml content) {
-        content.appendLayout(c -> tabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("statistic.point"), routes.StatisticController.viewPointStatistics()),
-                        new InternalLink(Messages.get("statistic.problem"), routes.StatisticController.viewProblemStatistics())
-                ), c)
-        );
+        ImmutableList.Builder<InternalLink> tabBuilder = ImmutableList.builder();
+        tabBuilder.add(new InternalLink(Messages.get("statistic.point"), routes.StatisticController.viewPointStatistics()));
+        tabBuilder.add(new InternalLink(Messages.get("statistic.problem"), routes.StatisticController.viewProblemStatistics()));
+        if (JerahmeelUtils.hasRole("admin")) {
+            tabBuilder.add(new InternalLink(Messages.get("statistic.submission"), routes.StatisticController.viewSubmissionStatistics()));
+        }
+        content.appendLayout(c -> tabLayout.render(tabBuilder.build(), c));
     }
 
     static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {

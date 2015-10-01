@@ -168,6 +168,23 @@ statistic.problem.totalSubmissions=Submissions
 statistic.problem.lastUpdated=Last updated
 statistic.problem.noStatisticYet=No statistic yet.
 
+statistic.submission=Submission Statistic
+statistic.submissions.bundle=Bundle Submission
+statistic.submissions.programming=Programming Submission
+statistic.submissions.timeUTC=Based on Server Time
+statistic.submissions.time=Relative Time
+statistic.submissions.total=# Submissions
+statistic.submissions.timeUTC.thisHour=This hour
+statistic.submissions.timeUTC.thisDay=Today
+statistic.submissions.timeUTC.thisWeek=This week
+statistic.submissions.timeUTC.thisMonth=This month
+statistic.submissions.timeUTC.thisYear=This year
+statistic.submissions.time.lastHour=Last hour
+statistic.submissions.time.lastDay=Last day
+statistic.submissions.time.lastWeek=Last week
+statistic.submissions.time.lastMonth=Last month
+statistic.submissions.time.lastYear=Last year
+
 widget.point=Hall of Fame
 widget.point.rank=Rank
 widget.point.user=User

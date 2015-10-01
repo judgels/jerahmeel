@@ -163,6 +163,7 @@ GET         /statistics/point                                                   
 GET         /statistics/point/                                                                                                              @org.iatoki.judgels.jerahmeel.controllers.StatisticController.listPointStatistics(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc")
 GET         /statistics/problem                                                                                                             @org.iatoki.judgels.jerahmeel.controllers.StatisticController.viewProblemStatistics()
 GET         /statistics/problem/                                                                                                            @org.iatoki.judgels.jerahmeel.controllers.StatisticController.listProblemStatistics(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc")
+GET         /statistics/submission                                                                                                          @org.iatoki.judgels.jerahmeel.controllers.StatisticController.viewSubmissionStatistics()
 
 
 # Internal API
