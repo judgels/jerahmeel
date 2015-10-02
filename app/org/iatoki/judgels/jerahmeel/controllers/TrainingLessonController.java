@@ -12,14 +12,12 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
-import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
@@ -31,7 +29,7 @@ import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.views.html.session.lesson.viewLessonView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.viewLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.listSessionLessonsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
@@ -78,13 +76,13 @@ public final class TrainingLessonController extends AbstractJudgelsController {
     }
 
     @Authenticated(value = GuestView.class)
-    @Transactional
+    @Transactional(readOnly = true)
     public Result viewLessons(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         return listLessons(curriculumId, curriculumCourseId, courseSessionId, 0, "alias", "asc", "");
     }
 
     @Authenticated(value = GuestView.class)
-    @Transactional
+    @Transactional(readOnly = true)
     public Result listLessons(long curriculumId, long curriculumCourseId, long courseSessionId, long page, String orderBy, String orderDir, String filterString) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -100,15 +98,11 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         List<String> lessonJids = pageOfSessionLessonProgress.getData().stream().map(cp -> cp.getSessionLesson().getLessonJid()).collect(Collectors.toList());
         Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
 
-        if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJid(IdentityUtils.getUserJid(), session.getJid()) && sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), session.getJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        }
-
         return showListLessons(curriculum, curriculumCourse, course, courseSession, session, pageOfSessionLessonProgress, orderBy, orderDir, filterString, lessonTitlesMap);
     }
 
     @Authenticated(value = GuestView.class)
-    @Transactional
+    @Transactional(readOnly = true)
     public Result viewLesson(long curriculumId, long curriculumCourseId, long courseSessionId, long sessionLessonId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionLessonNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
@@ -134,16 +128,12 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         String requestUrl = sandalphonClientAPI.getLessonStatementRenderAPIEndpoint(sessionLesson.getLessonJid());
         String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
-        LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
+        LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody, sessionLesson.getId()));
         SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(sessionLesson.getAlias(), routes.TrainingLessonController.viewLesson(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionLesson.getId()))
         );
-
-        if (!JerahmeelUtils.isGuest() && !userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), sessionLesson.getLessonJid(), UserItemStatus.COMPLETED)) {
-            userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionLesson.getLessonJid(), UserItemStatus.COMPLETED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
-        }
 
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
 

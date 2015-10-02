@@ -24,7 +24,6 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.sandalphon.ProblemType;
 
@@ -90,7 +89,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
         ImmutableList.Builder<SessionProblemProgress> sessionProblemProgressBuilder = ImmutableList.builder();
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             ProblemProgress progress = ProblemProgress.NOT_VIEWED;
-            if (userItemDao.existsByUserJidAndItemJid(IdentityUtils.getUserJid(), sessionProblemModel.problemJid)) {
+            if (userItemDao.existsByUserJidAndItemJid(userJid, sessionProblemModel.problemJid)) {
                 UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, sessionProblemModel.problemJid);
                 if (UserItemStatus.VIEWED.name().equals(userItemModel.status)) {
                     progress = ProblemProgress.VIEWED;

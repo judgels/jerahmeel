@@ -70,3 +70,11 @@
 }
 
 @paginationView(pageOfSessionProblemsProgress, orderBy, orderDir, filterString, listFunc)
+
+<script type="text/javascript">
+    var sessionUpdateViewUrl = "@org.iatoki.judgels.jerahmeel.controllers.api.internal.routes.InternalSessionAPIController.updateSessionViewStatus(courseSession.getId)";
+    var courseSessionId = @courseSession.getId;
+</script>
+@if(!JerahmeelUtils.isGuest()) {
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/sessionUpdateView.js")"></script>
+}

@@ -7,6 +7,7 @@
 @import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.sandalphon.ProgrammingSubmission
+@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
 @(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSubmissions: Page[ProgrammingSubmission], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
@@ -61,3 +62,11 @@
 }
 
 @paginationView(pageOfSubmissions, orderBy, orderDir, "", listFunc)
+
+<script type="text/javascript">
+    var sessionUpdateViewUrl = "@org.iatoki.judgels.jerahmeel.controllers.api.internal.routes.InternalSessionAPIController.updateSessionViewStatus(courseSessionId)";
+    var courseSessionId = @courseSessionId;
+</script>
+@if(!JerahmeelUtils.isGuest()) {
+    <script type="text/javascript" src="@controllers.routes.Assets.versioned("javascripts/sessionUpdateView.js")"></script>
+}

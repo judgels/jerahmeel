@@ -1,6 +1,5 @@
 package org.iatoki.judgels.jerahmeel.controllers.api.internal;
 
-import com.google.gson.Gson;
 import org.iatoki.judgels.AutoComplete;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -29,9 +28,9 @@ public final class InternalCourseAPIController extends AbstractJudgelsAPIControl
     @Transactional
     public Result autocompleteCourse(String term) {
         List<Course> courses = courseService.getCoursesByTerm(term);
-        List<AutoComplete> autocompletedCourseses = courses.stream()
-                .map(c -> new AutoComplete("" + c.getId(), c.getName(), c.getName()))
+        List<AutoComplete> autocompletedCourses = courses.stream()
+                .map(c -> new AutoComplete("" + c.getId(), c.getJid(), c.getName()))
                 .collect(Collectors.toList());
-        return ok(new Gson().toJson(autocompletedCourseses));
+        return okAsJson(autocompletedCourses);
     }
 }

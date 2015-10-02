@@ -171,3 +171,8 @@ GET         /statistics/submission                                              
 GET         /api/courses/autocomplete                                                                                                       @org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalCourseAPIController.autocompleteCourse(term ?= null)
 
 GET         /api/sessions/autocomplete                                                                                                      @org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalSessionAPIController.autocompleteSession(term ?= null)
+POST        /api/sessions/view                                                                                                              @org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalSessionAPIController.updateSessionViewStatus(courseSessionId: Long)
+
+POST        /api/lessons/view                                                                                                               @org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalLessonAPIController.updateLessonViewStatus(sessionLessonId: Long)
+
+POST        /api/problems/view                                                                                                              @org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalProblemAPIController.updateProblemViewStatus(sessionProblemId: Long)
