@@ -51,7 +51,7 @@ public final class UserItemHibernateDao extends AbstractHibernateDao<Long, UserI
 
         query.where(cb.and(cb.equal(root.get(UserItemModel_.userJid), userJid), cb.equal(root.get(UserItemModel_.itemJid), itemJid)));
 
-        return JPA.em().createQuery(query).getSingleResult();
+        return getFirstResultAndDeleteTheRest(query);
     }
 
     @Override
