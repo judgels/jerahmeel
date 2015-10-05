@@ -26,7 +26,7 @@ import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.addPro
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.editProblemSetProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.listProblemSetProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.listVisibleProblemSetProblemsView;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.viewProblemView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.viewProblemSetProblemView;
 import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
@@ -138,7 +138,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
 
         session("problemJid", problemSetProblem.getProblemJid());
 
-        LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody, problemSetProblem.getId()));
+        LazyHtml content = new LazyHtml(viewProblemSetProblemView.render(requestUrl, requestBody));
         content.appendLayout(c -> tabLayout.render(ImmutableList.of(new InternalLink(Messages.get("archives.problemSet.problems"), routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()))), c));
         content.appendLayout(c -> headingWithBackLayout.render(
                     SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage()),
