@@ -143,11 +143,11 @@ public final class ArchiveController extends AbstractJudgelsController {
         if (archiveId == 0) {
             currentArchive = null;
             parentArchive = null;
-            childArchivesWithScore = archiveService.getChildArchivesWithScore("");
+            childArchivesWithScore = archiveService.getChildArchivesWithScore("", IdentityUtils.getUserJid());
         } else {
             currentArchive = archiveService.findArchiveById(archiveId);
             parentArchive = currentArchive.getParentArchive();
-            childArchivesWithScore = archiveService.getChildArchivesWithScore(currentArchive.getJid());
+            childArchivesWithScore = archiveService.getChildArchivesWithScore(currentArchive.getJid(), IdentityUtils.getUserJid());
         }
 
         LazyHtml content;
