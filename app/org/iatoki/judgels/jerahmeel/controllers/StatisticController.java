@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.PointStatistic;
 import org.iatoki.judgels.jerahmeel.ProblemStatistic;
 import org.iatoki.judgels.jerahmeel.SubmissionStatistic;
@@ -11,6 +12,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
+import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.statistic.listPointStatisticsView;
 import org.iatoki.judgels.jerahmeel.views.html.statistic.listProblemStatisticsView;
 import org.iatoki.judgels.jerahmeel.views.html.statistic.viewSubmissionStatisticsView;
@@ -31,6 +33,8 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named
@@ -91,7 +95,10 @@ public final class StatisticController extends AbstractJudgelsController {
     public Result listProblemStatistics(long pageIndex, String orderBy, String orderDir) {
         ProblemStatistic problemStatistic = problemStatisticService.getLatestProblemStatisticWithPagination(pageIndex, PAGE_SIZE, orderBy, orderDir, "");
 
-        LazyHtml content = new LazyHtml(listProblemStatisticsView.render(problemStatistic, pageIndex, orderBy, orderDir));
+        List<String> problemJids = problemStatistic.getPageOfProblemStatisticEntries().getData().stream().map(d -> d.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
+
+        LazyHtml content = new LazyHtml(listProblemStatisticsView.render(problemStatistic, problemTitlesMap, pageIndex, orderBy, orderDir));
         StatisticControllerUtils.appendTabLayout(content);
         content.appendLayout(c -> heading3Layout.render(Messages.get("statistic.problem") + " (" + Messages.get("statistic.problem.duration.week") + ")", c));
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
