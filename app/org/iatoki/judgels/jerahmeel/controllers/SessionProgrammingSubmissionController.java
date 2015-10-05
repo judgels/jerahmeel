@@ -94,12 +94,10 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
             submissionJid = submissionService.submit(problemJid, session.getJid(), gradingEngine, gradingLanguage, null, submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
             ProgrammingSubmissionUtils.storeSubmissionFiles(submissionLocalFileSystemProvider, submissionRemoteFileSystemProvider, submissionJid, submissionSource);
 
-            JerahmeelControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + session.getName() + ".");
-
         } catch (ProgrammingSubmissionException e) {
             flash("submissionError", e.getMessage());
 
-            return redirect(routes.SessionProblemController.viewProblem(sessionId, sessionProblem.getId()));
+            return redirect(routes.SessionProblemController.viewSessionProblem(sessionId, sessionProblem.getId()));
         }
 
         JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(SESSION, session.getJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));

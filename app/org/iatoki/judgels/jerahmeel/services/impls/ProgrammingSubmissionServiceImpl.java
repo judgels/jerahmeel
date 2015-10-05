@@ -45,9 +45,14 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
         ProgrammingSubmissionModel programmingSubmissionModel = programmingSubmissionDao.findByJid(gradingModel.submissionJid);
 
         String userJid = programmingSubmissionModel.userCreate;
-        String sessionJid = programmingSubmissionModel.containerJid;
+        String containerJid = programmingSubmissionModel.containerJid;
         String problemJid = programmingSubmissionModel.problemJid;
-        List<ProgrammingSubmission> submissionList = this.getProgrammingSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(sessionJid, problemJid, userJid);
+
+        if (!containerJid.startsWith("JIDSESS")) {
+            return;
+        }
+
+        List<ProgrammingSubmission> submissionList = this.getProgrammingSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
         boolean completed = false;
         int i = 0;
         while ((!completed) && (i < submissionList.size())) {
@@ -68,14 +73,14 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
         userItemDao.flush();
 
         completed = true;
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(containerJid);
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             if (!userItemDao.existsByUserJidItemJidAndStatus(userJid, sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                 completed = false;
                 break;
             }
         }
-        userItemModel = userItemDao.findByUserJidAndItemJid(userJid, sessionJid);
+        userItemModel = userItemDao.findByUserJidAndItemJid(userJid, containerJid);
         if (completed) {
             userItemModel.status = UserItemStatus.COMPLETED.name();
         } else {

@@ -17,7 +17,6 @@ import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
@@ -119,8 +118,6 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
             submissionJid = programmingSubmissionService.submit(problemJid, courseSession.getSessionJid(), gradingEngine, gradingLanguage, null, submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
             ProgrammingSubmissionUtils.storeSubmissionFiles(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submissionJid, submissionSource);
 
-            JerahmeelControllerUtils.getInstance().addActivityLog("Submit to problem " + sessionProblem.getAlias() + " in session " + courseSession.getSessionName() + ".");
-
         } catch (ProgrammingSubmissionException e) {
             flash("submissionError", e.getMessage());
 
@@ -168,7 +165,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
     }
 
     @Transactional(readOnly = true)
-    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long submissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException, ProgrammingSubmissionNotFoundException {
+    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long submissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, ProgrammingSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);

@@ -5,7 +5,7 @@ training.sessions=Chapters
 training.submissions.bundle=Non Programming Submissions
 training.submissions.programming=Programming Submissions
 training.session.isLocked=Chapter is still Locked
-training.session.mustLogin=You must login to submit
+training.session.problem.mustLogin=You must login to submit
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums
@@ -142,9 +142,57 @@ training.problem.inProgress=In Progress
 training.problem.points=Points
 training.problem.completed=Completed
 
+archive.archive=Archive
+archive.archives=Archives
+
+archive.subArchives=SubArchives
+archive.home=Home
+archive.problemSets=Problemsets
+archive.create=Create Archive
+archive.update=Update Archive
+archive.config.general=General
+archive.parent.none=None
+archive.parent=Parent
+archive.name=Name
+archive.description=Description
+archive.enter=Enter Archive
+archive.backTo=Back to
+
+archive.subArchive=SubArchive
+archive.totalPoints=Total Points
+
+archive.problemSet=ProblemSet
+
+archive.problemSet.create=Create ProblemSet
+archive.problemSet.name=Name
+archive.problemSet.description=Description
+archive.problemSet.totalPoints=Total Points
+archive.problemSet.backTo=Back to
+
+archive.problemSet.submissions.bundle=Non Programming Submissions
+archive.problemSet.submissions.programming=Programming Submissions
+archive.problemSet.isLocked=Chapter is still Locked
+archive.problemSet.problem.mustLogin=You must login to submit
+archive.problemSet.problem.backTo=Back to
+archive.problemSet.problem.notTried=Not Tried
+archive.problemSet.problems=Problems
+archive.problemSet.submissions=Submissions
+archive.problemSet.problem.points=Total Point
+
+problemSet.problem=Problem
+problemSet.problems=Problems
+problemSet.problem.alias=Alias
+problemSet.problem.name=Name
+problemSet.problem.type=Type
+problemSet.problem.status=Status
+problemSet.problem.slug=Slug
+problemSet.problem.jid=Problem Jid
+problemSet.problem.secret=Problem Secret
+
+
 submission.own=My Submissions
 submission.all=All Submissions
-submission.sessionName=Session Name
+submission.chapterOrProblemSet=Chapter/Problem Set
 submission.programming=Programming Submissions
 submission.bundle=Non Programming Submissions
 

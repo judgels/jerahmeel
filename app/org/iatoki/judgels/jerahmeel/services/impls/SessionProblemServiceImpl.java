@@ -188,6 +188,6 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public SessionProblem findSessionProblemBySessionJidAndProblemJid(String sessionJid, String problemJid) {
-        return SessionProblemServiceUtils.createFromModel(sessionProblemDao.findBySesssionJidAndProblemJid(sessionJid, problemJid));
+        return SessionProblemServiceUtils.createFromModel(sessionProblemDao.findBySessionJidAndProblemJid(sessionJid, problemJid));
     }
 }

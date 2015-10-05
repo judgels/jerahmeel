@@ -11,5 +11,5 @@ public interface SessionProblemDao extends Dao<Long, SessionProblemModel> {
 
     List<SessionProblemModel> getBySessionJid(String sessionJid);
 
-    SessionProblemModel findBySesssionJidAndProblemJid(String sessionJid, String problemJid);
+    SessionProblemModel findBySessionJidAndProblemJid(String sessionJid, String problemJid);
 }

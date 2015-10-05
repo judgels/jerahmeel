@@ -44,7 +44,7 @@ public final class SessionProblemHibernateDao extends AbstractHibernateDao<Long,
     }
 
     @Override
-    public SessionProblemModel findBySesssionJidAndProblemJid(String sessionJid, String problemJid) {
+    public SessionProblemModel findBySessionJidAndProblemJid(String sessionJid, String problemJid) {
         CriteriaBuilder cb = JPA.em().getCriteriaBuilder();
         CriteriaQuery<SessionProblemModel> query = cb.createQuery(SessionProblemModel.class);
         Root<SessionProblemModel> root = query.from(SessionProblemModel.class);

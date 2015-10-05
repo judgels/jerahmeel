@@ -14,6 +14,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
@@ -53,14 +54,16 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
     private final BundleSubmissionService bundleSubmissionService;
+    private final ProblemSetService problemSetService;
     private final SessionProblemService sessionProblemService;
     private final SessionService sessionService;
 
     @Inject
-    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, ProblemSetService problemSetService, SessionProblemService sessionProblemService, SessionService sessionService) {
         this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
         this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
         this.bundleSubmissionService = bundleSubmissionService;
+        this.problemSetService = problemSetService;
         this.sessionProblemService = sessionProblemService;
         this.sessionService = sessionService;
     }
@@ -75,9 +78,9 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     @Transactional(readOnly = true)
     public Result listOwnSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), null, null);
-        Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
-        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfBundleSubmissions, sessionJidToNameMap, pageIndex, orderBy, orderDir));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, pageIndex, orderBy, orderDir));
         SubmissionControllerUtils.appendOwnSubtabLayout(content);
         SubmissionControllerUtils.appendTabLayout(content);
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
@@ -127,9 +130,9 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, null, null, null);
         List<String> problemJids = pageOfBundleSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, sessionJidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
         SubmissionControllerUtils.appendAllSubtabLayout(content);
         if (!JerahmeelUtils.isGuest()) {
             SubmissionControllerUtils.appendTabLayout(content);

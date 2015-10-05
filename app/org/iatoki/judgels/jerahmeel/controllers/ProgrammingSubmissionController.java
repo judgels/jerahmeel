@@ -14,6 +14,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
@@ -48,6 +49,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
     private static final long PAGE_SIZE = 20;
 
+    private final ProblemSetService problemSetService;
     private final FileSystemProvider programmingSubmissionLocalFileSystemProvider;
     private final FileSystemProvider programmingSubmissionRemoteFileSystemProvider;
     private final ProgrammingSubmissionService programmingSubmissionService;
@@ -55,7 +57,8 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     private final SessionService sessionService;
 
     @Inject
-    public ProgrammingSubmissionController(@ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public ProgrammingSubmissionController(ProblemSetService problemSetService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+        this.problemSetService = problemSetService;
         this.programmingSubmissionLocalFileSystemProvider = programmingSubmissionLocalFileSystemProvider;
         this.programmingSubmissionRemoteFileSystemProvider = programmingSubmissionRemoteFileSystemProvider;
         this.programmingSubmissionService = programmingSubmissionService;
@@ -73,10 +76,10 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     @Transactional(readOnly = true)
     public Result listOwnSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<ProgrammingSubmission> pageOfProgrammingSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), null, null);
-        Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfProgrammingSubmissions, sessionJidToNameMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfProgrammingSubmissions, jidToNameMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir));
         SubmissionControllerUtils.appendOwnSubtabLayout(content);
         SubmissionControllerUtils.appendTabLayout(content);
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
@@ -126,10 +129,10 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
         List<String> problemJids = pageOfProgrammingSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfProgrammingSubmissions, sessionJidToNameMap, problemTitlesMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfProgrammingSubmissions, jidToNameMap, problemTitlesMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
         SubmissionControllerUtils.appendAllSubtabLayout(content);
         if (!JerahmeelUtils.isGuest()) {
             SubmissionControllerUtils.appendTabLayout(content);

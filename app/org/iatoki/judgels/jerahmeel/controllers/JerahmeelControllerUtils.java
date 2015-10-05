@@ -91,6 +91,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
 
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
         internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.jumpToCurriculums()));
+        internalLinkBuilder.add(new InternalLink(Messages.get("archive.archives"), routes.ArchiveController.index()));
         internalLinkBuilder.add(new InternalLink(Messages.get("submission.submissions"), routes.SubmissionController.jumpToSubmissions()));
         internalLinkBuilder.add(new InternalLink(Messages.get("statistic.statistics"), routes.StatisticController.index()));
         if (isAdmin()) {
@@ -151,16 +152,6 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
                     log += " view as " + IdentityUtils.getUsername();
                 }
                 UserActivityMessageServiceImpl.getInstance().addUserActivityMessage(new UserActivityMessage(System.currentTimeMillis(), JerahmeelUtils.getRealUserJid(), log, IdentityUtils.getIpAddress()));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void addActivityLog(String log) {
-        if (!JerahmeelUtils.isGuest()) {
-            try {
-                UserActivityMessageServiceImpl.getInstance().addUserActivityMessage(new UserActivityMessage(System.currentTimeMillis(), IdentityUtils.getUserJid(), log, IdentityUtils.getIpAddress()));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

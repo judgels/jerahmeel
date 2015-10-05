@@ -11,7 +11,7 @@
 
 @formErrorView(sessionLessonEditForm)
 
-@b3.form(routes.SessionLessonController.postEditLesson(sessionId, sessionLesson.getId)) {
+@b3.form(routes.SessionLessonController.postEditSessionLesson(sessionId, sessionLesson.getId)) {
 
     @helper.CSRF.formField
 

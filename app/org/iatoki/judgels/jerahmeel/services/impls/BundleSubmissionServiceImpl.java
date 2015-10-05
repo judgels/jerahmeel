@@ -44,16 +44,19 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         BundleSubmissionModel submissionModel = submissionDao.findByJid(gradingModel.submissionJid);
 
         String userJid = submissionModel.userCreate;
-        String sessionJid = submissionModel.containerJid;
+        String containerJid = submissionModel.containerJid;
         String problemJid = submissionModel.problemJid;
-        List<BundleSubmission> submissionList = this.getBundleSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(sessionJid, problemJid, userJid);
+
+        if (!containerJid.startsWith("JIDSESS")) {
+            return;
+        }
+
+        List<BundleSubmission> submissionList = this.getBundleSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
         boolean completed = false;
-        int i = 0;
-        while ((!completed) && (i < submissionList.size())) {
+        for (int i = 0; (!completed) && (i < submissionList.size()); ++i) {
             if (Double.compare(submissionList.get(i).getLatestScore(), 100) == 0) {
                 completed = true;
             }
-            ++i;
         }
 
         UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, problemJid);
@@ -67,14 +70,14 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         userItemDao.flush();
 
         completed = true;
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(sessionJid);
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(containerJid);
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             if (!userItemDao.existsByUserJidItemJidAndStatus(userJid, sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                 completed = false;
                 break;
             }
         }
-        userItemModel = userItemDao.findByUserJidAndItemJid(userJid, sessionJid);
+        userItemModel = userItemDao.findByUserJidAndItemJid(userJid, containerJid);
         if (completed) {
             userItemModel.status = UserItemStatus.COMPLETED.name();
         } else {

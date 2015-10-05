@@ -123,7 +123,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
 
         String reasonNotAllowedToSubmit = null;
         if (JerahmeelUtils.isGuest()) {
-            reasonNotAllowedToSubmit = Messages.get("training.session.mustLogin");
+            reasonNotAllowedToSubmit = Messages.get("training.session.problem.mustLogin");
         } else if (!sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), session.getJid())) {
             reasonNotAllowedToSubmit = Messages.get("training.session.isLocked");
         }

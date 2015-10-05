@@ -17,7 +17,6 @@ import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
@@ -111,7 +110,7 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
 
         DynamicForm dForm = DynamicForm.form().bindFromRequest();
 
-        BundleAnswer bundleAnswer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, SessionControllerUtils.getCurrentStatementLanguage());
+        BundleAnswer bundleAnswer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), courseSession.getSessionJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, bundleAnswer);
 
@@ -155,7 +154,7 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
     }
 
     @Transactional(readOnly = true)
-    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long bundleSubmissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, SessionProblemNotFoundException, BundleSubmissionNotFoundException {
+    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long bundleSubmissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, BundleSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
@@ -195,7 +194,7 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
         breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingController.jumpToCourses(curriculum.getId())));
         breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingController.jumpToSessions(curriculum.getId(), curriculumCourse.getId())));
-        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingLessonController.viewLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingController.jumpToLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         breadcrumbsBuilder.add(new InternalLink(Messages.get("training.submissions.bundle"), routes.TrainingBundleSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         breadcrumbsBuilder.add(lastLinks);
 
