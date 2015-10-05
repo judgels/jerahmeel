@@ -31,7 +31,7 @@ public final class InternalProblemAPIController extends AbstractJudgelsAPIContro
     @Authenticated(LoggedIn.class)
     @Transactional
     public Result updateProblemViewStatus(long sessionProblemId) throws SessionProblemNotFoundException {
-        JPA.em().getTransaction().commit();
+        JPA.em().getTransaction().begin();
 
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
         if (!userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.COMPLETED)) {
