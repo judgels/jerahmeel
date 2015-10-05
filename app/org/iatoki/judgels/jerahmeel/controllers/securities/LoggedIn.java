@@ -12,4 +12,9 @@ public class LoggedIn extends BaseLoggedIn {
         return org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.auth(context.request().uri());
     }
 
+    @Override
+    public void removeAuthenticationSessions(Http.Context context) {
+        context.session().remove("username");
+        context.session().remove("role");
+    }
 }
