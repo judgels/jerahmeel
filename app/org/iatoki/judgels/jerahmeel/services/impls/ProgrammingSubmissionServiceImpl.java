@@ -62,13 +62,25 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
             ++i;
         }
 
-        UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, problemJid);
-        if (completed) {
-            userItemModel.status = UserItemStatus.COMPLETED.name();
+        if (userItemDao.existsByUserJidAndItemJid(userJid, problemJid)) {
+            UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, problemJid);
+            if (completed) {
+                userItemModel.status = UserItemStatus.COMPLETED.name();
+            } else {
+                userItemModel.status = UserItemStatus.VIEWED.name();
+            }
+            userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
         } else {
-            userItemModel.status = UserItemStatus.VIEWED.name();
+            UserItemModel userItemModel = new UserItemModel();
+            userItemModel.userJid = userJid;
+            userItemModel.itemJid = problemJid;
+            if (completed) {
+                userItemModel.status = UserItemStatus.COMPLETED.name();
+            } else {
+                userItemModel.status = UserItemStatus.VIEWED.name();
+            }
+            userItemDao.persist(userItemModel, userJid, "localhost");
         }
-        userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
 
         userItemDao.flush();
 
@@ -80,12 +92,25 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
                 break;
             }
         }
-        userItemModel = userItemDao.findByUserJidAndItemJid(userJid, containerJid);
-        if (completed) {
-            userItemModel.status = UserItemStatus.COMPLETED.name();
+
+        if (userItemDao.existsByUserJidAndItemJid(userJid, containerJid)) {
+            UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, containerJid);
+            if (completed) {
+                userItemModel.status = UserItemStatus.COMPLETED.name();
+            } else {
+                userItemModel.status = UserItemStatus.VIEWED.name();
+            }
+            userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
         } else {
-            userItemModel.status = UserItemStatus.VIEWED.name();
+            UserItemModel userItemModel = new UserItemModel();
+            userItemModel.userJid = userJid;
+            userItemModel.itemJid = containerJid;
+            if (completed) {
+                userItemModel.status = UserItemStatus.COMPLETED.name();
+            } else {
+                userItemModel.status = UserItemStatus.VIEWED.name();
+            }
+            userItemDao.persist(userItemModel, userJid, "localhost");
         }
-        userItemDao.edit(userItemModel, userJid, userItemModel.ipUpdate);
     }
 }
