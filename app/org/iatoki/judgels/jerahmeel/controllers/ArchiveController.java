@@ -195,7 +195,7 @@ public final class ArchiveController extends AbstractJudgelsController {
 
                 content.appendLayout(c -> headingWithActionsAndBackLayout.render(Messages.get("archive.archive") + " " + currentArchive.getName(), actionsBuilder.build(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, routes.ArchiveController.viewArchives(parentArchiveId)), c));
             } else {
-                content.appendLayout(c -> headingWithActionAndBackLayout.render(Messages.get("archive.archive") + " " + currentArchive.getName(), new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(currentArchive.getId())), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, routes.ArchiveController.viewArchives(parentArchiveId)), c));
+                content.appendLayout(c -> headingWithBackLayout.render(currentArchive.getName(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, routes.ArchiveController.viewArchives(parentArchiveId)), c));
             }
         } else {
             if (JerahmeelUtils.hasRole("admin")) {
