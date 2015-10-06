@@ -173,8 +173,7 @@ public final class ArchiveServiceImpl implements ArchiveService {
             ArchiveModel currentArchiveModel = archiveModelStack.pop();
 
             if (currentArchiveModel.jid.equals(intendedArchiveModel.jid) && (intendedArchive == null)) {
-                Archive currentArchive = ArchiveServiceUtils.createArchiveFromModel(currentArchiveModel, parentArchive);
-                intendedArchive = currentArchive;
+                intendedArchive = ArchiveServiceUtils.createArchiveFromModel(currentArchiveModel, parentArchive);
             } else {
                 Archive currentArchive = ArchiveServiceUtils.createArchiveFromModel(currentArchiveModel, parentArchive);
 
@@ -194,9 +193,7 @@ public final class ArchiveServiceImpl implements ArchiveService {
             List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, currentArchive.getJid()), 0, -1);
             for (ArchiveModel archiveModel : archiveModels) {
                 Archive archive = ArchiveServiceUtils.createArchiveFromModel(archiveModel, currentArchive);
-                if (currentArchive != null) {
-                    currentArchive.getSubArchives().add(archive);
-                }
+                currentArchive.getSubArchives().add(archive);
                 archiveStack.push(archive);
             }
         }
