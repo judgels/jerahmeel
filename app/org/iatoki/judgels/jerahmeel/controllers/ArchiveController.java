@@ -18,8 +18,6 @@ import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.views.html.archive.createArchiveView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsWithScoreView;
-import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesView;
-import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesWithScoreView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.updateArchiveGeneralView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
@@ -27,9 +25,9 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
-import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionsAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
+import play.api.mvc.Call;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -140,75 +138,47 @@ public final class ArchiveController extends AbstractJudgelsController {
     }
 
     private Result showListArchivesProblemSets(long archiveId, long pageIndex, String orderBy, String orderDir, String filterString) throws ArchiveNotFoundException {
-        Archive currentArchive;
-        Archive parentArchive;
-
-
-        String currentArchiveJid;
-        if (archiveId == 0) {
-            currentArchive = null;
-            parentArchive = null;
-            currentArchiveJid = "";
-        } else {
-            currentArchive = archiveService.findArchiveById(archiveId);
-            parentArchive = currentArchive.getParentArchive();
-            currentArchiveJid = currentArchive.getJid();
-        }
+        Archive archive = archiveService.findArchiveById(archiveId);
+        Archive parentArchive = archive.getParentArchive();
 
         LazyHtml content;
         if (!JerahmeelUtils.isGuest()) {
-            List<ArchiveWithScore> childArchivesWithScore =  archiveService.getChildArchivesWithScore(currentArchiveJid, IdentityUtils.getUserJid());
-            if (currentArchive != null) {
-                Page<ProblemSetWithScore> pageOfProblemSetsWithScore = problemSetService.getPageOfProblemSetsWithScore(currentArchive, IdentityUtils.getUserJid(), pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<ArchiveWithScore> childArchivesWithScore =  archiveService.getChildArchivesWithScore(archive.getJid(), IdentityUtils.getUserJid());
+            Page<ProblemSetWithScore> pageOfProblemSetsWithScore = problemSetService.getPageOfProblemSetsWithScore(archive, IdentityUtils.getUserJid(), pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
 
-                content = new LazyHtml(listArchivesAndProblemSetsWithScoreView.render(currentArchive, childArchivesWithScore, pageOfProblemSetsWithScore, orderBy, orderDir, filterString));
-            } else {
-                content = new LazyHtml(listArchivesWithScoreView.render(currentArchive, childArchivesWithScore));
-            }
+            content = new LazyHtml(listArchivesAndProblemSetsWithScoreView.render(archive, childArchivesWithScore, pageOfProblemSetsWithScore, orderBy, orderDir, filterString));
         } else {
-            List<Archive> childArchives = archiveService.getChildArchives(currentArchiveJid);
-            if (currentArchive != null) {
-                Page<ProblemSet> pageOfProblemSets = problemSetService.getPageOfProblemSets(currentArchive, pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<Archive> childArchives = archiveService.getChildArchives(archive.getJid());
+            Page<ProblemSet> pageOfProblemSets = problemSetService.getPageOfProblemSets(archive, pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
 
-                content = new LazyHtml(listArchivesAndProblemSetsView.render(currentArchive, childArchives, pageOfProblemSets, orderBy, orderDir, filterString));
-            } else {
-                content = new LazyHtml(listArchivesView.render(currentArchive, childArchives));
-            }
+            content = new LazyHtml(listArchivesAndProblemSetsView.render(archive, childArchives, pageOfProblemSets, orderBy, orderDir, filterString));
         }
 
-        if (currentArchive != null) {
-            final String parentArchiveName;
-            final long parentArchiveId;
-            if (parentArchive == null) {
-                parentArchiveName = Messages.get("archive.archives");
-                parentArchiveId = 0;
-            } else {
-                parentArchiveName = parentArchive.getName();
-                parentArchiveId = parentArchive.getId();
-            }
-
-            if (JerahmeelUtils.hasRole("admin")) {
-                ImmutableList.Builder<InternalLink> actionsBuilder = ImmutableList.builder();
-                actionsBuilder.add(new InternalLink(Messages.get("commons.update"), routes.ArchiveController.updateArchiveGeneralConfig(archiveId)));
-                actionsBuilder.add(new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive()));
-                actionsBuilder.add(new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(currentArchive.getId())));
-
-                content.appendLayout(c -> headingWithActionsAndBackLayout.render(Messages.get("archive.archive") + " " + currentArchive.getName(), actionsBuilder.build(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, routes.ArchiveController.viewArchives(parentArchiveId)), c));
-            } else {
-                content.appendLayout(c -> headingWithBackLayout.render(currentArchive.getName(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, routes.ArchiveController.viewArchives(parentArchiveId)), c));
-            }
+        final String parentArchiveName;
+        final Call backCall;
+        if (parentArchive == null) {
+            parentArchiveName = Messages.get("training.home");
+            backCall = routes.TrainingController.index();
         } else {
-            if (JerahmeelUtils.hasRole("admin")) {
-                content.appendLayout(c -> headingWithActionAndBackLayout.render(Messages.get("archive.archives"), new InternalLink(Messages.get("commons.create"), routes.ArchiveController.createArchive()), new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()), c));
-            } else {
-                content.appendLayout(c -> headingWithBackLayout.render(Messages.get("archive.archives"), new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()), c));
-            }
+            parentArchiveName = parentArchive.getName();
+            backCall = routes.ArchiveController.viewArchives(parentArchive.getId());
+        }
+
+        if (JerahmeelUtils.hasRole("admin")) {
+            ImmutableList.Builder<InternalLink> actionsBuilder = ImmutableList.builder();
+            actionsBuilder.add(new InternalLink(Messages.get("commons.update"), routes.ArchiveController.updateArchiveGeneralConfig(archiveId)));
+            actionsBuilder.add(new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive()));
+            actionsBuilder.add(new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(archive.getId())));
+
+            content.appendLayout(c -> headingWithActionsAndBackLayout.render(Messages.get("archive.archive") + " " + archive.getName(), actionsBuilder.build(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, backCall), c));
+        } else {
+            content.appendLayout(c -> headingWithBackLayout.render(archive.getName(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, backCall), c));
         }
 
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
 
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
-        ArchiveControllerUtils.fillBreadcrumbsBuilder(breadcrumbsBuilder, currentArchive);
+        ArchiveControllerUtils.fillBreadcrumbsBuilder(breadcrumbsBuilder, archive);
         ArchiveControllerUtils.appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archives");
 
