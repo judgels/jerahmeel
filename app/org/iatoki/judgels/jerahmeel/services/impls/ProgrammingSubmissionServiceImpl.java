@@ -18,6 +18,7 @@ import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractProgrammingSubmissionServiceImpl;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
@@ -32,6 +33,7 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
+    @Inject
     public ProgrammingSubmissionServiceImpl(ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         super(programmingSubmissionDao, programmingGradingDao, sealtielClientAPI, gabrielClientJid);
         this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
