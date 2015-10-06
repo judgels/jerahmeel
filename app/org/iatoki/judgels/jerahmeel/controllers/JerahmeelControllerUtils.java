@@ -189,6 +189,8 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         } else {
             problemStatistic = null;
         }
+        List<String> problemStatisticProblemJids = problemStatistic.getPageOfProblemStatisticEntries().getData().stream().map(e -> e.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemStatisticsTitleMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemStatisticProblemJids), "en-US");
 
         List<SubmissionEntry> submissionEntries = Lists.newArrayList();
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(0, 5, "timeCreate", "desc", null, null, null);
@@ -205,7 +207,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
 
         Collections.sort(submissionEntries);
 
-        content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
+        content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic, problemStatisticsTitleMap), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
     }
 
     static JerahmeelControllerUtils getInstance() {

@@ -78,9 +78,11 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     @Transactional(readOnly = true)
     public Result listOwnSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), null, null);
+        List<String> problemJids = pageOfBundleSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
         Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
-        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, pageIndex, orderBy, orderDir));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir));
         SubmissionControllerUtils.appendOwnSubtabLayout(content);
         SubmissionControllerUtils.appendTabLayout(content);
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));

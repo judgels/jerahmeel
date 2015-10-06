@@ -76,10 +76,13 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     @Transactional(readOnly = true)
     public Result listOwnSubmissions(long pageIndex, String orderBy, String orderDir) {
         Page<ProgrammingSubmission> pageOfProgrammingSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), null, null);
+
+        List<String> problemJids = pageOfProgrammingSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
+        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
         Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfProgrammingSubmissions, jidToNameMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfProgrammingSubmissions, jidToNameMap, problemTitlesMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir));
         SubmissionControllerUtils.appendOwnSubtabLayout(content);
         SubmissionControllerUtils.appendTabLayout(content);
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
