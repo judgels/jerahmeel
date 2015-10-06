@@ -128,10 +128,10 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
                 currentSessionProblemModels = ImmutableList.of();
             }
 
-            long totalProblems = sessionProblemModels.size();
+            long totalProblems = currentSessionProblemModels.size();
             long solvedProblems = 0;
             double totalScore = SessionProblemServiceUtils.getUserTotalScoreFromSessionProblemModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, currentSessionProblemModels);
-            for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
+            for (SessionProblemModel sessionProblemModel : currentSessionProblemModels) {
                 if (userItemDao.existsByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                     solvedProblems++;
                 }
