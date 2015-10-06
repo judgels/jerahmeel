@@ -13,8 +13,6 @@ import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.models.daos.BaseBundleGradingDao;
-import org.iatoki.judgels.sandalphon.models.daos.BaseBundleSubmissionDao;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractBundleSubmissionServiceImpl;
@@ -35,8 +33,8 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
     private final UserItemDao userItemDao;
 
     @Inject
-    public BundleSubmissionServiceImpl(BaseBundleSubmissionDao<BundleSubmissionModel> bundleSubmissionDao, BaseBundleGradingDao<BundleGradingModel> bundleGradingDao, BundleProblemGrader bundleProblemGrader, BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
-        super(bundleSubmissionDao, bundleGradingDao, bundleProblemGrader);
+    public BundleSubmissionServiceImpl(BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, BundleProblemGrader bundleProblemGrader, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+        super(submissionDao, gradingDao, bundleProblemGrader);
         this.submissionDao = submissionDao;
         this.gradingDao = gradingDao;
         this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
