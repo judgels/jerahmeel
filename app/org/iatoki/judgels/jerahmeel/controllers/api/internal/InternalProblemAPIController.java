@@ -9,7 +9,6 @@ import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
-import play.db.jpa.JPA;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 
@@ -31,14 +30,10 @@ public final class InternalProblemAPIController extends AbstractJudgelsAPIContro
     @Authenticated(LoggedIn.class)
     @Transactional
     public Result updateProblemViewStatus(long sessionProblemId) throws SessionProblemNotFoundException {
-        JPA.em().getTransaction().commit();
-
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemById(sessionProblemId);
         if (!userItemService.userItemExistsByUserJidAndItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.COMPLETED)) {
             userItemService.upsertUserItem(IdentityUtils.getUserJid(), sessionProblem.getProblemJid(), UserItemStatus.VIEWED, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         }
-
-        JPA.em().getTransaction().commit();
 
         return ok();
     }
