@@ -138,6 +138,10 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
         for (CurriculumCourseModel curriculumCourseModel : curriculumCourseModels) {
             List<CourseSessionModel> currentCourseSessionModels = mapCourseJidToCourseSessionModels.get(curriculumCourseModel.courseJid);
 
+            if (currentCourseSessionModels == null) {
+                currentCourseSessionModels = ImmutableList.of();
+            }
+
             CourseProgressWithCompleted courseProgressWithCompleted = getUserProgressFromCourseSessionModels(userJid, currentCourseSessionModels);
             double totalScore = CourseSessionServiceUtils.getUserTotalScoreFromCourseSessionModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, currentCourseSessionModels, mapSessionJidToSessionProblemModels);
 
