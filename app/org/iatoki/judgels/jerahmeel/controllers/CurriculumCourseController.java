@@ -105,7 +105,7 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
             return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
         }
 
-        CurriculumCourse curriculumCourse = curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, curriculumCourseCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        CurriculumCourse curriculumCourse = curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
 
@@ -124,7 +124,6 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
         CurriculumCourseEditForm curriculumCourseEditData = new CurriculumCourseEditForm();
         curriculumCourseEditData.alias = curriculumCourse.getAlias();
-        curriculumCourseEditData.completeable = curriculumCourse.isCompleteable();
 
         Form<CurriculumCourseEditForm> curriculumCourseEditForm = Form.form(CurriculumCourseEditForm.class).fill(curriculumCourseEditData);
 
@@ -153,7 +152,7 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
             return showEditCourse(curriculum, curriculumCourse, curriculumCourseEditForm);
         }
 
-        curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseEditData.alias, curriculumCourseEditData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseEditData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
 

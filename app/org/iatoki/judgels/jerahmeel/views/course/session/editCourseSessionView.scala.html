@@ -15,7 +15,5 @@
 
     @b3.text(courseSessionEditForm("alias"), '_label -> Messages.get("session.alias"), 'class -> "form-control")
 
-    @b3.checkbox(courseSessionEditForm("completeable"), '_label -> Messages.get("session.completeable"))
-
     @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
 }

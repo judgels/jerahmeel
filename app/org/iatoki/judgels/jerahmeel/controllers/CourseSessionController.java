@@ -105,7 +105,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
             return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
         }
 
-        CourseSession courseSession = courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, courseSessionCreateData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        CourseSession courseSession = courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
 
@@ -124,7 +124,6 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
         CourseSessionEditForm courseSessionEditData = new CourseSessionEditForm();
         courseSessionEditData.alias = courseSession.getAlias();
-        courseSessionEditData.completeable = courseSession.isCompleteable();
         Form<CourseSessionEditForm> courseSessionEditForm = Form.form(CourseSessionEditForm.class).fill(courseSessionEditData);
 
         return showEditSession(course, courseSession, courseSessionEditForm);
@@ -151,7 +150,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
             return showEditSession(course, courseSession, courseSessionEditForm);
         }
 
-        courseSessionService.updateCourseSession(courseSession.getId(), courseSessionEditData.alias, courseSessionEditData.completeable, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        courseSessionService.updateCourseSession(courseSession.getId(), courseSessionEditData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
 

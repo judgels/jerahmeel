@@ -17,9 +17,9 @@ public interface CurriculumCourseService {
 
     Page<CurriculumCourseProgress> getPageOfCurriculumCoursesProgress(String userJid, String curriculumJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    CurriculumCourse addCurriculumCourse(String curriculumJid, String courseJid, String alias, boolean completeable, String userJid, String userIpAddress);
+    CurriculumCourse addCurriculumCourse(String curriculumJid, String courseJid, String alias, String userJid, String userIpAddress);
 
-    void updateCurriculumCourse(long curriculumCourseId, String alias, boolean completeable, String userJid, String userIpAddress);
+    void updateCurriculumCourse(long curriculumCourseId, String alias, String userJid, String userIpAddress);
 
     void removeCurriculumCourse(long curriculumCourseId);
 }

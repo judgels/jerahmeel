@@ -7,6 +7,5 @@ public final class ProblemSetCreateForm {
     @Constraints.Required
     public String name;
 
-    @Constraints.Required
     public String description;
 }

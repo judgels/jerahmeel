@@ -6,5 +6,4 @@ public final class SessionDependencyAddForm {
 
     @Constraints.Required
     public String sessionJid;
-
 }

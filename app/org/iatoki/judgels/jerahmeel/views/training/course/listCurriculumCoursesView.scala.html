@@ -16,10 +16,7 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingController.jumpToSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">
-                @if(curriculumCourseProgress.getCurriculumCourse.isCompleteable) {
-                    @{curriculumCourseProgress.getCurriculumCourse.getAlias}.
-                }
-                @curriculumCourseProgress.getCurriculumCourse.getCourseName
+                @{curriculumCourseProgress.getCurriculumCourse.getAlias}. @curriculumCourseProgress.getCurriculumCourse.getCourseName
             </a>
             @if(!JerahmeelUtils.isGuest) {
                 <div class="pull-right">
@@ -40,17 +37,10 @@
                                     [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
                                 </span>
                             } else {
-                                @if(curriculumCourseProgress.getCurriculumCourse.isCompleteable) {
-                                    <span class="alert alert-warning">
-                                        @Messages.get("training.course.available")
-                                        [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
-                                    </span>
-                                } else {
-                                    <span class="alert alert-warning">
-                                        @Messages.get("training.course.totalPoints"):
-                                        @curriculumCourseProgress.getTotalScores
-                                    </span>
-                                }
+                                <span class="alert alert-warning">
+                                    @Messages.get("training.course.available")
+                                    [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
+                                </span>
                             }
                         }
                     }

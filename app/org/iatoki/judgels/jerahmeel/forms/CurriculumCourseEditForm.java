@@ -6,8 +6,4 @@ public final class CurriculumCourseEditForm {
 
     @Constraints.Required
     public String alias;
-
-    @Constraints.Required
-    public boolean completeable;
-
 }

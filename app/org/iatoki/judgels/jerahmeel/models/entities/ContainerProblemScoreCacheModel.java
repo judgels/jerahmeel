@@ -8,16 +8,18 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "jerahmeel_course_session")
-public final class CourseSessionModel extends AbstractModel {
+@Table(name = "jerahmeel_container_score_cache")
+public final class ContainerProblemScoreCacheModel extends AbstractModel {
 
     @Id
     @GeneratedValue
     public long id;
 
-    public String courseJid;
+    public String containerJid;
 
-    public String sessionJid;
+    public String problemJid;
 
-    public String alias;
+    public String userJid;
+
+    public double score;
 }

@@ -16,10 +16,7 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingController.jumpToSession(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">
-                @if(courseSessionProgress.getCourseSession.isCompleteable) {
-                    @{courseSessionProgress.getCourseSession.getAlias}.
-                }
-                @courseSessionProgress.getCourseSession.getSessionName
+                @{courseSessionProgress.getCourseSession.getAlias}. @courseSessionProgress.getCourseSession.getSessionName
             </a>
             @if(!JerahmeelUtils.isGuest) {
                 <div class="pull-right">
@@ -40,17 +37,10 @@
                                     [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
                                 </span>
                             } else {
-                                @if(courseSessionProgress.getCourseSession.isCompleteable) {
-                                    <span class="alert alert-warning">
-                                        @Messages.get("training.session.available")
-                                        [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
-                                    </span>
-                                } else {
-                                    <span class="alert alert-warning">
-                                        @Messages.get("training.session.totalPoints"):
-                                        @courseSessionProgress.getTotalScores
-                                    </span>
-                                }
+                                <span class="alert alert-warning">
+                                    @Messages.get("training.session.available")
+                                    [@courseSessionProgress.getSolvedProblems / @courseSessionProgress.getTotalProblems]
+                                </span>
                             }
                         }
                     }

@@ -5,32 +5,22 @@ import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.Archive;
 import org.iatoki.judgels.jerahmeel.ArchiveNotFoundException;
 import org.iatoki.judgels.jerahmeel.ArchiveWithScore;
-import org.iatoki.judgels.jerahmeel.ProblemSetProblemType;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel_;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel_;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.services.ArchiveService;
 import org.iatoki.judgels.play.IdentityUtils;
-import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sandalphon.models.entities.AbstractBundleGradingModel_;
-import org.iatoki.judgels.sandalphon.models.entities.AbstractProgrammingGradingModel_;
-import org.iatoki.judgels.sandalphon.services.impls.BundleSubmissionServiceUtils;
-import org.iatoki.judgels.sandalphon.services.impls.ProgrammingSubmissionServiceUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,16 +36,18 @@ public final class ArchiveServiceImpl implements ArchiveService {
     private final ArchiveDao archiveDao;
     private final BundleGradingDao bundleGradingDao;
     private final BundleSubmissionDao bundleSubmissionDao;
+    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final ProblemSetDao problemSetDao;
     private final ProblemSetProblemDao problemSetProblemDao;
     private final ProgrammingGradingDao programmingGradingDao;
     private final ProgrammingSubmissionDao programmingSubmissionDao;
 
     @Inject
-    public ArchiveServiceImpl(ArchiveDao archiveDao, BundleGradingDao bundleGradingDao, BundleSubmissionDao bundleSubmissionDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingGradingDao programmingGradingDao, ProgrammingSubmissionDao programmingSubmissionDao) {
+    public ArchiveServiceImpl(ArchiveDao archiveDao, BundleGradingDao bundleGradingDao, BundleSubmissionDao bundleSubmissionDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingGradingDao programmingGradingDao, ProgrammingSubmissionDao programmingSubmissionDao) {
         this.archiveDao = archiveDao;
         this.bundleGradingDao = bundleGradingDao;
         this.bundleSubmissionDao = bundleSubmissionDao;
+        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
         this.problemSetDao = problemSetDao;
         this.problemSetProblemDao = problemSetProblemDao;
         this.programmingGradingDao = programmingGradingDao;
@@ -124,34 +116,7 @@ public final class ArchiveServiceImpl implements ArchiveService {
             List<ProblemSetModel> problemSetModels = problemSetDao.findSortedByFiltersIn("id", "asc", "", ImmutableMap.of(ProblemSetModel_.archiveJid, subArchiveJids.build()), 0, -1);
             List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFiltersIn("id", "asc", "", ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetModels.stream().map(ca -> ca.jid).collect(Collectors.toList())), 0, -1);
 
-            double totalScore = 0;
-            for (ProblemSetProblemModel problemSetProblemModel : problemSetProblemModels) {
-                double maxScore = -1;
-                if (problemSetProblemModel.type.equals(ProblemSetProblemType.BUNDLE.name())) {
-                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    for (BundleSubmissionModel bundleSubmissionModel : bundleSubmissionModels) {
-                        List<BundleGradingModel> gradingModels = bundleGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractBundleGradingModel_.submissionJid, bundleSubmissionModel.jid), 0, -1);
-                        BundleSubmission bundleSubmission = BundleSubmissionServiceUtils.createSubmissionFromModels(bundleSubmissionModel, gradingModels);
-
-                        if (bundleSubmission.getLatestScore() > maxScore) {
-                            maxScore = bundleSubmission.getLatestScore();
-                        }
-                    }
-                } else if (problemSetProblemModel.type.equals(ProblemSetProblemType.PROGRAMMING.name())) {
-                    List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    for (ProgrammingSubmissionModel programmingSubmissionModel : programmingSubmissionModels) {
-                        List<ProgrammingGradingModel> gradingModels = programmingGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractProgrammingGradingModel_.submissionJid, programmingSubmissionModel.jid), 0, -1);
-                        ProgrammingSubmission programmingSubmission = ProgrammingSubmissionServiceUtils.createSubmissionFromModels(programmingSubmissionModel, gradingModels);
-
-                        if (programmingSubmission.getLatestScore() > maxScore) {
-                            maxScore = programmingSubmission.getLatestScore();
-                        }
-                    }
-                }
-                if (Double.compare(maxScore, -1) != 0) {
-                    totalScore += maxScore;
-                }
-            }
+            double totalScore = ProblemSetProblemServiceUtils.getUserTotalScoreFromProblemSetProblemModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetProblemModels);
 
             directSubArchivesWithScore.add(new ArchiveWithScore(archive, totalScore));
         }

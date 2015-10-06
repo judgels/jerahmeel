@@ -29,13 +29,8 @@ final class CourseControllerUtils {
                     new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
                     c)
             );
-        } else if (curriculumCourse.isCompleteable()) {
-            content.appendLayout(c -> headingWithBackLayout.render(Messages.get("course.course") + " " + curriculumCourse.getAlias() + ": " + course.getName(),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
-                    c)
-            );
         } else {
-            content.appendLayout(c -> headingWithBackLayout.render(course.getName(),
+            content.appendLayout(c -> headingWithBackLayout.render(Messages.get("course.course") + " " + curriculumCourse.getAlias() + ": " + course.getName(),
                     new InternalLink(Messages.get("training.backTo") + " " + curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())),
                     c)
             );

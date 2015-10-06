@@ -4,10 +4,12 @@ import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.gabriel.GradingResult;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
+import org.iatoki.judgels.jerahmeel.models.entities.ContainerProblemScoreCacheModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
@@ -16,7 +18,6 @@ import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractProgrammingSubmissionServiceImpl;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
@@ -25,14 +26,15 @@ import java.util.List;
 @Named("programmingSubmissionService")
 public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingSubmissionServiceImpl<ProgrammingSubmissionModel, ProgrammingGradingModel> implements ProgrammingSubmissionService {
 
+    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final ProgrammingSubmissionDao programmingSubmissionDao;
     private final ProgrammingGradingDao programmingGradingDao;
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
-    @Inject
-    public ProgrammingSubmissionServiceImpl(ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+    public ProgrammingSubmissionServiceImpl(ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         super(programmingSubmissionDao, programmingGradingDao, sealtielClientAPI, gabrielClientJid);
+        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
         this.programmingSubmissionDao = programmingSubmissionDao;
         this.programmingGradingDao = programmingGradingDao;
         this.sessionProblemDao = sessionProblemDao;
@@ -48,11 +50,24 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
         String containerJid = programmingSubmissionModel.containerJid;
         String problemJid = programmingSubmissionModel.problemJid;
 
+        List<ProgrammingSubmission> submissionList = this.getProgrammingSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
+
+        if (containerProblemScoreCacheDao.existsByUserJidContainerJidAndProblemJid(userJid, containerJid, problemJid)) {
+            ContainerProblemScoreCacheModel containerProblemScoreCacheModel = containerProblemScoreCacheDao.getByUserJidContainerJidAndProblemJid(userJid, containerJid, problemJid);
+            double maxScore = 0;
+            for (int i = 0; i < submissionList.size(); ++i) {
+                if (submissionList.get(i).getLatestScore() > maxScore) {
+                    maxScore = submissionList.get(i).getLatestScore();
+                }
+            }
+            containerProblemScoreCacheModel.score = maxScore;
+            containerProblemScoreCacheDao.edit(containerProblemScoreCacheModel, "cacheUpdater", "localhost");
+        }
+
         if (!containerJid.startsWith("JIDSESS")) {
             return;
         }
 
-        List<ProgrammingSubmission> submissionList = this.getProgrammingSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
         boolean completed = false;
         int i = 0;
         while ((!completed) && (i < submissionList.size())) {

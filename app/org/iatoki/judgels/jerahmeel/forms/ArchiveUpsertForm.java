@@ -9,6 +9,5 @@ public final class ArchiveUpsertForm {
     @Constraints.Required
     public String name;
 
-    @Constraints.Required
     public String description;
 }

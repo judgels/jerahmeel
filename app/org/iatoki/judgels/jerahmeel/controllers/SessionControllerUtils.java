@@ -41,15 +41,9 @@ final class SessionControllerUtils {
                     new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );
-        } else if (courseSession.isCompleteable()) {
-            content.appendLayout(c -> headingWithBackLayout.render(
-                    Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
-                    c)
-            );
         } else {
             content.appendLayout(c -> headingWithBackLayout.render(
-                    session.getName(),
+                    Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(),
                     new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );

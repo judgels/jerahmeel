@@ -7,7 +7,5 @@ public final class CourseUpsertForm {
     @Constraints.Required
     public String name;
 
-    @Constraints.Required
     public String description;
-
 }

@@ -11,6 +11,6 @@ final class CurriculumCourseServiceUtils {
     }
 
     static CurriculumCourse createFromModel(CourseDao courseDao, CurriculumCourseModel model) {
-        return new CurriculumCourse(model.id, model.curriculumJid, model.courseJid, model.alias, courseDao.findByJid(model.courseJid).name, model.completeable);
+        return new CurriculumCourse(model.id, model.curriculumJid, model.courseJid, model.alias, courseDao.findByJid(model.courseJid).name);
     }
 }

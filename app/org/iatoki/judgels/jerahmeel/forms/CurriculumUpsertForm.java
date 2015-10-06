@@ -7,7 +7,5 @@ public final class CurriculumUpsertForm {
     @Constraints.Required
     public String name;
 
-    @Constraints.Required
     public String description;
-
 }

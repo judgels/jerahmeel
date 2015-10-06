@@ -9,8 +9,4 @@ public final class CourseSessionAddForm {
 
     @Constraints.Required
     public String alias;
-
-    @Constraints.Required
-    public boolean completeable;
-
 }

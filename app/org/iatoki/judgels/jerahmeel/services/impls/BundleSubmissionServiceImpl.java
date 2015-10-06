@@ -3,14 +3,18 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
+import org.iatoki.judgels.jerahmeel.models.entities.ContainerProblemScoreCacheModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
+import org.iatoki.judgels.sandalphon.models.daos.BaseBundleGradingDao;
+import org.iatoki.judgels.sandalphon.models.daos.BaseBundleSubmissionDao;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.services.impls.AbstractBundleSubmissionServiceImpl;
@@ -26,14 +30,16 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
 
     private final BundleSubmissionDao submissionDao;
     private final BundleGradingDao gradingDao;
+    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public BundleSubmissionServiceImpl(BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, BundleProblemGrader bundleProblemGrader, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
-        super(submissionDao, gradingDao, bundleProblemGrader);
+    public BundleSubmissionServiceImpl(BaseBundleSubmissionDao<BundleSubmissionModel> bundleSubmissionDao, BaseBundleGradingDao<BundleGradingModel> bundleGradingDao, BundleProblemGrader bundleProblemGrader, BundleSubmissionDao submissionDao, BundleGradingDao gradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+        super(bundleSubmissionDao, bundleGradingDao, bundleProblemGrader);
         this.submissionDao = submissionDao;
         this.gradingDao = gradingDao;
+        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
         this.sessionProblemDao = sessionProblemDao;
         this.userItemDao = userItemDao;
     }
@@ -47,11 +53,24 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
         String containerJid = submissionModel.containerJid;
         String problemJid = submissionModel.problemJid;
 
+        List<BundleSubmission> submissionList = this.getBundleSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
+
+        if (containerProblemScoreCacheDao.existsByUserJidContainerJidAndProblemJid(userJid, containerJid, problemJid)) {
+            ContainerProblemScoreCacheModel containerProblemScoreCacheModel = containerProblemScoreCacheDao.getByUserJidContainerJidAndProblemJid(userJid, containerJid, problemJid);
+            double maxScore = 0;
+            for (int i = 0; i < submissionList.size(); ++i) {
+                if (submissionList.get(i).getLatestScore() > maxScore) {
+                    maxScore = submissionList.get(i).getLatestScore();
+                }
+            }
+            containerProblemScoreCacheModel.score = maxScore;
+            containerProblemScoreCacheDao.edit(containerProblemScoreCacheModel, "cacheUpdater", "localhost");
+        }
+
         if (!containerJid.startsWith("JIDSESS")) {
             return;
         }
 
-        List<BundleSubmission> submissionList = this.getBundleSubmissionsWithGradingsByContainerJidAndProblemJidAndUserJid(containerJid, problemJid, userJid);
         boolean completed = false;
         for (int i = 0; (!completed) && (i < submissionList.size()); ++i) {
             if (Double.compare(submissionList.get(i).getLatestScore(), 100) == 0) {

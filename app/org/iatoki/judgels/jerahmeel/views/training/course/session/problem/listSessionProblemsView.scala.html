@@ -27,39 +27,26 @@
             <a href="@routes.TrainingProblemController.viewProblem(curriculum.getId, curriculumCourse.getId, courseSession.getId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @problemTitlesMap.get(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
             @if(!JerahmeelUtils.isGuest) {
                 <div class="pull-right">
-                    @if(courseSession.isCompleteable) {
-                        @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
-                            <span class="alert alert-success">
-                            @Messages.get("training.problem.completed")
-                            [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
-                            </span>
-                        } else {
-                            @if(Double.compare(sessionProblemProgress.getScores, -1.0f) == 0) {
-                                @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
-                                    <span class="alert alert-info">
-                                    @Messages.get("training.problem.viewed")
-                                    </span>
-                                } else {
-                                    <span class="alert alert-warning">
-                                    @Messages.get("training.problem.notViewed")
-                                    </span>
-                                }
-                            } else {
-                                <span class="alert alert-info">
-                                    @Messages.get("training.problem.tried")
-                                    [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
-                                </span>
-                            }
-                        }
+                    @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
+                        <span class="alert alert-success">
+                        @Messages.get("training.problem.completed")
+                        [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
+                        </span>
                     } else {
                         @if(Double.compare(sessionProblemProgress.getScores, -1.0f) == 0) {
-                            <span class="alert alert-warning">
-                                @Messages.get("training.problem.notTried")
-                            </span>
+                            @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
+                                <span class="alert alert-info">
+                                @Messages.get("training.problem.viewed")
+                                </span>
+                            } else {
+                                <span class="alert alert-warning">
+                                @Messages.get("training.problem.notViewed")
+                                </span>
+                            }
                         } else {
-                            <span class="alert alert-warning">
-                                @Messages.get("training.problem.points"):
-                                @sessionProblemProgress.getScores
+                            <span class="alert alert-info">
+                                @Messages.get("training.problem.tried")
+                                [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
                             </span>
                         }
                     }
