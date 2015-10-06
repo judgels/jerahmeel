@@ -1,0 +1,23 @@
+@import play.i18n.Messages
+@import org.iatoki.judgels.jerahmeel.Curriculum
+@import org.iatoki.judgels.jerahmeel.controllers.routes
+
+@(curriculums: List[Curriculum])
+
+<div class="well">
+    @Messages.get("training.welcome")
+</div>
+
+@for(curriculum <- curriculums) {
+    <div class="panel panel-default">
+        <div class="panel-body clearfix">
+            <a href="@routes.TrainingCourseController.viewCourses(curriculum.getId)" class="panel-title">@curriculum.getName</a>
+        </div>
+    </div>
+}
+
+<div class="panel panel-default">
+    <div class="panel-body clearfix">
+        <a href="@routes.ArchiveController.index()" class="panel-title">@Messages.get("archive.archives")</a>
+    </div>
+</div>

@@ -15,7 +15,7 @@
 @for(courseSessionProgress <- pageOfCourseSessionsProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingController.jumpToSession(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">
+            <a href="@routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionProgress.getCourseSession.getId)" class="panel-title">
                 @{courseSessionProgress.getCourseSession.getAlias}. @courseSessionProgress.getCourseSession.getSessionName
             </a>
             @if(!JerahmeelUtils.isGuest) {

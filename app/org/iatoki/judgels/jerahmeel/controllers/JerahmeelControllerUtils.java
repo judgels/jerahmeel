@@ -90,8 +90,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         }
 
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
-        internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.jumpToCurriculums()));
-        internalLinkBuilder.add(new InternalLink(Messages.get("archive.archives"), routes.ArchiveController.index()));
+        internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), routes.TrainingController.index()));
         internalLinkBuilder.add(new InternalLink(Messages.get("submission.submissions"), routes.SubmissionController.jumpToSubmissions()));
         internalLinkBuilder.add(new InternalLink(Messages.get("statistic.statistics"), routes.StatisticController.index()));
         if (isAdmin()) {
@@ -166,7 +165,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     }
 
     private boolean isInTrainingMainPage() {
-        return ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())) || ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingCurriculumController.viewCurriculums().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()) + "/");
+        return ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()));
     }
 
     private void addProblemWidget(LazyHtml content, String problemJid) {

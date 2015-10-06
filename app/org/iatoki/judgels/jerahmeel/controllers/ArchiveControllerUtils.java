@@ -27,6 +27,7 @@ public final class ArchiveControllerUtils {
 
     static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.home"), routes.TrainingController.index()));
         breadcrumbsBuilder.add(new InternalLink(Messages.get("archive.archives"), routes.ArchiveController.index()));
 
         return breadcrumbsBuilder;

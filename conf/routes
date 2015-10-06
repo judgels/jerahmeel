@@ -1,15 +1,12 @@
 ->          /                                                                                                                               playcommons.Routes
 ->          /                                                                                                                               jophielcommons.Routes
 
-GET         /                                                                                                                               @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.index()
+GET         /                                                                                                                               @org.iatoki.judgels.jerahmeel.controllers.TrainingController.index()
 GET         /auth                                                                                                                           @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.auth(returnUri ?= "")
 GET         /authRole                                                                                                                       @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.authRole(returnUri ?= "")
 GET         /afterLogin                                                                                                                     @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.afterLogin(returnUri ?= "")
 POST        /viewAs                                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.postViewAs()
 GET         /resetViewAs                                                                                                                    @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.resetViewAs()
-
-GET         /training/curriculums                                                                                                           @org.iatoki.judgels.jerahmeel.controllers.TrainingCurriculumController.viewCurriculums()
-GET         /training/curriculums/                                                                                                          @org.iatoki.judgels.jerahmeel.controllers.TrainingCurriculumController.listCurriculums(pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", filterString ?= "")
 
 GET         /training/curriculums/:curriculumId/courses                                                                                     @org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController.viewCourses(curriculumId: Long)
 GET         /training/curriculums/:curriculumId/courses/                                                                                    @org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController.listCourses(curriculumId: Long, pageIndex: Long ?= 0, orderBy ?= "alias", orderDir ?= "asc", filterString ?= "")
@@ -38,14 +35,6 @@ POST        /training/curriculums/:curriculumId/courses/:courseId/sessions/:sess
 GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/submissions/programming                               @org.iatoki.judgels.jerahmeel.controllers.TrainingProgrammingSubmissionController.viewSubmissions(curriculumId: Long, courseId: Long, sessionId: Long)
 GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/submissions/programming/                              @org.iatoki.judgels.jerahmeel.controllers.TrainingProgrammingSubmissionController.listSubmissions(curriculumId: Long, courseId: Long, sessionId: Long, pageIndex: Long ?= 0, orderBy ?= "id", orderDir ?= "asc", problemJid ?= null)
 GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/submissions/programming/:submissionId                 @org.iatoki.judgels.jerahmeel.controllers.TrainingProgrammingSubmissionController.viewSubmission(curriculumId: Long, courseId: Long, sessionId: Long, submissionId: Long)
-
-GET         /training/jumpToCurriculums                                                                                                     @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToCurriculums()
-GET         /training/curriculums/:curriculumId/jumpToCourses                                                                               @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToCourses(curriculumId: Long)
-GET         /training/curriculums/:curriculumId/courses/:courseId/jumpToSessions                                                            @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToSessions(curriculumId: Long, courseId: Long)
-GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/jumpToSession                                         @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToSession(curriculumId: Long, courseId: Long, sessionId: Long)
-GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/jumpToProblems                                        @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToProblems(curriculumId: Long, courseId: Long, sessionId: Long)
-GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/jumpToLessons                                         @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToLessons(curriculumId: Long, courseId: Long, sessionId: Long)
-GET         /training/curriculums/:curriculumId/courses/:courseId/sessions/:sessionId/jumpToSubmissions                                     @org.iatoki.judgels.jerahmeel.controllers.TrainingController.jumpToSubmissions(curriculumId: Long, courseId: Long, sessionId: Long)
 
 GET         /archive/                                                                                                                       @org.iatoki.judgels.jerahmeel.controllers.ArchiveController.index()
 GET         /archive/create                                                                                                                 @org.iatoki.judgels.jerahmeel.controllers.ArchiveController.createArchive()

@@ -38,7 +38,7 @@ public final class ApplicationController extends AbstractJudgelsController {
     }
 
     public Result index() {
-        return redirect(routes.TrainingController.jumpToCurriculums());
+        return redirect(routes.TrainingController.index());
     }
 
     public Result auth(String returnUri) {

@@ -12,7 +12,7 @@ final class TrainingControllerUtils {
 
     static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder() {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ImmutableList.builder();
-        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.home"), routes.TrainingController.jumpToCurriculums()));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("training.home"), routes.TrainingController.index()));
 
         return breadcrumbsBuilder;
     }

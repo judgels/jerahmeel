@@ -4,7 +4,11 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.play.Page;
 
+import java.util.List;
+
 public interface CurriculumService {
+
+    List<Curriculum> getAllCurriculums();
 
     Page<Curriculum> getPageOfCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 

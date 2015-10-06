@@ -1,63 +1,54 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
-import org.iatoki.judgels.jerahmeel.CourseSession;
-import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
-import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.views.html.training.listTrainingsView;
+import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import play.db.jpa.Transactional;
+import play.i18n.Messages;
 import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 
 @Singleton
 @Named
 public final class TrainingController extends AbstractJudgelsController {
 
-    private final CourseSessionService courseSessionService;
+    private final CurriculumService curriculumService;
 
     @Inject
-    public TrainingController(CourseSessionService courseSessionService) {
-        this.courseSessionService = courseSessionService;
+    public TrainingController(CurriculumService curriculumService) {
+        this.curriculumService = curriculumService;
     }
 
-    @Authenticated(value = GuestView.class)
-    public Result jumpToCurriculums() {
-        return redirect(routes.TrainingCurriculumController.viewCurriculums());
-    }
-
-    @Authenticated(value = GuestView.class)
-    public Result jumpToCourses(long curriculumId) {
-        return redirect(routes.TrainingCourseController.viewCourses(curriculumId));
-    }
-
-    @Authenticated(value = GuestView.class)
-    public Result jumpToSessions(long curriculumId, long curriculumCourseId) {
-        return redirect(routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourseId));
-    }
-
-    @Authenticated(value = GuestView.class)
+    @Authenticated(GuestView.class)
     @Transactional(readOnly = true)
-    public Result jumpToSession(long curriculumId, long curriculumCourseId, long courseSessionId) throws CourseSessionNotFoundException {
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
-
-        return redirect(routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionId));
+    public Result index() {
+        return listTrainings();
     }
 
-    @Authenticated(value = GuestView.class)
-    public Result jumpToLessons(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionId));
+    @Authenticated(GuestView.class)
+    @Transactional(readOnly = true)
+    public Result listTrainings() {
+        List<Curriculum> curriculums = curriculumService.getAllCurriculums();
+
+        return showListTrainings(curriculums);
     }
 
-    @Authenticated(value = GuestView.class)
-    public Result jumpToProblems(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingProblemController.viewProblems(curriculumId, curriculumCourseId, courseSessionId));
-    }
+    private Result showListTrainings(List<Curriculum> curriculums) {
+        LazyHtml content = new LazyHtml(listTrainingsView.render(curriculums));
+        content.appendLayout(c -> headingLayout.render(Messages.get("training.home"), c));
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, TrainingControllerUtils.getBreadcrumbsBuilder().build());
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Home");
 
-    public Result jumpToSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) {
-        return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculumId, curriculumCourseId, courseSessionId));
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 }

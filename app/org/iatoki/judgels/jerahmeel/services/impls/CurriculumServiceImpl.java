@@ -13,6 +13,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named("curriculumService")
@@ -23,6 +24,13 @@ public final class CurriculumServiceImpl implements CurriculumService {
     @Inject
     public CurriculumServiceImpl(CurriculumDao curriculumDao) {
         this.curriculumDao = curriculumDao;
+    }
+
+    @Override
+    public List<Curriculum> getAllCurriculums() {
+        List<CurriculumModel> curriculumModels = curriculumDao.getAll();
+
+        return curriculumModels.stream().map(m -> CurriculumServiceUtils.createCurriculumFromModel(m)).collect(Collectors.toList());
     }
 
     @Override

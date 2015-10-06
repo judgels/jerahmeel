@@ -26,12 +26,12 @@ final class CurriculumControllerUtils {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("curriculum.curriculum") + " #" + curriculum.getId() + ": " + curriculum.getName(),
                     new InternalLink(Messages.get("commons.update"), routes.CurriculumController.editCurriculumGeneral(curriculum.getId())),
-                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
+                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()),
                     c)
             );
         } else {
             content.appendLayout(c -> headingWithBackLayout.render(curriculum.getName(),
-                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.jumpToCurriculums()),
+                    new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()),
                     c)
             );
         }

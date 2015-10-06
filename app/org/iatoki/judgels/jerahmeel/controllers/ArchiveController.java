@@ -25,8 +25,8 @@ import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
-import org.iatoki.judgels.play.views.html.layouts.headingWithActionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionsAndBackLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
 import play.data.Form;
 import play.db.jpa.Transactional;
 import play.filters.csrf.AddCSRFToken;
@@ -55,7 +55,6 @@ public final class ArchiveController extends AbstractJudgelsController {
         this.problemSetService = problemSetService;
     }
 
-    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result index() throws ArchiveNotFoundException {
         return viewArchives(0);
@@ -163,7 +162,7 @@ public final class ArchiveController extends AbstractJudgelsController {
             final String parentArchiveName;
             final long parentArchiveId;
             if (parentArchive == null) {
-                parentArchiveName = Messages.get("archive.home");
+                parentArchiveName = Messages.get("archive.archives");
                 parentArchiveId = 0;
             } else {
                 parentArchiveName = parentArchive.getName();
@@ -182,9 +181,9 @@ public final class ArchiveController extends AbstractJudgelsController {
             }
         } else {
             if (JerahmeelUtils.hasRole("admin")) {
-                content.appendLayout(c -> headingWithActionLayout.render(Messages.get("archive.archives"), new InternalLink(Messages.get("commons.create"), routes.ArchiveController.createArchive()), c));
+                content.appendLayout(c -> headingWithActionAndBackLayout.render(Messages.get("archive.archives"), new InternalLink(Messages.get("commons.create"), routes.ArchiveController.createArchive()), new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()), c));
             } else {
-                content.appendLayout(c -> headingLayout.render(Messages.get("archive.archives"), c));
+                content.appendLayout(c -> headingWithBackLayout.render(Messages.get("archive.archives"), new InternalLink(Messages.get("training.backToHome"), routes.TrainingController.index()), c));
             }
         }
 

@@ -25,10 +25,10 @@ final class SessionControllerUtils {
 
     static void appendViewLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, CourseSession courseSession, Session session) {
         ImmutableList.Builder<InternalLink> tabLinksBuilder = ImmutableList.builder();
-        tabLinksBuilder.add(new InternalLink(Messages.get("session.lessons"), routes.TrainingController.jumpToLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
-        tabLinksBuilder.add(new InternalLink(Messages.get("session.problems"), routes.TrainingController.jumpToProblems(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        tabLinksBuilder.add(new InternalLink(Messages.get("session.lessons"), routes.TrainingLessonController.viewLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        tabLinksBuilder.add(new InternalLink(Messages.get("session.problems"), routes.TrainingProblemController.viewProblems(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         if (!JerahmeelUtils.isGuest()) {
-            tabLinksBuilder.add(new InternalLink(Messages.get("session.submissions"), routes.TrainingController.jumpToSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+            tabLinksBuilder.add(new InternalLink(Messages.get("session.submissions"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         }
         content.appendLayout(c -> tabLayout.render(tabLinksBuilder.build(), c));
         if (session.getDescription().isEmpty()) {
