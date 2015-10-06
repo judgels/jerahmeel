@@ -4,41 +4,28 @@
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-@import org.iatoki.judgels.jerahmeel.SessionLessonProgress
+@import org.iatoki.judgels.jerahmeel.SessionLesson
 @import org.iatoki.judgels.jerahmeel.LessonProgress
 
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionLessonsProgress: Page[SessionLessonProgress], orderBy: String, orderDir: String, filterString: String, lessonTitlesMap: Map[String, String])
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSessionLessons: Page[SessionLesson], orderBy: String, orderDir: String, filterString: String, lessonTitlesMap: Map[String, String])
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingLessonController.listLessons(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir)}
 
-@searchView(pageOfSessionLessonsProgress.getPageIndex, orderBy, orderDir, filterString, listFunc)
+@searchView(pageOfSessionLessons.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 
-@for(sessionLessonProgress <- pageOfSessionLessonsProgress.getData()) {
+@for(sessionLesson <- pageOfSessionLessons.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLessonProgress.getSessionLesson.getId)" class="panel-title">@sessionLessonProgress.getSessionLesson.getAlias. @lessonTitlesMap.get(sessionLessonProgress.getSessionLesson.getLessonJid)</a>
-            @if(!JerahmeelUtils.isGuest) {
-                <div class="pull-right">
-                    @if(sessionLessonProgress.getLessonProgress.equals(LessonProgress.VIEWED)) {
-                        <span class="alert alert-success">
-                        @Messages.get("training.lesson.viewed")
-                        </span>
-                    } else {
-                        <span class="alert alert-warning">
-                        @Messages.get("training.lesson.notViewed")
-                        </span>
-                    }
-                </div>
-            }
+            <a href="@routes.TrainingLessonController.viewLesson(curriculumId, curriculumCourseId, courseSessionId, sessionLesson.getId)" class="panel-title">@sessionLesson.getAlias. @lessonTitlesMap.get(sessionLesson.getLessonJid)</a>
         </div>
     </div>
 }
 
-@paginationView(pageOfSessionLessonsProgress, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfSessionLessons, orderBy, orderDir, filterString, listFunc)
 
 <script type="text/javascript">
     var sessionUpdateViewUrl = "@org.iatoki.judgels.jerahmeel.controllers.api.internal.routes.InternalSessionAPIController.updateSessionViewStatus(courseSessionId)";

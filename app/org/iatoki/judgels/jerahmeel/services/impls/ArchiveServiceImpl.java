@@ -91,10 +91,15 @@ public final class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public List<ArchiveWithScore> getChildArchivesWithScore(String parentJid, String userJid) {
+    public List<Archive> getChildArchives(String parentJid) {
         List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, parentJid), 0, -1);
 
-        List<Archive> directSubArchives = archiveModels.stream().map(m -> createArchiveWithParentAndSubArchivesFromModel(m)).collect(Collectors.toList());
+        return archiveModels.stream().map(m -> createArchiveWithParentAndSubArchivesFromModel(m)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ArchiveWithScore> getChildArchivesWithScore(String parentJid, String userJid) {
+        List<Archive> directSubArchives = getChildArchives(parentJid);
 
         ImmutableList.Builder<ArchiveWithScore> directSubArchivesWithScore = ImmutableList.builder();
         for (Archive archive : directSubArchives) {

@@ -5,7 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.LessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
+import org.iatoki.judgels.jerahmeel.SessionLessonWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionLessonDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
@@ -59,17 +59,17 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
     }
 
     @Override
-    public Page<SessionLessonProgress> getPageOfSessionLessonsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionLessonWithProgress> getPageOfSessionLessonsWithProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()), ImmutableMap.of());
         List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        ImmutableList.Builder<SessionLessonProgress> sessionLessonProgressBuilder = ImmutableList.builder();
+        ImmutableList.Builder<SessionLessonWithProgress> sessionLessonProgressBuilder = ImmutableList.builder();
         for (SessionLessonModel sessionLessonModel :  sessionLessonModels) {
             LessonProgress progress = LessonProgress.NOT_VIEWED;
             if (userItemDao.existsByUserJidAndItemJid(userJid, sessionLessonModel.lessonJid)) {
                 progress = LessonProgress.VIEWED;
             }
-            sessionLessonProgressBuilder.add(new SessionLessonProgress(SessionLessonServiceUtils.createFromModel(sessionLessonModel), progress));
+            sessionLessonProgressBuilder.add(new SessionLessonWithProgress(SessionLessonServiceUtils.createFromModel(sessionLessonModel), progress));
         }
 
         return new Page<>(sessionLessonProgressBuilder.build(), totalPages, pageIndex, pageSize);

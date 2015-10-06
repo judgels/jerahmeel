@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class CurriculumCourseProgress {
+public class CurriculumCourseWithProgress {
 
     private final CurriculumCourse curriculumCourse;
     private final CourseProgress courseProgress;
@@ -8,7 +8,7 @@ public class CurriculumCourseProgress {
     private final long totalSessions;
     private final double totalScores;
 
-    public CurriculumCourseProgress(CurriculumCourse curriculumCourse, CourseProgress courseProgress, long completedSessions, long totalSessions, double totalScores) {
+    public CurriculumCourseWithProgress(CurriculumCourse curriculumCourse, CourseProgress courseProgress, long completedSessions, long totalSessions, double totalScores) {
         this.curriculumCourse = curriculumCourse;
         this.courseProgress = courseProgress;
         this.completedSessions = completedSessions;

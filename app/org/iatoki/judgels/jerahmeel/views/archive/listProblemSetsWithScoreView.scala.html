@@ -7,9 +7,9 @@
 @import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.Archive
-@import org.iatoki.judgels.jerahmeel.ProblemSet
+@import org.iatoki.judgels.jerahmeel.ProblemSetWithScore
 
-@(currentArchive: Archive, pageOfProblemSets: Page[ProblemSet], orderBy: String, orderDir: String, filterString: String)
+@(currentArchive: Archive, pageOfProblemSets: Page[ProblemSetWithScore], orderBy: String, orderDir: String, filterString: String)
 
 <h3>@Messages.get("archive.problemSets")</h3>
 
@@ -22,7 +22,13 @@
 @for((problemSet, index) <- pageOfProblemSets.getData.zipWithIndex) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.ProblemSetController.jumpToProblems(problemSet.getId)" class="panel-title">@problemSet.getName</a>
+            <a href="@routes.ProblemSetController.jumpToProblems(problemSet.getProblemSet.getId)" class="panel-title">@problemSet.getProblemSet.getName</a>
+            <div class="pull-right">
+                <span class="alert alert-warning">
+                    @Messages.get("archive.problemSet.totalPoints"):
+                    @problemSet.getScore
+                </span>
+            </div>
         </div>
     </div>
 }

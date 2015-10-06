@@ -8,55 +8,28 @@
 @import org.iatoki.judgels.jerahmeel.Curriculum
 @import org.iatoki.judgels.jerahmeel.CurriculumCourse
 @import org.iatoki.judgels.jerahmeel.CourseSession
-@import org.iatoki.judgels.jerahmeel.SessionProblemProgress
+@import org.iatoki.judgels.jerahmeel.SessionProblem
 @import org.iatoki.judgels.jerahmeel.ProblemProgress
 
-@(curriculum: Curriculum, curriculumCourse: CurriculumCourse, courseSession: CourseSession, pageOfSessionProblemsProgress: Page[SessionProblemProgress], orderBy: String, orderDir: String, filterString: String, problemTitlesMap: Map[String, String])
+@(curriculum: Curriculum, curriculumCourse: CurriculumCourse, courseSession: CourseSession, pageOfSessionProblems: Page[SessionProblem], orderBy: String, orderDir: String, filterString: String, problemTitlesMap: Map[String, String])
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingProblemController.listProblems(curriculum.getId, curriculumCourse.getId, courseSession.getId, newPageIndex, newOrderBy, newOrderDir)}
 
-@searchView(pageOfSessionProblemsProgress.getPageIndex, orderBy, orderDir, filterString, listFunc)
+@searchView(pageOfSessionProblems.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 
-@for(sessionProblemProgress <- pageOfSessionProblemsProgress.getData()) {
+@for(sessionProblem <- pageOfSessionProblems.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingProblemController.viewProblem(curriculum.getId, curriculumCourse.getId, courseSession.getId, sessionProblemProgress.getSessionProblem.getId)" class="panel-title">@sessionProblemProgress.getSessionProblem.getAlias. @problemTitlesMap.get(sessionProblemProgress.getSessionProblem.getProblemJid)</a>
-            @if(!JerahmeelUtils.isGuest) {
-                <div class="pull-right">
-                    @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
-                        <span class="alert alert-success">
-                        @Messages.get("training.problem.completed")
-                        [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
-                        </span>
-                    } else {
-                        @if(Double.compare(sessionProblemProgress.getScores, -1.0f) == 0) {
-                            @if(sessionProblemProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
-                                <span class="alert alert-info">
-                                @Messages.get("training.problem.viewed")
-                                </span>
-                            } else {
-                                <span class="alert alert-warning">
-                                @Messages.get("training.problem.notViewed")
-                                </span>
-                            }
-                        } else {
-                            <span class="alert alert-info">
-                                @Messages.get("training.problem.tried")
-                                [@Messages.get("training.problem.points"): @sessionProblemProgress.getScores]
-                            </span>
-                        }
-                    }
-                </div>
-            }
+            <a href="@routes.TrainingProblemController.viewProblem(curriculum.getId, curriculumCourse.getId, courseSession.getId, sessionProblem.getId)" class="panel-title">@sessionProblem.getAlias. @problemTitlesMap.get(sessionProblem.getProblemJid)</a>
         </div>
     </div>
 }
 
-@paginationView(pageOfSessionProblemsProgress, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfSessionProblems, orderBy, orderDir, filterString, listFunc)
 
 <script type="text/javascript">
     var sessionUpdateViewUrl = "@org.iatoki.judgels.jerahmeel.controllers.api.internal.routes.InternalSessionAPIController.updateSessionViewStatus(courseSession.getId)";

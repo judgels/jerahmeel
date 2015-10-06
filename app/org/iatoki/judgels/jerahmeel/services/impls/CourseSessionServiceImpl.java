@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
+import org.iatoki.judgels.jerahmeel.CourseSessionWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionProgress;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
@@ -97,7 +97,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     }
 
     @Override
-    public Page<CourseSessionProgress> getPageOfCourseSessionsProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<CourseSessionWithProgress> getPageOfCourseSessionsWithProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
@@ -115,7 +115,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
             mapSessionJidToSessionProblemModels.put(sessionProblemModel.sessionJid, value);
         }
 
-        ImmutableList.Builder<CourseSessionProgress> courseSessionProgressBuilder = ImmutableList.builder();
+        ImmutableList.Builder<CourseSessionWithProgress> courseSessionProgressBuilder = ImmutableList.builder();
         List<UserItemModel> completedUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
         Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
         List<UserItemModel> onProgressUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.VIEWED.name());
@@ -150,7 +150,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
                     progress = SessionProgress.AVAILABLE;
                 }
             }
-            courseSessionProgressBuilder.add(new CourseSessionProgress(CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
+            courseSessionProgressBuilder.add(new CourseSessionWithProgress(CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
         }
 
         return new Page<>(courseSessionProgressBuilder.build(), totalPages, pageIndex, pageSize);

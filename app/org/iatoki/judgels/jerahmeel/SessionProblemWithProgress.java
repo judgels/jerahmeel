@@ -1,12 +1,12 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class SessionProblemProgress {
+public class SessionProblemWithProgress {
 
     private final SessionProblem sessionProblem;
     private final ProblemProgress problemProgress;
     private final double scores;
 
-    public SessionProblemProgress(SessionProblem sessionProblem, ProblemProgress problemProgress, double scores) {
+    public SessionProblemWithProgress(SessionProblem sessionProblem, ProblemProgress problemProgress, double scores) {
         this.sessionProblem = sessionProblem;
         this.problemProgress = problemProgress;
         this.scores = scores;

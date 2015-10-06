@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class CourseSessionProgress {
+public class CourseSessionWithProgress {
 
     private final CourseSession courseSession;
     private final SessionProgress sessionProgress;
@@ -8,7 +8,7 @@ public class CourseSessionProgress {
     private final long totalProblems;
     private final double totalScores;
 
-    public CourseSessionProgress(CourseSession courseSession, SessionProgress sessionProgress, long solvedProblems, long totalProblems, double totalScores) {
+    public CourseSessionWithProgress(CourseSession courseSession, SessionProgress sessionProgress, long solvedProblems, long totalProblems, double totalScores) {
         this.courseSession = courseSession;
         this.sessionProgress = sessionProgress;
         this.solvedProblems = solvedProblems;

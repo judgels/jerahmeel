@@ -12,6 +12,8 @@ public interface ArchiveService {
 
     List<Archive> getAllArchives();
 
+    List<Archive> getChildArchives(String parentJid);
+
     List<ArchiveWithScore> getChildArchivesWithScore(String parentJid, String userJid);
 
     Archive findArchiveById(long archiveId) throws ArchiveNotFoundException;

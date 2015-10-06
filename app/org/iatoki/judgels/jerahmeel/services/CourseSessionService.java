@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel.services;
 
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.CourseSessionProgress;
+import org.iatoki.judgels.jerahmeel.CourseSessionWithProgress;
 import org.iatoki.judgels.play.Page;
 
 public interface CourseSessionService {
@@ -15,7 +15,7 @@ public interface CourseSessionService {
 
     Page<CourseSession> getPageOfCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Page<CourseSessionProgress> getPageOfCourseSessionsProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<CourseSessionWithProgress> getPageOfCourseSessionsWithProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     CourseSession addCourseSession(String courseJid, String sessionJid, String alias, String userJid, String userIpAddress);
 

@@ -26,6 +26,7 @@ import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.addPro
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.editProblemSetProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.listProblemSetProblemsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.listVisibleProblemSetProblemsView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.listVisibleProblemSetProblemsWithScoreView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.problem.viewProblemSetProblemView;
 import org.iatoki.judgels.jophiel.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
@@ -82,11 +83,32 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
     public Result listVisibleProblemSetProblems(long problemSetId, long page, String orderBy, String orderDir, String filterString) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
 
-        Page<ProblemSetProblemWithScore> pageOfProblemSetProblemWithScore = problemSetProblemService.getPageOfProblemSetProblemsWithScore(IdentityUtils.getUserJid(), problemSet.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        List<String> problemJids = pageOfProblemSetProblemWithScore.getData().stream().map(cp -> cp.getProblemSetProblem().getProblemJid()).collect(Collectors.toList());
-        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+        LazyHtml content;
+        if (!JerahmeelUtils.isGuest()) {
+            Page<ProblemSetProblemWithScore> pageOfProblemSetProblemsWithScore = problemSetProblemService.getPageOfProblemSetProblemsWithScore(IdentityUtils.getUserJid(), problemSet.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> problemJids = pageOfProblemSetProblemsWithScore.getData().stream().map(cp -> cp.getProblemSetProblem().getProblemJid()).collect(Collectors.toList());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
 
-        return showListVisibleProblemSetProblems(problemSet, pageOfProblemSetProblemWithScore, orderBy, orderDir, filterString, problemTitlesMap);
+            content = new LazyHtml(listVisibleProblemSetProblemsWithScoreView.render(problemSet, pageOfProblemSetProblemsWithScore, orderBy, orderDir, filterString, problemTitlesMap));
+        } else {
+            Page<ProblemSetProblem> pageOfProblemSetProblems = problemSetProblemService.getPageOfProblemSetProblems(problemSet.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> problemJids = pageOfProblemSetProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+
+            content = new LazyHtml(listVisibleProblemSetProblemsView.render(problemSet, pageOfProblemSetProblems, orderBy, orderDir, filterString, problemTitlesMap));
+        }
+
+        if (JerahmeelUtils.hasRole("admin")) {
+            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
+        }
+        ProblemSetControllerUtils.appendTabLayout(content, problemSet);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, problemSet,
+                new InternalLink(Messages.get("commons.view"), routes.ProblemSetProblemController.viewVisibleProblemSetProblems(problemSet.getId()))
+        );
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Problem Sets - Problems");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Authenticated(value = GuestView.class)
@@ -303,21 +325,6 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(PROBLEM_SET, problemSet.getJid(), problemSet.getName(), PROBLEM, problemSetProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()))));
 
         return redirect(routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()));
-    }
-
-    private Result showListVisibleProblemSetProblems(ProblemSet problemSet, Page<ProblemSetProblemWithScore> pageOfProblemSetProblemWithScore, String orderBy, String orderDir, String filterString, Map<String, String> problemTitlesMap) {
-        LazyHtml content = new LazyHtml(listVisibleProblemSetProblemsView.render(problemSet, pageOfProblemSetProblemWithScore, orderBy, orderDir, filterString, problemTitlesMap));
-        if (JerahmeelUtils.hasRole("admin")) {
-            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
-        }
-        ProblemSetControllerUtils.appendTabLayout(content, problemSet);
-        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, problemSet,
-                new InternalLink(Messages.get("commons.view"), routes.ProblemSetProblemController.viewVisibleProblemSetProblems(problemSet.getId()))
-        );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Problem Sets - Problems");
-
-        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     private Result showListProblemSetProblems(ProblemSet problemSet, Page<ProblemSetProblem> pageOfProblemSetProblems, String orderBy, String orderDir, String filterString, Map<String, String> problemSlugsMap) {

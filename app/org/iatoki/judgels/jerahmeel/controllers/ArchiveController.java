@@ -5,6 +5,7 @@ import org.iatoki.judgels.jerahmeel.Archive;
 import org.iatoki.judgels.jerahmeel.ArchiveNotFoundException;
 import org.iatoki.judgels.jerahmeel.ArchiveWithScore;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
+import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.jerahmeel.ProblemSetWithScore;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
@@ -16,7 +17,9 @@ import org.iatoki.judgels.jerahmeel.services.ArchiveService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.views.html.archive.createArchiveView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsWithScoreView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesWithScoreView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.updateArchiveGeneralView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
@@ -55,19 +58,20 @@ public final class ArchiveController extends AbstractJudgelsController {
         this.problemSetService = problemSetService;
     }
 
-    @Transactional(readOnly = true)
+    @Authenticated(value = GuestView.class)
+    @Transactional
     public Result index() throws ArchiveNotFoundException {
         return viewArchives(0);
     }
 
     @Authenticated(value = GuestView.class)
-    @Transactional(readOnly = true)
+    @Transactional
     public Result viewArchives(long archiveId) throws ArchiveNotFoundException {
         return showListArchivesProblemSets(archiveId, 0, "id", "asc", "");
     }
 
     @Authenticated(value = GuestView.class)
-    @Transactional(readOnly = true)
+    @Transactional
     public Result listArchivesProblemSets(long archiveId, long pageIndex, String orderBy, String orderDir, String filterString) throws ArchiveNotFoundException {
         return showListArchivesProblemSets(archiveId, pageIndex, orderBy, orderDir, filterString);
     }
@@ -138,24 +142,38 @@ public final class ArchiveController extends AbstractJudgelsController {
     private Result showListArchivesProblemSets(long archiveId, long pageIndex, String orderBy, String orderDir, String filterString) throws ArchiveNotFoundException {
         Archive currentArchive;
         Archive parentArchive;
-        List<ArchiveWithScore> childArchivesWithScore;
+
+
+        String currentArchiveJid;
         if (archiveId == 0) {
             currentArchive = null;
             parentArchive = null;
-            childArchivesWithScore = archiveService.getChildArchivesWithScore("", IdentityUtils.getUserJid());
+            currentArchiveJid = "";
         } else {
             currentArchive = archiveService.findArchiveById(archiveId);
             parentArchive = currentArchive.getParentArchive();
-            childArchivesWithScore = archiveService.getChildArchivesWithScore(currentArchive.getJid(), IdentityUtils.getUserJid());
+            currentArchiveJid = currentArchive.getJid();
         }
 
         LazyHtml content;
-        if (currentArchive != null) {
-            Page<ProblemSetWithScore> pageOfProblemSets = problemSetService.getPageOfProblemSets(currentArchive, IdentityUtils.getUserJid(), pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
+        if (!JerahmeelUtils.isGuest()) {
+            List<ArchiveWithScore> childArchivesWithScore =  archiveService.getChildArchivesWithScore(currentArchiveJid, IdentityUtils.getUserJid());
+            if (currentArchive != null) {
+                Page<ProblemSetWithScore> pageOfProblemSetsWithScore = problemSetService.getPageOfProblemSetsWithScore(currentArchive, IdentityUtils.getUserJid(), pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
 
-            content = new LazyHtml(listArchivesAndProblemSetsView.render(currentArchive, childArchivesWithScore, pageOfProblemSets, orderBy, orderDir, filterString));
+                content = new LazyHtml(listArchivesAndProblemSetsWithScoreView.render(currentArchive, childArchivesWithScore, pageOfProblemSetsWithScore, orderBy, orderDir, filterString));
+            } else {
+                content = new LazyHtml(listArchivesWithScoreView.render(currentArchive, childArchivesWithScore));
+            }
         } else {
-            content = new LazyHtml(listArchivesView.render(currentArchive, childArchivesWithScore));
+            List<Archive> childArchives = archiveService.getChildArchives(currentArchiveJid);
+            if (currentArchive != null) {
+                Page<ProblemSet> pageOfProblemSets = problemSetService.getPageOfProblemSets(currentArchive, pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
+
+                content = new LazyHtml(listArchivesAndProblemSetsView.render(currentArchive, childArchives, pageOfProblemSets, orderBy, orderDir, filterString));
+            } else {
+                content = new LazyHtml(listArchivesView.render(currentArchive, childArchives));
+            }
         }
 
         if (currentArchive != null) {

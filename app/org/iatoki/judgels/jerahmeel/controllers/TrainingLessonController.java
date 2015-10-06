@@ -12,11 +12,12 @@ import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionLesson;
 import org.iatoki.judgels.jerahmeel.SessionLessonNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionLessonProgress;
 import org.iatoki.judgels.jerahmeel.SessionLessonStatus;
+import org.iatoki.judgels.jerahmeel.SessionLessonWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
@@ -29,8 +30,9 @@ import org.iatoki.judgels.jerahmeel.services.SessionLessonService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.viewLessonView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.listSessionLessonsView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.listSessionLessonsWithProgressView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.lesson.viewLessonView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -94,11 +96,28 @@ public final class TrainingLessonController extends AbstractJudgelsController {
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
-        Page<SessionLessonProgress> pageOfSessionLessonProgress = sessionLessonService.getPageOfSessionLessonsProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        List<String> lessonJids = pageOfSessionLessonProgress.getData().stream().map(cp -> cp.getSessionLesson().getLessonJid()).collect(Collectors.toList());
-        Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+        LazyHtml content;
 
-        return showListLessons(curriculum, curriculumCourse, course, courseSession, session, pageOfSessionLessonProgress, orderBy, orderDir, filterString, lessonTitlesMap);
+        if (!JerahmeelUtils.isGuest()) {
+            Page<SessionLessonWithProgress> pageOfSessionLessonsWithProgress = sessionLessonService.getPageOfSessionLessonsWithProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> lessonJids = pageOfSessionLessonsWithProgress.getData().stream().map(cp -> cp.getSessionLesson().getLessonJid()).collect(Collectors.toList());
+            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+
+            content = new LazyHtml(listSessionLessonsWithProgressView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessonsWithProgress, orderBy, orderDir, filterString, lessonTitlesMap));
+        } else {
+            Page<SessionLesson> pageOfSessionLessons = sessionLessonService.getPageOfSessionLessons(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> lessonJids = pageOfSessionLessons.getData().stream().map(cp -> cp.getLessonJid()).collect(Collectors.toList());
+            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+
+            content = new LazyHtml(listSessionLessonsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessons, orderBy, orderDir, filterString, lessonTitlesMap));
+        }
+
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Authenticated(value = GuestView.class)
@@ -158,16 +177,6 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         String mediaUrl = sandalphonClientAPI.getLessonStatementMediaRenderAPIEndpoint(sessionLesson.getLessonJid(), filename);
 
         return redirect(mediaUrl);
-    }
-
-    private Result showListLessons(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionLessonProgress> pageOfSessionLessonsProgress, String orderBy, String orderDir, String filterString, Map<String, String> lessonTitlesMap) {
-        LazyHtml content = new LazyHtml(listSessionLessonsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessonsProgress, orderBy, orderDir, filterString, lessonTitlesMap));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
-        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
-
-        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {

@@ -18,9 +18,9 @@ import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
+import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
@@ -32,8 +32,9 @@ import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.viewProblemView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.listSessionProblemsView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.listSessionProblemsWithProgressView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.session.problem.viewProblemView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -99,11 +100,28 @@ public final class TrainingProblemController extends AbstractJudgelsController {
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
         Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
-        Page<SessionProblemProgress> pageOfSessionProblemsProgress = sessionProblemService.getPageOfSessionProblemsProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
-        List<String> problemJids = pageOfSessionProblemsProgress.getData().stream().map(cp -> cp.getSessionProblem().getProblemJid()).collect(Collectors.toList());
-        Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
 
-        return showListProblems(curriculum, curriculumCourse, course, courseSession, session, pageOfSessionProblemsProgress, orderBy, orderDir, filterString, problemTitlesMap);
+        LazyHtml content;
+        if (!JerahmeelUtils.isGuest()) {
+            Page<SessionProblemWithProgress> pageOfSessionProblemsWithProgress = sessionProblemService.getPageOfSessionProblemsWithProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> problemJids = pageOfSessionProblemsWithProgress.getData().stream().map(cp -> cp.getSessionProblem().getProblemJid()).collect(Collectors.toList());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+
+            content = new LazyHtml(listSessionProblemsWithProgressView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblemsWithProgress, orderBy, orderDir, filterString, problemTitlesMap));
+        } else {
+            Page<SessionProblem> pageOfSessionProblems = sessionProblemService.getPageOfSessionProblems(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> problemJids = pageOfSessionProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+
+            content = new LazyHtml(listSessionProblemsView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblems, orderBy, orderDir, filterString, problemTitlesMap));
+        }
+
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Authenticated(value = GuestView.class)
@@ -200,16 +218,6 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         String mediaUrl = sandalphonClientAPI.getProblemStatementMediaRenderAPIEndpoint(sessionProblem.getProblemJid(), filename);
 
         return redirect(mediaUrl);
-    }
-
-    private Result showListProblems(Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, Page<SessionProblemProgress> pageOfSessionProblemsProgress, String orderBy, String orderDir, String filterString, Map<String, String> problemTitlesMap) {
-        LazyHtml content = new LazyHtml(listSessionProblemsView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblemsProgress, orderBy, orderDir, filterString, problemTitlesMap));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
-        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
-
-        return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {

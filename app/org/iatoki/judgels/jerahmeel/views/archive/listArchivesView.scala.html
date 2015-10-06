@@ -1,25 +1,15 @@
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.JudgelsPlayUtils
 @import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.Archive
-@import org.iatoki.judgels.jerahmeel.ArchiveWithScore
 @import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 
-@(currentArchive: Archive, childArchives: List[ArchiveWithScore])
+@(currentArchive: Archive, childArchives: List[Archive])
 
 @for(archive <- childArchives) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.ArchiveController.viewArchives(archive.getArchive.getId)" class="panel-title">@archive.getArchive.getName</a>
-            @if(!JerahmeelUtils.isGuest) {
-                <div class="pull-right">
-                    <span class="alert alert-warning">
-                        @Messages.get("archive.totalPoints"):
-                        @archive.getScore
-                    </span>
-                </div>
-            }
+            <a href="@routes.ArchiveController.viewArchives(archive.getId)" class="panel-title">@archive.getName</a>
         </div>
     </div>
 }

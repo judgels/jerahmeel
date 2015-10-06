@@ -3,51 +3,23 @@
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
-@import org.iatoki.judgels.jerahmeel.CurriculumCourseProgress
+@import org.iatoki.judgels.jerahmeel.CurriculumCourse
 @import org.iatoki.judgels.jerahmeel.CourseProgress
 
-@(curriculumId: Long, pageOfCurriculumCoursesProgress: Page[CurriculumCourseProgress], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, pageOfCurriculumCourses: Page[CurriculumCourse], orderBy: String, orderDir: String, filterString: String)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingCourseController.listCourses(curriculumId, newPageIndex, newOrderBy, newOrderDir)}
 
-@for(curriculumCourseProgress <- pageOfCurriculumCoursesProgress.getData()) {
+@for(curriculumCourse <- pageOfCurriculumCourses.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourseProgress.getCurriculumCourse.getId)" class="panel-title">
-                @{curriculumCourseProgress.getCurriculumCourse.getAlias}. @curriculumCourseProgress.getCurriculumCourse.getCourseName
+            <a href="@routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourse.getId)" class="panel-title">
+                @{curriculumCourse.getAlias}. @curriculumCourse.getCourseName
             </a>
-            @if(!JerahmeelUtils.isGuest) {
-                <div class="pull-right">
-                    @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
-                        <span class="alert alert-danger">
-                            @Messages.get("training.course.locked") [- / @curriculumCourseProgress.getTotalSessions]
-                        </span>
-                    } else {
-                        @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
-                            <span class="alert alert-success">
-                                @Messages.get("training.course.completed")
-                                [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
-                            </span>
-                        } else {
-                            @if(curriculumCourseProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
-                                <span class="alert alert-info">
-                                    @Messages.get("training.course.inProgress")
-                                    [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
-                                </span>
-                            } else {
-                                <span class="alert alert-warning">
-                                    @Messages.get("training.course.available")
-                                    [@curriculumCourseProgress.getCompletedSessions / @curriculumCourseProgress.getTotalSessions]
-                                </span>
-                            }
-                        }
-                    }
-                </div>
-            }
         </div>
     </div>
 }
 
-@paginationView(pageOfCurriculumCoursesProgress, orderBy, orderDir, filterString, listFunc)
+@paginationView(pageOfCurriculumCourses, orderBy, orderDir, filterString, listFunc)

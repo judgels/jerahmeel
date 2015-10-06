@@ -6,7 +6,7 @@ import com.google.common.collect.Maps;
 import org.iatoki.judgels.jerahmeel.ProblemProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
+import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
@@ -82,11 +82,11 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
     }
 
     @Override
-    public Page<SessionProblemProgress> getPageOfSessionProblemsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
+    public Page<SessionProblemWithProgress> getPageOfSessionProblemsWithProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid, SessionProblemModel_.status, SessionProblemStatus.VISIBLE.name()), ImmutableMap.of());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid, SessionProblemModel_.status, SessionProblemStatus.VISIBLE.name()), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        ImmutableList.Builder<SessionProblemProgress> sessionProblemProgressBuilder = ImmutableList.builder();
+        ImmutableList.Builder<SessionProblemWithProgress> sessionProblemProgressBuilder = ImmutableList.builder();
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             ProblemProgress progress = ProblemProgress.NOT_VIEWED;
             if (userItemDao.existsByUserJidAndItemJid(userJid, sessionProblemModel.problemJid)) {
@@ -121,7 +121,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
                 }
             }
 
-            sessionProblemProgressBuilder.add(new SessionProblemProgress(SessionProblemServiceUtils.createFromModel(sessionProblemModel), progress, maxScore));
+            sessionProblemProgressBuilder.add(new SessionProblemWithProgress(SessionProblemServiceUtils.createFromModel(sessionProblemModel), progress, maxScore));
         }
 
         return new Page<>(sessionProblemProgressBuilder.build(), totalPages, pageIndex, pageSize);

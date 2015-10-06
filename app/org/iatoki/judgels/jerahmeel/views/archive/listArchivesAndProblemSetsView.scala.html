@@ -1,9 +1,8 @@
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.Archive
-@import org.iatoki.judgels.jerahmeel.ArchiveWithScore
-@import org.iatoki.judgels.jerahmeel.ProblemSetWithScore
+@import org.iatoki.judgels.jerahmeel.ProblemSet
 
-@(currentArchive: Archive, childArchives: List[ArchiveWithScore], pageOfProblemSets: Page[ProblemSetWithScore], orderBy: String, orderDir: String, filterString: String)
+@(currentArchive: Archive, childArchives: List[Archive], pageOfProblemSets: Page[ProblemSet], orderBy: String, orderDir: String, filterString: String)
 
 <div class="well">
     @Html(currentArchive.getDescription)

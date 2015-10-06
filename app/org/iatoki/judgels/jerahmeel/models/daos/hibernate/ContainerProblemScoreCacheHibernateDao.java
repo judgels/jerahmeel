@@ -39,6 +39,6 @@ public final class ContainerProblemScoreCacheHibernateDao extends AbstractHibern
 
         query.where(cb.and(cb.equal(root.get(ContainerProblemScoreCacheModel_.userJid), userJid), cb.equal(root.get(ContainerProblemScoreCacheModel_.containerJid), containerJid), cb.equal(root.get(ContainerProblemScoreCacheModel_.problemJid), problemJid)));
 
-        return JPA.em().createQuery(query).getSingleResult();
+        return getFirstResultAndDeleteTheRest(query);
     }
 }

@@ -11,7 +11,9 @@ import java.util.Map;
 
 public interface ProblemSetService {
 
-    Page<ProblemSetWithScore> getPageOfProblemSets(Archive archive, String userJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<ProblemSet> getPageOfProblemSets(Archive archive, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+
+    Page<ProblemSetWithScore> getPageOfProblemSetsWithScore(Archive archive, String userJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     ProblemSet findProblemSetById(long problemSetId) throws ProblemSetNotFoundException;
 

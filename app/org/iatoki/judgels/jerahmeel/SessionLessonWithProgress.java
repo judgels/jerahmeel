@@ -1,11 +1,11 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class SessionLessonProgress {
+public class SessionLessonWithProgress {
 
     private final SessionLesson sessionLesson;
     private final LessonProgress lessonProgress;
 
-    public SessionLessonProgress(SessionLesson sessionLesson, LessonProgress lessonProgress) {
+    public SessionLessonWithProgress(SessionLesson sessionLesson, LessonProgress lessonProgress) {
         this.sessionLesson = sessionLesson;
         this.lessonProgress = lessonProgress;
     }

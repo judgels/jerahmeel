@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel.services;
 
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.SessionProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblemProgress;
+import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.play.Page;
@@ -17,7 +17,7 @@ public interface SessionProblemService {
 
     Page<SessionProblem> getPageOfSessionProblems(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
-    Page<SessionProblemProgress> getPageOfSessionProblemsProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
+    Page<SessionProblemWithProgress> getPageOfSessionProblemsWithProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     void addSessionProblem(String sessionJid, String problemJid, String problemSecret, String alias, SessionProblemType type, SessionProblemStatus status, String userJid, String userIpAddress);
 
