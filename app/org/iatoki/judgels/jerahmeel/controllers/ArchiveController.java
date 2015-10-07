@@ -65,7 +65,7 @@ public final class ArchiveController extends AbstractJudgelsController {
     @Authenticated(value = GuestView.class)
     @Transactional
     public Result viewArchives(long archiveId) throws ArchiveNotFoundException {
-        return showListArchivesProblemSets(archiveId, 0, "id", "asc", "");
+        return showListArchivesProblemSets(archiveId, 0, "name", "asc", "");
     }
 
     @Authenticated(value = GuestView.class)

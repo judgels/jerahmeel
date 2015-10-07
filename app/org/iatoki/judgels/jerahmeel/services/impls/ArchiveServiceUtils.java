@@ -74,7 +74,7 @@ public final class ArchiveServiceUtils {
     }
 
     static List<Archive> getChildArchives(ArchiveDao archiveDao, String parentJid) {
-        List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, parentJid), 0, -1);
+        List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("name", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, parentJid), 0, -1);
 
         return archiveModels.stream().map(m -> createArchiveWithParentAndSubArchivesFromModel(archiveDao, m)).collect(Collectors.toList());
     }
