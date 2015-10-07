@@ -119,13 +119,15 @@ public final class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public void createArchive(String parentJid, String name, String description) {
+    public long createArchive(String parentJid, String name, String description) {
         ArchiveModel archiveModel = new ArchiveModel();
         archiveModel.parentJid = parentJid;
         archiveModel.name = name;
         archiveModel.description = description;
 
         archiveDao.persist(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        return archiveModel.id;
     }
 
     @Override
