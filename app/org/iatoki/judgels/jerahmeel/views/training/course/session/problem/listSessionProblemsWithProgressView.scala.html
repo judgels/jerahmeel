@@ -32,7 +32,7 @@
                     [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScores]
                     </span>
                 } else {
-                    @if(Double.compare(sessionProblemWithProgress.getScores, -1.0f) == 0) {
+                    @if(Double.compare(sessionProblemWithProgress.getScores, Double.NEGATIVE_INFINITY) == 0) {
                         @if(sessionProblemWithProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
                             <span class="alert alert-info">
                             @Messages.get("training.problem.viewed")

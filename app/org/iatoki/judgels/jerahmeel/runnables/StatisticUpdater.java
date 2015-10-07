@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.runnables;
 
-import com.beust.jcommander.internal.Lists;
-import com.beust.jcommander.internal.Maps;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.iatoki.judgels.jerahmeel.PointStatisticEntry;
 import org.iatoki.judgels.jerahmeel.ProblemScoreStatisticEntry;
 import org.iatoki.judgels.jerahmeel.ProblemStatisticEntry;

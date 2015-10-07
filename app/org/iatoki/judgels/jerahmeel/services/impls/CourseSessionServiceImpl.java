@@ -12,6 +12,7 @@ import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
@@ -43,6 +44,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
     private final BundleSubmissionDao bundleSubmissionDao;
     private final BundleGradingDao bundleGradingDao;
+    private final ContainerScoreCacheDao containerScoreCacheDao;
     private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final CourseSessionDao courseSessionDao;
     private final SessionDao sessionDao;
@@ -53,9 +55,10 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     private final UserItemDao userItemDao;
 
     @Inject
-    public CourseSessionServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, UserItemDao userItemDao) {
+    public CourseSessionServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, UserItemDao userItemDao) {
         this.bundleSubmissionDao = bundleSubmissionDao;
         this.bundleGradingDao = bundleGradingDao;
+        this.containerScoreCacheDao = containerScoreCacheDao;
         this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
         this.courseSessionDao = courseSessionDao;
         this.sessionDao = sessionDao;
@@ -130,7 +133,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
             long totalProblems = currentSessionProblemModels.size();
             long solvedProblems = 0;
-            double totalScore = SessionProblemServiceUtils.getUserTotalScoreFromSessionProblemModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, currentSessionProblemModels);
+            double totalScore = SessionProblemServiceUtils.getUserTotalScoreFromSessionProblemModels(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, courseSessionModel.sessionJid, currentSessionProblemModels);
             for (SessionProblemModel sessionProblemModel : currentSessionProblemModels) {
                 if (userItemDao.existsByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                     solvedProblems++;

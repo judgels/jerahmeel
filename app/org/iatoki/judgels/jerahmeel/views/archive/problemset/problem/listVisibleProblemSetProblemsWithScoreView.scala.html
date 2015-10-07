@@ -23,7 +23,7 @@
         <div class="panel-body clearfix">
             <a href="@routes.ProblemSetProblemController.viewProblemSetProblem(problemSet.getId, problemSetProblemWithScore.getProblemSetProblem.getId)" class="panel-title">@problemSetProblemWithScore.getProblemSetProblem.getAlias. @problemTitlesMap.get(problemSetProblemWithScore.getProblemSetProblem.getProblemJid)</a>
             <div class="pull-right">
-                @if(Double.compare(problemSetProblemWithScore.getScore, -1.0f) == 0) {
+                @if(Double.compare(problemSetProblemWithScore.getScore, Double.NEGATIVE_INFINITY) == 0) {
                     <span class="alert alert-warning">
                         @Messages.get("archive.problemSet.problem.notTried")
                     </span>

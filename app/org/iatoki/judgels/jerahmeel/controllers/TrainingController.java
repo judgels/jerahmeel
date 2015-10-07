@@ -37,13 +37,13 @@ public final class TrainingController extends AbstractJudgelsController {
     }
 
     @Authenticated(GuestView.class)
-    @Transactional(readOnly = true)
+    @Transactional
     public Result index() {
         return listTrainings();
     }
 
     @Authenticated(GuestView.class)
-    @Transactional(readOnly = true)
+    @Transactional
     public Result listTrainings() {
         List<Curriculum> curriculums = curriculumService.getAllCurriculums();
 

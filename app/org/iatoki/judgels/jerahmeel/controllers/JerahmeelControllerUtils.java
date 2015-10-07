@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
-import com.beust.jcommander.internal.Lists;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.iatoki.judgels.api.jophiel.JophielClientAPI;
 import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
