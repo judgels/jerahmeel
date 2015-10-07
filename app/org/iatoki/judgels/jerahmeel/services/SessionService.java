@@ -14,6 +14,8 @@ public interface SessionService {
 
     List<Session> getSessionsByTerm(String term);
 
+    Map<String, Session> getSessionsMapByJids(List<String> sessionJids);
+
     Page<Session> getPageOfSessions(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
     Session findSessionByJid(String sessionJid);

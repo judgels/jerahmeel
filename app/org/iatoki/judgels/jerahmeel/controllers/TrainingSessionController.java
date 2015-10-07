@@ -10,12 +10,14 @@ import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
+import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
+import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.UserItemService;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.listCourseSessionsView;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.session.listCourseSessionsWithProgressView;
@@ -30,6 +32,9 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named
@@ -42,14 +47,16 @@ public final class TrainingSessionController extends AbstractJudgelsController {
     private final CourseService courseService;
     private final CourseSessionService courseSessionService;
     private final UserItemService userItemService;
+    private final SessionService sessionService;
 
     @Inject
-    public TrainingSessionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, UserItemService userItemService) {
+    public TrainingSessionController(CurriculumService curriculumService, CurriculumCourseService curriculumCourseService, CourseService courseService, CourseSessionService courseSessionService, UserItemService userItemService, SessionService sessionService) {
         this.curriculumService = curriculumService;
         this.curriculumCourseService = curriculumCourseService;
         this.courseService = courseService;
         this.courseSessionService = courseSessionService;
         this.userItemService = userItemService;
+        this.sessionService = sessionService;
     }
 
     @Authenticated(value = GuestView.class)
@@ -73,12 +80,16 @@ public final class TrainingSessionController extends AbstractJudgelsController {
         LazyHtml content;
         if (!JerahmeelUtils.isGuest()) {
             Page<CourseSessionWithProgress> pageOfCourseSessionsWithProgress = courseSessionService.getPageOfCourseSessionsWithProgress(IdentityUtils.getUserJid(), curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessionsWithProgress.getData().stream().map(e -> e.getCourseSession().getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            content = new LazyHtml(listCourseSessionsWithProgressView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessionsWithProgress, orderBy, orderDir, filterString));
+            content = new LazyHtml(listCourseSessionsWithProgressView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessionsWithProgress, sessionsMap, orderBy, orderDir, filterString));
         } else {
             Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(curriculumCourse.getCourseJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessions, orderBy, orderDir, filterString));
+            content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString));
         }
 
         CourseControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course);

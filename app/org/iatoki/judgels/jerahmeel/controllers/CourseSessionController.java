@@ -5,6 +5,7 @@ import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
@@ -32,6 +33,9 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
@@ -66,9 +70,12 @@ public final class CourseSessionController extends AbstractJudgelsController {
         Course course = courseService.findCourseById(courseId);
 
         Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+        Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
+
         Form<CourseSessionAddForm> courseSessionAddForm = Form.form(CourseSessionAddForm.class);
 
-        return showListAddSessions(course, courseSessionAddForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+        return showListAddSessions(course, courseSessionAddForm, pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString);
     }
 
     @Transactional
@@ -79,35 +86,47 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
         if (formHasErrors(courseSessionCreateForm)) {
             Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString);
         }
 
         CourseSessionAddForm courseSessionCreateData = courseSessionCreateForm.get();
         if (!sessionService.sessionExistsByJid(courseSessionCreateData.sessionJid)) {
             courseSessionCreateForm.reject(Messages.get("error.course.invalidJid"));
             Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+
+            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString);
         }
 
         if (courseSessionService.existsByCourseJidAndAlias(course.getJid(), courseSessionCreateData.alias)) {
             courseSessionCreateForm.reject(Messages.get("error.course.session.duplicateAlias"));
             Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+
+            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString);
         }
 
         if (courseSessionService.existsByCourseJidAndSessionJid(course.getJid(), courseSessionCreateData.sessionJid)) {
             courseSessionCreateForm.reject(Messages.get("error.course.sessionExist"));
             Page<CourseSession> pageOfCourseSessions = courseSessionService.getPageOfCourseSessions(course.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> sessionJids = pageOfCourseSessions.getData().stream().map(e -> e.getSessionJid()).collect(Collectors.toList());
+            Map<String, Session> sessionsMap = sessionService.getSessionsMapByJids(sessionJids);
 
-            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, orderBy, orderDir, filterString);
+
+            return showListAddSessions(course, courseSessionCreateForm, pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString);
         }
 
         CourseSession courseSession = courseSessionService.addCourseSession(course.getJid(), courseSessionCreateData.sessionJid, courseSessionCreateData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), session.getName()));
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
@@ -152,7 +171,8 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
         courseSessionService.updateCourseSession(courseSession.getId(), courseSessionEditData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), session.getName()));
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
@@ -161,6 +181,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
     public Result removeSession(long courseId, long courseSessionId) throws CourseNotFoundException, CourseSessionNotFoundException {
         Course course = courseService.findCourseById(courseId);
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
         if (!course.getJid().equals(courseSession.getCourseJid())) {
             return forbidden();
@@ -168,13 +189,13 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
         courseSessionService.removeCourseSession(courseSessionId);
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), courseSession.getSessionName()));
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(COURSE, course.getJid(), course.getName(), SESSION, courseSession.getSessionJid(), session.getName()));
 
         return redirect(routes.CourseSessionController.viewSessions(course.getId()));
     }
 
-    private Result showListAddSessions(Course course, Form<CourseSessionAddForm> courseSessionAddForm, Page<CourseSession> pageOfCourseSessions, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listAddCourseSessionsView.render(course.getId(), pageOfCourseSessions, orderBy, orderDir, filterString, courseSessionAddForm));
+    private Result showListAddSessions(Course course, Form<CourseSessionAddForm> courseSessionAddForm, Page<CourseSession> pageOfCourseSessions, Map<String, Session> sessionsMap, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listAddCourseSessionsView.render(course.getId(), pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString, courseSessionAddForm));
         CourseControllerUtils.appendUpdateLayout(content, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, course,

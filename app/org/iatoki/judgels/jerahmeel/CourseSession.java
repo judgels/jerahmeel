@@ -6,14 +6,12 @@ public final class CourseSession {
     private final String courseJid;
     private final String sessionJid;
     private final String alias;
-    private final String sessionName;
 
-    public CourseSession(long id, String courseJid, String sessionJid, String alias, String sessionName) {
+    public CourseSession(long id, String courseJid, String sessionJid, String alias) {
         this.id = id;
         this.courseJid = courseJid;
         this.sessionJid = sessionJid;
         this.alias = alias;
-        this.sessionName = sessionName;
     }
 
     public long getId() {
@@ -30,9 +28,5 @@ public final class CourseSession {
 
     public String getAlias() {
         return alias;
-    }
-
-    public String getSessionName() {
-        return sessionName;
     }
 }

@@ -17,6 +17,7 @@ import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named("sessionService")
@@ -44,6 +45,12 @@ public final class SessionServiceImpl implements SessionService {
         }
 
         return sessionBuilder.build();
+    }
+
+    @Override
+    public Map<String, Session> getSessionsMapByJids(List<String> sessionJids) {
+        List<SessionModel> sessionModels = sessionDao.findSortedByFiltersIn("id", "asc", "", ImmutableMap.of(SessionModel_.jid, sessionJids), 0, -1);
+        return sessionModels.stream().collect(Collectors.toMap(m -> m.jid, m -> SessionServiceUtils.createSessionFromModel(m)));
     }
 
     @Override

@@ -7,6 +7,7 @@ import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseModel;
+import org.iatoki.judgels.jerahmeel.models.entities.CourseModel_;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.play.Page;
 
@@ -14,6 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named("courseService")
@@ -29,6 +32,12 @@ public final class CourseServiceImpl implements CourseService {
     @Override
     public boolean courseExistsByJid(String courseJid) {
         return courseDao.existsByJid(courseJid);
+    }
+
+    @Override
+    public Map<String, Course> getCoursesMapByJids(List<String> courseJids) {
+        List<CourseModel> courseModels = courseDao.findSortedByFiltersIn("id", "asc", "", ImmutableMap.of(CourseModel_.jid, courseJids), 0, -1);
+        return courseModels.stream().collect(Collectors.toMap(m -> m.jid, m -> CourseServiceUtils.createCourseFromModel(m)));
     }
 
     @Override

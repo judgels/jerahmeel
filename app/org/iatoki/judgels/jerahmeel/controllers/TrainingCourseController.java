@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseWithProgress;
@@ -8,6 +9,7 @@ import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
+import org.iatoki.judgels.jerahmeel.services.CourseService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
 import org.iatoki.judgels.jerahmeel.views.html.training.course.listCurriculumCoursesView;
@@ -23,6 +25,9 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 @Named
@@ -32,11 +37,13 @@ public final class TrainingCourseController extends AbstractJudgelsController {
 
     private final CurriculumCourseService curriculumCourseService;
     private final CurriculumService curriculumService;
+    private final CourseService courseService;
 
     @Inject
-    public TrainingCourseController(CurriculumCourseService curriculumCourseService, CurriculumService curriculumService) {
+    public TrainingCourseController(CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, CourseService courseService) {
         this.curriculumCourseService = curriculumCourseService;
         this.curriculumService = curriculumService;
+        this.courseService = courseService;
     }
 
     @Authenticated(value = GuestView.class)
@@ -53,12 +60,16 @@ public final class TrainingCourseController extends AbstractJudgelsController {
         LazyHtml content;
         if (!JerahmeelUtils.isGuest()) {
             Page<CurriculumCourseWithProgress> pageOfCurriculumCoursesWithProgress = curriculumCourseService.getPageOfCurriculumCoursesWithProgress(IdentityUtils.getUserJid(), curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCoursesWithProgress.getData().stream().map(e -> e.getCurriculumCourse().getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            content = new LazyHtml(listCurriculumCoursesWithProgressView.render(curriculum.getId(), pageOfCurriculumCoursesWithProgress, orderBy, orderDir, filterString));
+            content = new LazyHtml(listCurriculumCoursesWithProgressView.render(curriculum.getId(), pageOfCurriculumCoursesWithProgress, coursesMap, orderBy, orderDir, filterString));
         } else {
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            content = new LazyHtml(listCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, orderBy, orderDir, filterString));
+            content = new LazyHtml(listCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString));
         }
 
         CurriculumControllerUtils.appendViewLayout(content, curriculum);

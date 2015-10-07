@@ -2,11 +2,11 @@
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.CourseSessionWithProgress
+@import org.iatoki.judgels.jerahmeel.Session
 @import org.iatoki.judgels.jerahmeel.SessionProgress
 
-@(curriculumId: Long, curriculumCourseId: Long, pageOfCourseSessionsWithProgress: Page[CourseSessionWithProgress], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, curriculumCourseId: Long, pageOfCourseSessionsWithProgress: Page[CourseSessionWithProgress], sessionsMap: Map[String, Session], orderBy: String, orderDir: String, filterString: String)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
@@ -16,7 +16,7 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingLessonController.viewLessons(curriculumId, curriculumCourseId, courseSessionWithProgress.getCourseSession.getId)" class="panel-title">
-                @{courseSessionWithProgress.getCourseSession.getAlias}. @courseSessionWithProgress.getCourseSession.getSessionName
+                @{courseSessionWithProgress.getCourseSession.getAlias}. @sessionsMap.get(courseSessionWithProgress.getCourseSession.getSessionJid).getName
             </a>
             <div class="pull-right">
                 @if(courseSessionWithProgress.getSessionProgress.equals(SessionProgress.LOCKED)) {

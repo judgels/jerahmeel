@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
@@ -32,6 +33,9 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
 @Authorized(value = "admin")
@@ -66,9 +70,12 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
 
         Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+        List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+        Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
+
         Form<CurriculumCourseAddForm> curriculumCourseAddForm = Form.form(CurriculumCourseAddForm.class);
 
-        return showListAddCourses(curriculum, curriculumCourseAddForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+        return showListAddCourses(curriculum, curriculumCourseAddForm, pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString);
     }
 
     @Transactional
@@ -79,35 +86,44 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
         if (formHasErrors(curriculumCourseCreateForm)) {
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString);
         }
 
         CurriculumCourseAddForm curriculumCourseCreateData = curriculumCourseCreateForm.get();
         if (!courseService.courseExistsByJid(curriculumCourseCreateData.courseJid)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.invalidJid"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString);
         }
 
         if (curriculumCourseService.existsByCurriculumJidAndAlias(curriculum.getJid(), curriculumCourseCreateData.alias)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.course.duplicateAlias"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString);
         }
 
         if (curriculumCourseService.existsByCurriculumJidAndCourseJid(curriculum.getJid(), curriculumCourseCreateData.courseJid)) {
             curriculumCourseCreateForm.reject(Messages.get("error.curriculum.courseExist"));
             Page<CurriculumCourse> pageOfCurriculumCourses = curriculumCourseService.getPageOfCurriculumCourses(curriculum.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
+            List<String> courseJids = pageOfCurriculumCourses.getData().stream().map(e -> e.getCourseJid()).collect(Collectors.toList());
+            Map<String, Course> coursesMap = courseService.getCoursesMapByJids(courseJids);
 
-            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, orderBy, orderDir, filterString);
+            return showListAddCourses(curriculum, curriculumCourseCreateForm, pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString);
         }
 
         CurriculumCourse curriculumCourse = curriculumCourseService.addCurriculumCourse(curriculum.getJid(), curriculumCourseCreateData.courseJid, curriculumCourseCreateData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.ADD_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), course.getName()));
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
@@ -154,7 +170,8 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
         curriculumCourseService.updateCurriculumCourse(curriculumCourse.getId(), curriculumCourseEditData.alias, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.EDIT_IN.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), course.getName()));
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
@@ -170,13 +187,14 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
         curriculumCourseService.removeCurriculumCourse(curriculumCourseId);
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), curriculumCourse.getCourseName()));
+        Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
+        JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(CURRICULUM, curriculum.getJid(), curriculum.getName(), COURSE, curriculumCourse.getCourseJid(), course.getName()));
 
         return redirect(routes.CurriculumCourseController.viewCourses(curriculum.getId()));
     }
 
-    private Result showListAddCourses(Curriculum curriculum, Form<CurriculumCourseAddForm> curriculumCourseAddForm, Page<CurriculumCourse> pageOfCurriculumCourses, String orderBy, String orderDir, String filterString) {
-        LazyHtml content = new LazyHtml(listAddCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, orderBy, orderDir, filterString, curriculumCourseAddForm));
+    private Result showListAddCourses(Curriculum curriculum, Form<CurriculumCourseAddForm> curriculumCourseAddForm, Page<CurriculumCourse> pageOfCurriculumCourses, Map<String, Course> coursesMap, String orderBy, String orderDir, String filterString) {
+        LazyHtml content = new LazyHtml(listAddCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString, curriculumCourseAddForm));
         CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum);

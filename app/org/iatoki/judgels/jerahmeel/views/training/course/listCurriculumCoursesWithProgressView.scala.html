@@ -2,11 +2,11 @@
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.jerahmeel.controllers.routes
-@import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.CurriculumCourseWithProgress
+@import org.iatoki.judgels.jerahmeel.Course
 @import org.iatoki.judgels.jerahmeel.CourseProgress
 
-@(curriculumId: Long, pageOfCurriculumCoursesWithProgress: Page[CurriculumCourseWithProgress], orderBy: String, orderDir: String, filterString: String)
+@(curriculumId: Long, pageOfCurriculumCoursesWithProgress: Page[CurriculumCourseWithProgress], coursesMap: Map[String, Course], orderBy: String, orderDir: String, filterString: String)
 
 @implicitFieldConstructor = @{ b3.horizontal.fieldConstructor("col-md-3", "col-md-9") }
 
@@ -16,7 +16,7 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourseWithProgress.getCurriculumCourse.getId)" class="panel-title">
-                @{curriculumCourseWithProgress.getCurriculumCourse.getAlias}. @curriculumCourseWithProgress.getCurriculumCourse.getCourseName
+                @{curriculumCourseWithProgress.getCurriculumCourse.getAlias}. @coursesMap.get(curriculumCourseWithProgress.getCurriculumCourse.getCourseJid).getName
             </a>
             <div class="pull-right">
                 @if(curriculumCourseWithProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {

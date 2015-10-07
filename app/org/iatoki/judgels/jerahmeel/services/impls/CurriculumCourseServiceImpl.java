@@ -85,7 +85,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
     public CurriculumCourse findCurriculumCourseByCurriculumCourseId(long curriculumCourseId) throws CurriculumCourseNotFoundException {
         CurriculumCourseModel curriculumCourseModel = curriculumCourseDao.findById(curriculumCourseId);
         if (curriculumCourseModel != null) {
-            return CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel);
+            return CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel);
         } else {
             throw new CurriculumCourseNotFoundException("Curriculum Course Not Found.");
         }
@@ -96,7 +96,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
         long totalPages = curriculumCourseDao.countByFilters(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of());
         List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<CurriculumCourse> curriculumCourses = curriculumCourseModels.stream().map(m -> CurriculumCourseServiceUtils.createFromModel(courseDao, m)).collect(Collectors.toList());
+        List<CurriculumCourse> curriculumCourses = curriculumCourseModels.stream().map(m -> CurriculumCourseServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
         return new Page<>(curriculumCourses, totalPages, pageIndex, pageSize);
     }
@@ -145,7 +145,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
             CourseProgressWithCompleted courseProgressWithCompleted = getUserProgressFromCourseSessionModels(userJid, currentCourseSessionModels);
             double totalScore = CourseSessionServiceUtils.getUserTotalScoreFromCourseSessionModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, currentCourseSessionModels, mapSessionJidToSessionProblemModels);
 
-            curriculumCourseProgressBuilder.add(new CurriculumCourseWithProgress(CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel), courseProgressWithCompleted.courseProgress, courseProgressWithCompleted.completed, courseSessionModels.size(), totalScore));
+            curriculumCourseProgressBuilder.add(new CurriculumCourseWithProgress(CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel), courseProgressWithCompleted.courseProgress, courseProgressWithCompleted.completed, courseSessionModels.size(), totalScore));
         }
 
         return new Page<>(curriculumCourseProgressBuilder.build(), totalPages, pageIndex, pageSize);
@@ -160,7 +160,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
         curriculumCourseDao.persist(curriculumCourseModel, userJid, userIpAddress);
 
-        return CurriculumCourseServiceUtils.createFromModel(courseDao, curriculumCourseModel);
+        return CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel);
     }
 
     @Override

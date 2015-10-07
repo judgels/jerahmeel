@@ -80,7 +80,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
     public CourseSession findCourseSessionById(long courseSessionId) throws CourseSessionNotFoundException {
         CourseSessionModel courseSessionModel = courseSessionDao.findById(courseSessionId);
         if (courseSessionModel != null) {
-            return CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel);
+            return CourseSessionServiceUtils.createFromModel(courseSessionModel);
         } else {
             throw new CourseSessionNotFoundException("Course Session Not Found.");
         }
@@ -91,7 +91,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
         long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
 
-        List<CourseSession> courseSessions = courseSessionModels.stream().map(m -> CourseSessionServiceUtils.createFromModel(sessionDao, m)).collect(Collectors.toList());
+        List<CourseSession> courseSessions = courseSessionModels.stream().map(m -> CourseSessionServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
         return new Page<>(courseSessions, totalPages, pageIndex, pageSize);
     }
@@ -150,7 +150,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
                     progress = SessionProgress.AVAILABLE;
                 }
             }
-            courseSessionProgressBuilder.add(new CourseSessionWithProgress(CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
+            courseSessionProgressBuilder.add(new CourseSessionWithProgress(CourseSessionServiceUtils.createFromModel(courseSessionModel), progress, solvedProblems, totalProblems, totalScore));
         }
 
         return new Page<>(courseSessionProgressBuilder.build(), totalPages, pageIndex, pageSize);
@@ -165,7 +165,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
         courseSessionDao.persist(courseSessionModel, userJid, userIpAddress);
 
-        return CourseSessionServiceUtils.createFromModel(sessionDao, courseSessionModel);
+        return CourseSessionServiceUtils.createFromModel(courseSessionModel);
     }
 
     @Override

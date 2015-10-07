@@ -7,7 +7,6 @@ import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.CourseSessionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
 
@@ -20,8 +19,8 @@ final class CourseSessionServiceUtils {
         // prevent instantiation
     }
 
-    static CourseSession createFromModel(SessionDao sessionDao, CourseSessionModel model) {
-        return new CourseSession(model.id, model.courseJid, model.sessionJid, model.alias, sessionDao.findByJid(model.sessionJid).name);
+    static CourseSession createFromModel(CourseSessionModel model) {
+        return new CourseSession(model.id, model.courseJid, model.sessionJid, model.alias);
     }
 
     static double getUserTotalScoreFromCourseSessionModels(ContainerProblemScoreCacheDao containerProblemScoreCacheDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, String userJid, List<CourseSessionModel> courseSessionModels, Map<String, List<SessionProblemModel>> mapSessionJidToSessionProblemModels) {

@@ -5,10 +5,13 @@ import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
 import org.iatoki.judgels.play.Page;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CourseService {
 
     boolean courseExistsByJid(String courseJid);
+
+    Map<String, Course> getCoursesMapByJids(List<String> courseJids);
 
     List<Course> getCoursesByTerm(String term);
 

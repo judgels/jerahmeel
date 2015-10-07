@@ -112,7 +112,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
             content = new LazyHtml(listSessionLessonsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessons, orderBy, orderDir, filterString, lessonTitlesMap));
         }
 
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
@@ -148,7 +148,7 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
         LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody, sessionLesson.getId()));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(sessionLesson.getAlias(), routes.TrainingLessonController.viewLesson(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionLesson.getId()))

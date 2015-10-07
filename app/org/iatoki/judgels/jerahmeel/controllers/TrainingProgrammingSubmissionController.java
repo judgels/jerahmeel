@@ -96,6 +96,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
         CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
 
         if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid())) {
             return notFound();
@@ -124,7 +125,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
             return redirect(routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()));
         }
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(SESSION, courseSession.getSessionJid(), courseSession.getSessionName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(SESSION, courseSession.getSessionJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));
 
         return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()));
     }
@@ -156,7 +157,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         LazyHtml content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
         TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
@@ -188,7 +189,7 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
 
         LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
         TrainingSubmissionControllerUtils.appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(submission.getId() + "", routes.TrainingProgrammingSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), submission.getId()))

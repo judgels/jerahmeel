@@ -116,7 +116,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
             content = new LazyHtml(listSessionProblemsView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblems, orderBy, orderDir, filterString, problemTitlesMap));
         }
 
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
@@ -181,7 +181,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         session("problemJid", sessionProblem.getProblemJid());
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody, sessionProblem.getId()));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, courseSession, session);
+        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(sessionProblem.getAlias(), routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()))

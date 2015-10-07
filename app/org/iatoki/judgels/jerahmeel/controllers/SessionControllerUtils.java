@@ -1,6 +1,7 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
+import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseSession;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
@@ -23,7 +24,7 @@ final class SessionControllerUtils {
         // prevent instantiation
     }
 
-    static void appendViewLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, CourseSession courseSession, Session session) {
+    static void appendViewLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session) {
         ImmutableList.Builder<InternalLink> tabLinksBuilder = ImmutableList.builder();
         tabLinksBuilder.add(new InternalLink(Messages.get("session.lessons"), routes.TrainingLessonController.viewLessons(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
         tabLinksBuilder.add(new InternalLink(Messages.get("session.problems"), routes.TrainingProblemController.viewProblems(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
@@ -38,13 +39,13 @@ final class SessionControllerUtils {
             content.appendLayout(c -> headingWithActionAndBackLayout.render(
                     Messages.get("session.session") + " #" + session.getId() + ": " + session.getName(),
                     new InternalLink(Messages.get("commons.update"), routes.SessionController.editSessionGeneral(session.getId())),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + course.getName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );
         } else {
             content.appendLayout(c -> headingWithBackLayout.render(
                     Messages.get("session.session") + " " + courseSession.getAlias() + ": " + session.getName(),
-                    new InternalLink(Messages.get("training.backTo") + " " + curriculumCourse.getCourseName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
+                    new InternalLink(Messages.get("training.backTo") + " " + course.getName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())),
                     c)
             );
         }
