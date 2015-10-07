@@ -3,29 +3,21 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.iatoki.judgels.jerahmeel.ProblemProgress;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemStatus;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemType;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel_;
-import org.iatoki.judgels.jerahmeel.models.entities.UserItemModel;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.play.Page;
-import org.iatoki.judgels.sandalphon.ProblemType;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -40,19 +32,19 @@ public final class ProblemSetProblemServiceImpl implements ProblemSetProblemServ
 
     private final BundleSubmissionDao bundleSubmissionDao;
     private final BundleGradingDao bundleGradingDao;
+    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final ProgrammingSubmissionDao programmingSubmissionDao;
     private final ProgrammingGradingDao programmingGradingDao;
     private final ProblemSetProblemDao problemSetProblemDao;
-    private final UserItemDao userItemDao;
 
     @Inject
-    public ProblemSetProblemServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, ProblemSetProblemDao problemSetProblemDao, UserItemDao userItemDao) {
+    public ProblemSetProblemServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, ProblemSetProblemDao problemSetProblemDao) {
         this.bundleSubmissionDao = bundleSubmissionDao;
         this.bundleGradingDao = bundleGradingDao;
+        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
         this.programmingSubmissionDao = programmingSubmissionDao;
         this.programmingGradingDao = programmingGradingDao;
         this.problemSetProblemDao = problemSetProblemDao;
-        this.userItemDao = userItemDao;
     }
 
     @Override
@@ -88,38 +80,7 @@ public final class ProblemSetProblemServiceImpl implements ProblemSetProblemServ
 
         ImmutableList.Builder<ProblemSetProblemWithScore> problemSetProblemProgressBuilder = ImmutableList.builder();
         for (ProblemSetProblemModel problemSetProblemModel : problemSetProblemModels) {
-            ProblemProgress progress = ProblemProgress.NOT_VIEWED;
-            if (userItemDao.existsByUserJidAndItemJid(userJid, problemSetProblemModel.problemJid)) {
-                UserItemModel userItemModel = userItemDao.findByUserJidAndItemJid(userJid, problemSetProblemModel.problemJid);
-                if (UserItemStatus.VIEWED.name().equals(userItemModel.status)) {
-                    progress = ProblemProgress.VIEWED;
-                } else if (UserItemStatus.COMPLETED.name().equals(userItemModel.status)) {
-                    progress = ProblemProgress.COMPLETED;
-                }
-            }
-
-            double maxScore = -1;
-            if (!progress.equals(ProblemProgress.NOT_VIEWED)) {
-                if (problemSetProblemModel.type.equals(ProblemType.BUNDLE.name())) {
-                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.getBySubmissionJids(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
-                    for (String submissionJid : bundleGradingModels.keySet()) {
-                        double submissionScore = bundleGradingModels.get(submissionJid).get(bundleGradingModels.get(submissionJid).size() - 1).score;
-                        if (submissionScore > maxScore) {
-                            maxScore = submissionScore;
-                        }
-                    }
-                } else if (problemSetProblemModel.type.equals(ProblemType.PROGRAMMING.name())) {
-                    List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    Map<String, List<ProgrammingGradingModel>> gradingModels = programmingGradingDao.getBySubmissionJids(programmingSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
-                    for (String submissionJid : gradingModels.keySet()) {
-                        double submissionScore = gradingModels.get(submissionJid).get(gradingModels.get(submissionJid).size() - 1).score;
-                        if (submissionScore > maxScore) {
-                            maxScore = submissionScore;
-                        }
-                    }
-                }
-            }
+            double maxScore = ProblemSetProblemServiceUtils.getUserMaxScoreFromProblemSetProblemModel(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetProblemModel);
 
             problemSetProblemProgressBuilder.add(new ProblemSetProblemWithScore(ProblemSetProblemServiceUtils.createFromModel(problemSetProblemModel), maxScore));
         }

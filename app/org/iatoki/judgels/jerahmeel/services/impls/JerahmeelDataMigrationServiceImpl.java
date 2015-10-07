@@ -15,7 +15,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
 
     @Override
     public long getCodeDataVersion() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -26,6 +26,19 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
         if (databaseVersion < 3) {
             migrateV2toV3();
         }
+        if (databaseVersion < 4) {
+            migrateV3toV4();
+        }
+    }
+
+    private void migrateV3toV4() throws SQLException {
+        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        Connection connection = session.getJdbcConnectionAccess().obtainConnection();
+
+        Statement statement = connection.createStatement();
+
+        statement.execute("DROP TABLE " + "jerahmeel_container_problem_score_cache" + ";");
+        statement.execute("RENAME TABLE " + "jerahmeel_container_score_cache" + " TO " + "jerahmeel_container_problem_score_cache" + ";");
     }
 
     private void migrateV2toV3() throws SQLException {

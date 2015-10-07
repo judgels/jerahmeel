@@ -34,45 +34,43 @@ final class ProblemSetProblemServiceUtils {
         return new ProblemSetProblem(model.id, model.problemSetJid, model.problemJid, model.problemSecret, model.alias, ProblemSetProblemType.valueOf(model.type), ProblemSetProblemStatus.valueOf(model.status));
     }
 
+    static double getUserMaxScoreFromProblemSetProblemModel(ContainerProblemScoreCacheDao containerProblemScoreCacheDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, String userJid, ProblemSetProblemModel problemSetProblemModel) {
+        if (containerProblemScoreCacheDao.existsByUserJidContainerJidAndProblemJid(userJid, problemSetProblemModel.problemSetJid, problemSetProblemModel.problemJid)) {
+            ContainerProblemScoreCacheModel containerProblemScoreCacheModel = containerProblemScoreCacheDao.getByUserJidContainerJidAndProblemJid(userJid, problemSetProblemModel.problemSetJid, problemSetProblemModel.problemJid);
+            return containerProblemScoreCacheModel.score;
+        }
+
+        double maxScore = 0;
+        if (problemSetProblemModel.type.equals(ProblemSetProblemType.BUNDLE.name())) {
+            List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
+            for (BundleSubmissionModel bundleSubmissionModel : bundleSubmissionModels) {
+                List<BundleGradingModel> gradingModels = bundleGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractBundleGradingModel_.submissionJid, bundleSubmissionModel.jid), 0, -1);
+                BundleSubmission bundleSubmission = BundleSubmissionServiceUtils.createSubmissionFromModels(bundleSubmissionModel, gradingModels);
+
+                if (bundleSubmission.getLatestScore() > maxScore) {
+                    maxScore = bundleSubmission.getLatestScore();
+                }
+            }
+        } else if (problemSetProblemModel.type.equals(ProblemSetProblemType.PROGRAMMING.name())) {
+            List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
+            for (ProgrammingSubmissionModel programmingSubmissionModel : programmingSubmissionModels) {
+                List<ProgrammingGradingModel> gradingModels = programmingGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractProgrammingGradingModel_.submissionJid, programmingSubmissionModel.jid), 0, -1);
+                ProgrammingSubmission programmingSubmission = ProgrammingSubmissionServiceUtils.createSubmissionFromModels(programmingSubmissionModel, gradingModels);
+
+                if (programmingSubmission.getLatestScore() > maxScore) {
+                    maxScore = programmingSubmission.getLatestScore();
+                }
+            }
+        }
+
+        ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, problemSetProblemModel.problemJid, problemSetProblemModel.problemJid, maxScore);
+        return maxScore;
+    }
+
     static double getUserTotalScoreFromProblemSetProblemModels(ContainerProblemScoreCacheDao containerProblemScoreCacheDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, String userJid, List<ProblemSetProblemModel> problemSetProblemModels) {
         double totalScore = 0;
         for (ProblemSetProblemModel problemSetProblemModel : problemSetProblemModels) {
-            if (containerProblemScoreCacheDao.existsByUserJidContainerJidAndProblemJid(userJid, problemSetProblemModel.problemSetJid, problemSetProblemModel.problemJid)) {
-                ContainerProblemScoreCacheModel containerProblemScoreCacheModel = containerProblemScoreCacheDao.getByUserJidContainerJidAndProblemJid(userJid, problemSetProblemModel.problemSetJid, problemSetProblemModel.problemJid);
-                totalScore += containerProblemScoreCacheModel.score;
-            } else {
-                double maxScore = 0;
-                if (problemSetProblemModel.type.equals(ProblemSetProblemType.BUNDLE.name())) {
-                    List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    for (BundleSubmissionModel bundleSubmissionModel : bundleSubmissionModels) {
-                        List<BundleGradingModel> gradingModels = bundleGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractBundleGradingModel_.submissionJid, bundleSubmissionModel.jid), 0, -1);
-                        BundleSubmission bundleSubmission = BundleSubmissionServiceUtils.createSubmissionFromModels(bundleSubmissionModel, gradingModels);
-
-                        if (bundleSubmission.getLatestScore() > maxScore) {
-                            maxScore = bundleSubmission.getLatestScore();
-                        }
-                    }
-                } else if (problemSetProblemModel.type.equals(ProblemSetProblemType.PROGRAMMING.name())) {
-                    List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-                    for (ProgrammingSubmissionModel programmingSubmissionModel : programmingSubmissionModels) {
-                        List<ProgrammingGradingModel> gradingModels = programmingGradingDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(AbstractProgrammingGradingModel_.submissionJid, programmingSubmissionModel.jid), 0, -1);
-                        ProgrammingSubmission programmingSubmission = ProgrammingSubmissionServiceUtils.createSubmissionFromModels(programmingSubmissionModel, gradingModels);
-
-                        if (programmingSubmission.getLatestScore() > maxScore) {
-                            maxScore = programmingSubmission.getLatestScore();
-                        }
-                    }
-                }
-
-                ContainerProblemScoreCacheModel containerProblemScoreCacheModel = new ContainerProblemScoreCacheModel();
-                containerProblemScoreCacheModel.containerJid = problemSetProblemModel.problemSetJid;
-                containerProblemScoreCacheModel.problemJid = problemSetProblemModel.problemJid;
-                containerProblemScoreCacheModel.userJid = userJid;
-                containerProblemScoreCacheModel.score = maxScore;
-                containerProblemScoreCacheDao.persist(containerProblemScoreCacheModel, "cacheLazyUpdater", "localhost");
-
-                totalScore += maxScore;
-            }
+            totalScore += getUserMaxScoreFromProblemSetProblemModel(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetProblemModel);
         }
 
         return totalScore;
