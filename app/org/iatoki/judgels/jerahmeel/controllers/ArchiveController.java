@@ -134,7 +134,7 @@ public final class ArchiveController extends AbstractJudgelsController {
         ArchiveUpsertForm archiveUpsertData = archiveUpsertForm.get();
         archiveService.updateArchive(archive.getJid(), archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description);
 
-        return redirect(routes.ArchiveController.index());
+        return redirect(routes.ArchiveController.viewArchives(archive.getId()));
     }
 
     private Result showListArchivesProblemSets(long archiveId, long pageIndex, String orderBy, String orderDir, String filterString) throws ArchiveNotFoundException {
