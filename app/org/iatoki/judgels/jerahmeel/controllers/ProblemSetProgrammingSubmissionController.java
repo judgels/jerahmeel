@@ -136,10 +136,10 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
         ProblemSetProblem problemSetProblem = problemSetProblemService.findProblemSetProblemByProblemSetJidAndProblemJid(problemSet.getJid(), submission.getProblemJid());
         String problemSetProblemAlias = problemSetProblem.getAlias();
-        String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid());
+        String problemsetProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
-        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, problemSetProblemAlias, sessionProblemName, gradingLanguageName, problemSet.getName()));
+        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, problemSetProblemAlias, problemsetProblemName, gradingLanguageName, problemSet.getName()));
         ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
