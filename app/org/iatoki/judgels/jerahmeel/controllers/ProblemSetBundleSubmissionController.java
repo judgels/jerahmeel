@@ -1,8 +1,6 @@
 package org.iatoki.judgels.jerahmeel.controllers;
 
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
@@ -26,9 +24,9 @@ import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
-import org.iatoki.judgels.sandalphon.BundleDetailResult;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
 import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
+import org.iatoki.judgels.sandalphon.BundleSubmissionUtils;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.views.html.problem.bundle.submission.bundleSubmissionView;
 import play.data.DynamicForm;
@@ -41,7 +39,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
@@ -132,7 +129,7 @@ public final class ProblemSetBundleSubmissionController extends AbstractJudgelsC
         String problemSetProblemAlias = problemSetProblem.getAlias();
         String problemSetProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
 
-        LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<LinkedHashMap<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), problemSetProblemAlias, problemSetProblemName, problemSet.getName()));
+        LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, BundleSubmissionUtils.parseGradingResult(bundleSubmission), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), problemSetProblemAlias, problemSetProblemName, problemSet.getName()));
         ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
