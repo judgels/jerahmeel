@@ -16,6 +16,8 @@ public final class JerahmeelProperties {
     private String jerahmeelBaseUrl;
     private File jerahmeelBaseDataDir;
 
+    private String jerahmeelWelcomeMessage;
+
     private String jophielBaseUrl;
     private String jophielClientJid;
     private String jophielClientSecret;
@@ -64,6 +66,10 @@ public final class JerahmeelProperties {
 
     public String getJerahmeelBaseUrl() {
         return jerahmeelBaseUrl;
+    }
+
+    public String getJerahmeelWelcomeMessage() {
+        return jerahmeelWelcomeMessage;
     }
 
     public String getJophielBaseUrl() {
@@ -181,6 +187,8 @@ public final class JerahmeelProperties {
     private void build() {
         jerahmeelBaseUrl = requireStringValue("jerahmeel.baseUrl");
         jerahmeelBaseDataDir = requireDirectoryValue("jerahmeel.baseDataDir");
+
+        jerahmeelWelcomeMessage = requireStringValue("jerahmeel.welcomeMessage");
 
         jophielBaseUrl = requireStringValue("jophiel.baseUrl");
         jophielClientJid = requireStringValue("jophiel.clientJid");

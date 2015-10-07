@@ -1,4 +1,4 @@
-@import play.i18n.Messages
+@import org.iatoki.judgels.jerahmeel.JerahmeelProperties
 @import org.iatoki.judgels.jerahmeel.Archive
 @import org.iatoki.judgels.jerahmeel.Curriculum
 @import org.iatoki.judgels.jerahmeel.controllers.routes
@@ -6,7 +6,7 @@
 @(curriculums: List[Curriculum], archives: List[Archive])
 
 <div class="well">
-    @Messages.get("training.welcome")
+    @Html(JerahmeelProperties.getInstance.getJerahmeelWelcomeMessage)
 </div>
 
 @for(curriculum <- curriculums) {
