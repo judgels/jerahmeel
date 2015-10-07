@@ -98,7 +98,7 @@ public final class ArchiveController extends AbstractJudgelsController {
         ArchiveUpsertForm archiveUpsertData = archiveUpsertForm.get();
         archiveService.createArchive(archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description);
 
-        return redirect(routes.ArchiveController.index());
+        return redirect(routes.TrainingController.index());
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
