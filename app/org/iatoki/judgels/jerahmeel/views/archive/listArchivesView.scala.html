@@ -10,6 +10,12 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.ArchiveController.viewArchives(archive.getId)" class="panel-title">@archive.getName</a>
+            @if(!archive.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(archive.getDescription)
+                </div>
+            }
         </div>
     </div>
 }

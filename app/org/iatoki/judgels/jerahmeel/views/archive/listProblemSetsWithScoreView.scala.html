@@ -29,6 +29,12 @@
                     @problemSet.getScore
                 </span>
             </div>
+            @if(!problemSet.getProblemSet.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(problemSet.getProblemSet.getDescription)
+                </div>
+            }
         </div>
     </div>
 }

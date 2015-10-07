@@ -13,6 +13,12 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingCourseController.viewCourses(curriculum.getId)" class="panel-title">@curriculum.getName</a>
+            @if(!curriculum.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(curriculum.getDescription)
+                </div>
+            }
         </div>
     </div>
 }
@@ -27,6 +33,12 @@
                     @archiveWithScore.getScore
                 </span>
             </div>
+            @if(!archiveWithScore.getArchive.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(archiveWithScore.getArchive.getDescription)
+                </div>
+            }
         </div>
     </div>
 }

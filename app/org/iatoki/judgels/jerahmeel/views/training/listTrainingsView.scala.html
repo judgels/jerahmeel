@@ -13,6 +13,12 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.TrainingCourseController.viewCourses(curriculum.getId)" class="panel-title">@curriculum.getName</a>
+            @if(!curriculum.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(curriculum.getDescription)
+                </div>
+            }
         </div>
     </div>
 }
@@ -21,6 +27,12 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.ArchiveController.viewArchives(archive.getId)" class="panel-title">@archive.getName</a>
+            @if(!archive.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(archive.getDescription)
+                </div>
+            }
         </div>
     </div>
 }

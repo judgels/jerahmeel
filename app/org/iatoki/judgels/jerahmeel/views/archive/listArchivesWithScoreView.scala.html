@@ -17,6 +17,12 @@
                     @archive.getScore
                 </span>
             </div>
+            @if(!archive.getArchive.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(archive.getArchive.getDescription)
+                </div>
+            }
         </div>
     </div>
 }

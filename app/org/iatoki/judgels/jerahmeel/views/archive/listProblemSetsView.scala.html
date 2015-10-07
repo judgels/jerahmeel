@@ -23,6 +23,12 @@
     <div class="panel panel-default">
         <div class="panel-body clearfix">
             <a href="@routes.ProblemSetController.jumpToProblems(problemSet.getId)" class="panel-title">@problemSet.getName</a>
+            @if(!problemSet.getDescription.isEmpty) {
+                <hr />
+                <div class="small">
+                    @Html(problemSet.getDescription)
+                </div>
+            }
         </div>
     </div>
 }
