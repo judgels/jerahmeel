@@ -133,6 +133,16 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public ProblemSet findProblemSetByJid(String problemSetJid) {
+        ProblemSetModel problemSetModel = problemSetDao.findByJid(problemSetJid);
+
+        ArchiveModel archiveModel = archiveDao.findByJid(problemSetModel.archiveJid);
+        Archive archive = ArchiveServiceUtils.createArchiveWithParentsFromModel(archiveDao, archiveModel);
+
+        return ProblemSetServiceUtils.createProblemSetFromModelAndArchive(problemSetModel, archive);
+    }
+
+    @Override
     public Map<String, String> getProblemSetJidToNameMapByProblemSetJids(Collection<String> problemSetJids) {
         List<ProblemSetModel> problemSetModels = problemSetDao.findSortedByFiltersIn("id", "asc", "", ImmutableMap.of(ProblemSetModel_.jid, problemSetJids), 0, -1);
 

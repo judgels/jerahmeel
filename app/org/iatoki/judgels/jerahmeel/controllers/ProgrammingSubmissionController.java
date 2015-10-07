@@ -6,6 +6,8 @@ import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.SubmissionSource;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
+import org.iatoki.judgels.jerahmeel.ProblemSet;
+import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
@@ -14,6 +16,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
@@ -49,6 +52,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
     private static final long PAGE_SIZE = 20;
 
+    private final ProblemSetProblemService problemSetProblemService;
     private final ProblemSetService problemSetService;
     private final FileSystemProvider programmingSubmissionLocalFileSystemProvider;
     private final FileSystemProvider programmingSubmissionRemoteFileSystemProvider;
@@ -57,7 +61,8 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     private final SessionService sessionService;
 
     @Inject
-    public ProgrammingSubmissionController(ProblemSetService problemSetService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public ProgrammingSubmissionController(ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+        this.problemSetProblemService = problemSetProblemService;
         this.problemSetService = problemSetService;
         this.programmingSubmissionLocalFileSystemProvider = programmingSubmissionLocalFileSystemProvider;
         this.programmingSubmissionRemoteFileSystemProvider = programmingSubmissionRemoteFileSystemProvider;
@@ -175,15 +180,33 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     }
 
     private LazyHtml getViewSubmissionContent(ProgrammingSubmission programmingSubmission) {
-        Session session = sessionService.findSessionByJid(programmingSubmission.getContainerJid());
+        String containerJid;
+        String containerName;
+        String problemAlias;
+        String problemName;
+        if (programmingSubmission.getContainerJid().startsWith("JIDPRSE")) {
+            ProblemSet problemSet = problemSetService.findProblemSetByJid(programmingSubmission.getContainerJid());
+            containerJid = problemSet.getJid();
+            containerName = problemSet.getName();
+
+            ProblemSetProblem problemSetProblem = problemSetProblemService.findProblemSetProblemByProblemSetJidAndProblemJid(containerJid, programmingSubmission.getProblemJid());
+            problemAlias = problemSetProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+        } else {
+            Session session = sessionService.findSessionByJid(programmingSubmission.getContainerJid());
+            containerJid = session.getJid();
+            containerName = session.getName();
+
+            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(containerJid, programmingSubmission.getProblemJid());
+            problemAlias = sessionProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+        }
+
         SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, programmingSubmission.getJid());
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(programmingSubmission.getAuthorJid());
-        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), programmingSubmission.getProblemJid());
-        String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), "en-US");
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(programmingSubmission.getGradingLanguage()).getName();
 
-        return new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(programmingSubmission.getGradingEngine()).renderViewSubmission(programmingSubmission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
+        return new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(programmingSubmission.getGradingEngine()).renderViewSubmission(programmingSubmission, submissionSource, authorName, problemAlias, problemName, gradingLanguageName, containerName));
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, InternalLink... lastLinks) {

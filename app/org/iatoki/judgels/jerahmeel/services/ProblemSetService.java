@@ -17,6 +17,8 @@ public interface ProblemSetService {
 
     ProblemSet findProblemSetById(long problemSetId) throws ProblemSetNotFoundException;
 
+    ProblemSet findProblemSetByJid(String problemSetJid);
+
     Map<String, String> getProblemSetJidToNameMapByProblemSetJids(Collection<String> problemSetJids);
 
     void createProblemSet(String archiveJid, String name, String description);

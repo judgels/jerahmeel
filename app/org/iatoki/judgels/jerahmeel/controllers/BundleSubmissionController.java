@@ -6,6 +6,8 @@ import com.google.gson.reflect.TypeToken;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
+import org.iatoki.judgels.jerahmeel.ProblemSet;
+import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
 import org.iatoki.judgels.jerahmeel.Session;
 import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
@@ -14,6 +16,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
+import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
 import org.iatoki.judgels.jerahmeel.services.SessionService;
@@ -54,15 +57,17 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
     private final BundleSubmissionService bundleSubmissionService;
+    private final ProblemSetProblemService problemSetProblemService;
     private final ProblemSetService problemSetService;
     private final SessionProblemService sessionProblemService;
     private final SessionService sessionService;
 
     @Inject
-    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, ProblemSetService problemSetService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, SessionProblemService sessionProblemService, SessionService sessionService) {
         this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
         this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
         this.bundleSubmissionService = bundleSubmissionService;
+        this.problemSetProblemService = problemSetProblemService;
         this.problemSetService = problemSetService;
         this.sessionProblemService = sessionProblemService;
         this.sessionService = sessionService;
@@ -175,7 +180,27 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     }
 
     private LazyHtml getViewSubmissionContent(BundleSubmission bundleSubmission) {
-        Session session = sessionService.findSessionByJid(bundleSubmission.getContainerJid());
+        String containerJid;
+        String containerName;
+        String problemAlias;
+        String problemName;
+        if (bundleSubmission.getContainerJid().startsWith("JIDPRSE")) {
+            ProblemSet problemSet = problemSetService.findProblemSetByJid(bundleSubmission.getContainerJid());
+            containerJid = problemSet.getJid();
+            containerName = problemSet.getName();
+
+            ProblemSetProblem problemSetProblem = problemSetProblemService.findProblemSetProblemByProblemSetJidAndProblemJid(containerJid, bundleSubmission.getProblemJid());
+            problemAlias = problemSetProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+        } else {
+            Session session = sessionService.findSessionByJid(bundleSubmission.getContainerJid());
+            containerJid = session.getJid();
+            containerName = session.getName();
+
+            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(containerJid, bundleSubmission.getProblemJid());
+            problemAlias = sessionProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+        }
 
         BundleAnswer bundleAnswer;
         try {
@@ -184,11 +209,8 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
             throw new RuntimeException(e);
         }
 
-        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
-        String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), "en-US");
 
-        return new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
+        return new LazyHtml(bundleSubmissionView.render(bundleSubmission, new Gson().fromJson(bundleSubmission.getLatestDetails(), new TypeToken<Map<String, BundleDetailResult>>() { }.getType()), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), problemAlias, problemName, containerName));
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, InternalLink... lastLinks) {
