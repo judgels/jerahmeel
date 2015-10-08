@@ -24,7 +24,6 @@ import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
-import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionsAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
@@ -158,10 +157,6 @@ public final class ArchiveController extends AbstractJudgelsController {
             Page<ProblemSet> pageOfProblemSets = problemSetService.getPageOfProblemSets(archive, pageIndex, PAGE_SIZE, orderBy, orderDir, filterString);
 
             content = new LazyHtml(listArchivesAndProblemSetsView.render(archive, childArchives, pageOfProblemSets, orderBy, orderDir, filterString));
-        }
-
-        if (!archive.getDescription().isEmpty()) {
-            content.appendLayout(c -> descriptionLayout.render(archive.getDescription(), c));
         }
 
         final String parentArchiveName;
