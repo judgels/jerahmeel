@@ -5,7 +5,7 @@ import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
-import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
+import org.iatoki.judgels.play.views.html.layouts.descriptionHtmlLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
@@ -26,8 +26,8 @@ final class ProblemSetControllerUtils {
             tabLinksBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions"), routes.ProblemSetController.jumpToSubmissions(problemSet.getId())));
         }
         content.appendLayout(c -> tabLayout.render(tabLinksBuilder.build(), c));
-        if (problemSet.getDescription().isEmpty()) {
-            content.appendLayout(c -> descriptionLayout.render(problemSet.getDescription(), c));
+        if (!problemSet.getDescription().isEmpty()) {
+            content.appendLayout(c -> descriptionHtmlLayout.render(problemSet.getDescription(), c));
         }
 
         if (JerahmeelUtils.hasRole("admin")) {
