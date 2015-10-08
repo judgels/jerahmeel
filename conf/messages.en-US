@@ -229,11 +229,11 @@ statistic.submissions.timeUTC.thisDay=Today
 statistic.submissions.timeUTC.thisWeek=This week
 statistic.submissions.timeUTC.thisMonth=This month
 statistic.submissions.timeUTC.thisYear=This year
-statistic.submissions.time.lastHour=Last hour
-statistic.submissions.time.lastDay=Last day
-statistic.submissions.time.lastWeek=Last week
-statistic.submissions.time.lastMonth=Last month
-statistic.submissions.time.lastYear=Last year
+statistic.submissions.time.lastHour=Last 1 hour
+statistic.submissions.time.lastDay=Last 1 day
+statistic.submissions.time.lastWeek=Last 1 week
+statistic.submissions.time.lastMonth=Last 30 days
+statistic.submissions.time.lastYear=Last 365 days
 
 widget.point=Hall of Fame
 widget.point.rank=Rank

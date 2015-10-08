@@ -151,10 +151,10 @@ public final class StatisticController extends AbstractJudgelsController {
         calendar.add(Calendar.WEEK_OF_MONTH, -1);
         long lastWeek = calendar.getTimeInMillis();
         calendar.setTime(currentDate);
-        calendar.add(Calendar.MONTH, -1);
+        calendar.add(Calendar.DATE, -30);
         long lastMonth = calendar.getTimeInMillis();
         calendar.setTime(currentDate);
-        calendar.add(Calendar.YEAR, -1);
+        calendar.add(Calendar.DATE, -365);
         long lastYear = calendar.getTimeInMillis();
 
         SubmissionStatistic bundleSubmissionStatistic = getSubmissionStatistic(bundleSubmissionsTime, thisHour, thisDay, thisWeek, thisMonth, thisYear, lastHour, lastDay, lastWeek, lastMonth, lastYear);
