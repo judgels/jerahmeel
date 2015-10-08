@@ -137,6 +137,6 @@ public final class ArchiveServiceImpl implements ArchiveService {
         archiveModel.name = name;
         archiveModel.description = description;
 
-        archiveDao.persist(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        archiveDao.edit(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
     }
 }
