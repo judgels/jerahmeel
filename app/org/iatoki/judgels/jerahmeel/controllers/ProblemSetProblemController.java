@@ -314,7 +314,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         }
 
         ProblemSetProblemEditForm problemSetProblemEditData = problemSetProblemEditForm.get();
-        if (!problemSetProblemEditData.alias.equals(problemSetProblem.getAlias()) && !problemSetProblemService.aliasExistsInProblemSet(problemSet.getJid(), problemSetProblemEditData.alias)) {
+        if (!problemSetProblemEditData.alias.equals(problemSetProblem.getAlias()) && problemSetProblemService.aliasExistsInProblemSet(problemSet.getJid(), problemSetProblemEditData.alias)) {
             problemSetProblemEditForm.reject(Messages.get("error.problemSet.problem.duplicateAlias"));
 
             return showEditProblemSetProblem(problemSet, problemSetProblem, problemSetProblemEditForm);

@@ -257,7 +257,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         SessionProblemEditForm sessionProblemEditData = sessionProblemEditForm.get();
-        if (!sessionProblemEditData.alias.equals(sessionProblem.getAlias()) && !sessionProblemService.aliasExistsInSession(session.getJid(), sessionProblemEditData.alias)) {
+        if (!sessionProblemEditData.alias.equals(sessionProblem.getAlias()) && sessionProblemService.aliasExistsInSession(session.getJid(), sessionProblemEditData.alias)) {
             sessionProblemEditForm.reject(Messages.get("error.session.problem.duplicateAlias"));
 
             return showEditSessionProblem(session, sessionProblem, sessionProblemEditForm);
