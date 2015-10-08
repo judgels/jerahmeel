@@ -18,7 +18,9 @@ public interface ArchiveService {
 
     Archive findArchiveById(long archiveId) throws ArchiveNotFoundException;
 
-    long createArchive(String parentJid, String name, String description);
+    Archive findArchiveByJid(String archiveJid);
 
-    void updateArchive(String archiveJid, String parentJid, String name, String description);
+    long createArchive(String parentJid, String name, String description, String userJid, String userIpAddress);
+
+    void updateArchive(String archiveJid, String parentJid, String name, String description, String userJid, String userIpAddress);
 }

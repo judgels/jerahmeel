@@ -11,11 +11,7 @@
 
 @(currentArchive: Archive, pageOfProblemSets: Page[ProblemSetWithScore], orderBy: String, orderDir: String, filterString: String)
 
-<h3>@Messages.get("archive.problemSets")</h3>
-
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ArchiveController.listArchivesProblemSets(currentArchive.getId, newPageIndex, newOrderBy, newOrderDir, newFilterString)}
-
-@searchView(pageOfProblemSets.getPageIndex, orderBy, orderDir, filterString, listFunc)
 
 <div class="clearfix"></div>
 

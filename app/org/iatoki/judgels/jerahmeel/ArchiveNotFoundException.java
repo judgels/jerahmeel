@@ -22,6 +22,6 @@ public final class ArchiveNotFoundException extends EntityNotFoundException {
 
     @Override
     public String getEntityName() {
-        return "Forum";
+        return "Archive";
     }
 }

@@ -4,14 +4,19 @@ import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.jerahmeel.Archive;
 import org.iatoki.judgels.jerahmeel.ArchiveNotFoundException;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
+import org.iatoki.judgels.jerahmeel.ProblemSet;
+import org.iatoki.judgels.jerahmeel.ProblemSetNotFoundException;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.forms.ProblemSetCreateForm;
+import org.iatoki.judgels.jerahmeel.forms.ProblemSetUpsertForm;
 import org.iatoki.judgels.jerahmeel.services.ArchiveService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.createProblemSetView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.editProblemSetView;
+import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
@@ -51,39 +56,104 @@ public final class ProblemSetController extends AbstractJudgelsController {
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result createProblemSet(long archiveId) throws ArchiveNotFoundException {
-        Archive archive = archiveService.findArchiveById(archiveId);
+        ProblemSetUpsertForm problemSetUpsertData = new ProblemSetUpsertForm();
+        if (archiveId != 0) {
+            Archive archive = archiveService.findArchiveById(archiveId);
+            problemSetUpsertData.archiveJid = archive.getJid();
+        }
 
-        Form<ProblemSetCreateForm> problemSetCreateForm = Form.form(ProblemSetCreateForm.class);
+        Form<ProblemSetUpsertForm> problemSetUpsertForm = Form.form(ProblemSetUpsertForm.class).fill(problemSetUpsertData);
 
-        return showCreateProblemSet(archive, problemSetCreateForm);
+        return showCreateProblemSet(archiveId, problemSetUpsertForm);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional
     @RequireCSRFCheck
-    public Result postCreateProblemSet(long archiveId) throws ArchiveNotFoundException {
-        Archive archive = archiveService.findArchiveById(archiveId);
+    public Result postCreateProblemSet() {
+        Form<ProblemSetUpsertForm> problemSetUpsertForm = Form.form(ProblemSetUpsertForm.class).bindFromRequest();
 
-        Form<ProblemSetCreateForm> problemSetCreateForm = Form.form(ProblemSetCreateForm.class).bindFromRequest();
-
-        if (formHasErrors(problemSetCreateForm)) {
-            return showCreateProblemSet(archive, problemSetCreateForm);
+        if (formHasErrors(problemSetUpsertForm)) {
+            return showCreateProblemSet(0, problemSetUpsertForm);
         }
 
-        ProblemSetCreateForm problemSetCreateData = problemSetCreateForm.get();
-        problemSetService.createProblemSet(archive.getJid(), problemSetCreateData.name, problemSetCreateData.description);
+        ProblemSetUpsertForm problemSetUpsertData = problemSetUpsertForm.get();
+        if (!archiveService.archiveExistsByJid(problemSetUpsertData.archiveJid)) {
+            problemSetUpsertForm.reject(Messages.get("error.problemSet.archiveNotExist"));
+
+            return showCreateProblemSet(0, problemSetUpsertForm);
+        }
+
+        Archive archive = archiveService.findArchiveByJid(problemSetUpsertData.archiveJid);
+        problemSetService.createProblemSet(archive.getJid(), problemSetUpsertData.name, problemSetUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.ArchiveController.viewArchives(archive.getId()));
     }
 
-    private Result showCreateProblemSet(Archive archive, Form<ProblemSetCreateForm> problemSetCreateForm) {
-        LazyHtml content = new LazyHtml(createProblemSetView.render(archive, problemSetCreateForm));
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional(readOnly = true)
+    @AddCSRFToken
+    public Result editProblemSet(long problemSetId) throws ProblemSetNotFoundException {
+        ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
+
+        ProblemSetUpsertForm problemSetUpsertData = new ProblemSetUpsertForm();
+        problemSetUpsertData.archiveJid = problemSet.getParentArchive().getJid();
+        problemSetUpsertData.name = problemSet.getName();
+        problemSetUpsertData.description = problemSet.getDescription();
+
+        Form<ProblemSetUpsertForm> problemSetUpsertForm = Form.form(ProblemSetUpsertForm.class).fill(problemSetUpsertData);
+
+        return showEditProblemSet(problemSet, problemSetUpsertForm);
+    }
+
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional
+    @RequireCSRFCheck
+    public Result postEditProblemSet(long problemSetId) throws ProblemSetNotFoundException {
+        ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
+
+        Form<ProblemSetUpsertForm> problemSetUpsertForm = Form.form(ProblemSetUpsertForm.class).bindFromRequest();
+
+        if (formHasErrors(problemSetUpsertForm)) {
+            return showEditProblemSet(problemSet, problemSetUpsertForm);
+        }
+
+        ProblemSetUpsertForm problemSetUpsertData = problemSetUpsertForm.get();
+        if (!archiveService.archiveExistsByJid(problemSetUpsertData.archiveJid)) {
+            problemSetUpsertForm.reject(Messages.get("error.problemSet.archiveNotExist"));
+
+            return showEditProblemSet(problemSet, problemSetUpsertForm);
+        }
+
+        problemSetService.updateProblemSet(problemSet.getJid(), problemSetUpsertData.archiveJid, problemSetUpsertData.name, problemSetUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        return redirect(routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()));
+    }
+
+    private Result showCreateProblemSet(long archiveId, Form<ProblemSetUpsertForm> problemSetUpsertForm) {
+        LazyHtml content = new LazyHtml(createProblemSetView.render(problemSetUpsertForm, archiveService.getAllArchives()));
         content.appendLayout(c -> headingLayout.render(Messages.get("archive.problemSet.create"), c));
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
+        internalLinkBuilder.add(new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(archiveId)));
+        ArchiveControllerUtils.appendBreadcrumbsLayout(content, internalLinkBuilder.build());
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Problem Set - Create");
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    private Result showEditProblemSet(ProblemSet problemSet, Form<ProblemSetUpsertForm> problemSetUpsertForm) {
+        LazyHtml content = new LazyHtml(editProblemSetView.render(problemSet, problemSetUpsertForm, archiveService.getAllArchives()));
+        content.appendLayout(c -> headingLayout.render(Messages.get("archive.problemSet.edit"), c));
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
+        Archive archive = problemSet.getParentArchive();
         if (archive != null) {
             Stack<InternalLink> internalLinkStack = new Stack<>();
             Archive currentParent = archive;
@@ -96,9 +166,9 @@ public final class ProblemSetController extends AbstractJudgelsController {
                 internalLinkBuilder.add(internalLinkStack.pop());
             }
         }
-        internalLinkBuilder.add(new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(archive.getId())));
+        internalLinkBuilder.add(new InternalLink(Messages.get("archive.problemSet.edit"), routes.ProblemSetController.createProblemSet(archive.getId())));
         ArchiveControllerUtils.appendBreadcrumbsLayout(content, internalLinkBuilder.build());
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Problem Set - Create");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Problem Set - Edit");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 }

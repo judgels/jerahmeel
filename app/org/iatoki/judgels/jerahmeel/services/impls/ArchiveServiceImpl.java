@@ -17,7 +17,6 @@ import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel_;
 import org.iatoki.judgels.jerahmeel.services.ArchiveService;
-import org.iatoki.judgels.play.IdentityUtils;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -119,24 +118,29 @@ public final class ArchiveServiceImpl implements ArchiveService {
     }
 
     @Override
-    public long createArchive(String parentJid, String name, String description) {
+    public Archive findArchiveByJid(String archiveJid) {
+        return ArchiveServiceUtils.createArchiveFromModel(archiveDao.findByJid(archiveJid), null);
+    }
+
+    @Override
+    public long createArchive(String parentJid, String name, String description, String userJid, String userIpAddress) {
         ArchiveModel archiveModel = new ArchiveModel();
         archiveModel.parentJid = parentJid;
         archiveModel.name = name;
         archiveModel.description = description;
 
-        archiveDao.persist(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        archiveDao.persist(archiveModel, userJid, userIpAddress);
 
         return archiveModel.id;
     }
 
     @Override
-    public void updateArchive(String archiveJid, String parentJid, String name, String description) {
+    public void updateArchive(String archiveJid, String parentJid, String name, String description, String userJid, String userIpAddress) {
         ArchiveModel archiveModel = archiveDao.findByJid(archiveJid);
         archiveModel.parentJid = parentJid;
         archiveModel.name = name;
         archiveModel.description = description;
 
-        archiveDao.edit(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        archiveDao.edit(archiveModel, userJid, userIpAddress);
     }
 }

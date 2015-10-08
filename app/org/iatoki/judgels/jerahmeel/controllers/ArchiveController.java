@@ -16,14 +16,15 @@ import org.iatoki.judgels.jerahmeel.forms.ArchiveUpsertForm;
 import org.iatoki.judgels.jerahmeel.services.ArchiveService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.views.html.archive.createArchiveView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.editArchiveView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.listArchivesAndProblemSetsWithScoreView;
-import org.iatoki.judgels.jerahmeel.views.html.archive.updateArchiveGeneralView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithActionsAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
@@ -58,12 +59,6 @@ public final class ArchiveController extends AbstractJudgelsController {
 
     @Authenticated(value = GuestView.class)
     @Transactional
-    public Result index() throws ArchiveNotFoundException {
-        return viewArchives(0);
-    }
-
-    @Authenticated(value = GuestView.class)
-    @Transactional
     public Result viewArchives(long archiveId) throws ArchiveNotFoundException {
         return showListArchivesProblemSets(archiveId, 0, "name", "asc", "");
     }
@@ -78,10 +73,15 @@ public final class ArchiveController extends AbstractJudgelsController {
     @Authorized(value = "admin")
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result createArchive() {
-        Form<ArchiveUpsertForm> archiveUpsertForm = Form.form(ArchiveUpsertForm.class);
+    public Result createArchive(long parentArchiveId) throws ArchiveNotFoundException {
+        ArchiveUpsertForm archiveUpsertData = new ArchiveUpsertForm();
+        if (parentArchiveId != 0) {
+            Archive archive = archiveService.findArchiveById(parentArchiveId);
+            archiveUpsertData.parentJid = archive.getJid();
+        }
+        Form<ArchiveUpsertForm> archiveUpsertForm = Form.form(ArchiveUpsertForm.class).fill(archiveUpsertData);
 
-        return showCreateArchive(archiveUpsertForm);
+        return showCreateArchive(parentArchiveId, archiveUpsertForm);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
@@ -92,11 +92,17 @@ public final class ArchiveController extends AbstractJudgelsController {
         Form<ArchiveUpsertForm> archiveUpsertForm = Form.form(ArchiveUpsertForm.class).bindFromRequest();
 
         if (formHasErrors(archiveUpsertForm)) {
-            return showCreateArchive(archiveUpsertForm);
+            return showCreateArchive(0, archiveUpsertForm);
         }
 
         ArchiveUpsertForm archiveUpsertData = archiveUpsertForm.get();
-        long archiveId = archiveService.createArchive(archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description);
+        if (!archiveUpsertData.parentJid.isEmpty() && !archiveService.archiveExistsByJid(archiveUpsertData.parentJid)) {
+            archiveUpsertForm.reject(Messages.get("error.archive.notExist"));
+
+            return showCreateArchive(0, archiveUpsertForm);
+        }
+
+        long archiveId = archiveService.createArchive(archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.ArchiveController.viewArchives(archiveId));
     }
@@ -105,7 +111,7 @@ public final class ArchiveController extends AbstractJudgelsController {
     @Authorized(value = "admin")
     @Transactional(readOnly = true)
     @AddCSRFToken
-    public Result updateArchiveGeneralConfig(long archiveId) throws ArchiveNotFoundException {
+    public Result editArchive(long archiveId) throws ArchiveNotFoundException {
         Archive archive = archiveService.findArchiveById(archiveId);
         ArchiveUpsertForm archiveUpsertData = new ArchiveUpsertForm();
         if (archive.getParentArchive() != null) {
@@ -116,23 +122,23 @@ public final class ArchiveController extends AbstractJudgelsController {
 
         Form<ArchiveUpsertForm> archiveUpsertForm = Form.form(ArchiveUpsertForm.class).fill(archiveUpsertData);
 
-        return showUpdateArchiveGeneral(archiveUpsertForm, archive);
+        return showEditArchive(archiveUpsertForm, archive);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Authorized(value = "admin")
     @Transactional
     @RequireCSRFCheck
-    public Result postUpdateArchiveGeneralConfig(long archiveId) throws ArchiveNotFoundException {
+    public Result postEditArchive(long archiveId) throws ArchiveNotFoundException {
         Archive archive = archiveService.findArchiveById(archiveId);
         Form<ArchiveUpsertForm> archiveUpsertForm = Form.form(ArchiveUpsertForm.class).bindFromRequest();
 
         if (formHasErrors(archiveUpsertForm)) {
-            return showUpdateArchiveGeneral(archiveUpsertForm, archive);
+            return showEditArchive(archiveUpsertForm, archive);
         }
 
         ArchiveUpsertForm archiveUpsertData = archiveUpsertForm.get();
-        archiveService.updateArchive(archive.getJid(), archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description);
+        archiveService.updateArchive(archive.getJid(), archiveUpsertData.parentJid, archiveUpsertData.name, archiveUpsertData.description, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
         return redirect(routes.ArchiveController.viewArchives(archive.getId()));
     }
@@ -154,6 +160,10 @@ public final class ArchiveController extends AbstractJudgelsController {
             content = new LazyHtml(listArchivesAndProblemSetsView.render(archive, childArchives, pageOfProblemSets, orderBy, orderDir, filterString));
         }
 
+        if (!archive.getDescription().isEmpty()) {
+            content.appendLayout(c -> descriptionLayout.render(archive.getDescription(), c));
+        }
+
         final String parentArchiveName;
         final Call backCall;
         if (parentArchive == null) {
@@ -166,8 +176,8 @@ public final class ArchiveController extends AbstractJudgelsController {
 
         if (JerahmeelUtils.hasRole("admin")) {
             ImmutableList.Builder<InternalLink> actionsBuilder = ImmutableList.builder();
-            actionsBuilder.add(new InternalLink(Messages.get("commons.update"), routes.ArchiveController.updateArchiveGeneralConfig(archiveId)));
-            actionsBuilder.add(new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive()));
+            actionsBuilder.add(new InternalLink(Messages.get("commons.button.edit"), routes.ArchiveController.editArchive(archiveId)));
+            actionsBuilder.add(new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive(archiveId)));
             actionsBuilder.add(new InternalLink(Messages.get("archive.problemSet.create"), routes.ProblemSetController.createProblemSet(archive.getId())));
 
             content.appendLayout(c -> headingWithActionsAndBackLayout.render(Messages.get("archive.archive") + " " + archive.getName(), actionsBuilder.build(), new InternalLink(Messages.get("archive.backTo") + " " + parentArchiveName, backCall), c));
@@ -185,26 +195,25 @@ public final class ArchiveController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showCreateArchive(Form<ArchiveUpsertForm> archiveUpsertForm) {
+    private Result showCreateArchive(long parentArchiveId, Form<ArchiveUpsertForm> archiveUpsertForm) {
         LazyHtml content = new LazyHtml(createArchiveView.render(archiveUpsertForm, archiveService.getAllArchives()));
         content.appendLayout(c -> headingLayout.render(Messages.get("archive.create"), c));
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         ArchiveControllerUtils.appendBreadcrumbsLayout(content,
-                new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive())
+                new InternalLink(Messages.get("archive.create"), routes.ArchiveController.createArchive(parentArchiveId))
         );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Create");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    private Result showUpdateArchiveGeneral(Form<ArchiveUpsertForm> archiveUpsertForm, Archive archive) {
-        LazyHtml content = new LazyHtml(updateArchiveGeneralView.render(archiveUpsertForm, archive.getId(), archiveService.getAllArchives().stream().filter(f -> !f.containsJidInHierarchy(archive.getJid())).collect(Collectors.toList())));
+    private Result showEditArchive(Form<ArchiveUpsertForm> archiveUpsertForm, Archive archive) {
+        LazyHtml content = new LazyHtml(editArchiveView.render(archiveUpsertForm, archive.getId(), archiveService.getAllArchives().stream().filter(f -> !f.containsJidInHierarchy(archive.getJid())).collect(Collectors.toList())));
         ArchiveControllerUtils.appendUpdateLayout(content, archive);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         ArchiveControllerUtils.appendBreadcrumbsLayout(content,
-                new InternalLink(Messages.get("archive.update"), routes.ArchiveController.updateArchiveGeneralConfig(archive.getId())),
-                new InternalLink(Messages.get("archive.config.general"), routes.ArchiveController.updateArchiveGeneralConfig(archive.getId()))
+                new InternalLink(Messages.get("archive.edit"), routes.ArchiveController.editArchive(archive.getId()))
         );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Update");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Archive - Edit");
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 }

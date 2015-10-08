@@ -10,11 +10,11 @@
 
 @formErrorView(archiveUpsertForm)
 
-@b3.form(routes.ArchiveController.postUpdateArchiveGeneralConfig(archiveId)) {
+@b3.form(routes.ArchiveController.postEditArchive(archiveId)) {
 
     @helper.CSRF.formField
 
     @upsertArchiveView(archiveUpsertForm, archives)
 
-    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.update") }
+    @b3.submit('class -> "btn btn-primary") { @Messages.get("commons.button.edit") }
 }

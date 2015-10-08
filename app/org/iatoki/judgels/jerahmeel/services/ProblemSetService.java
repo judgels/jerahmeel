@@ -21,5 +21,7 @@ public interface ProblemSetService {
 
     Map<String, String> getProblemSetJidToNameMapByProblemSetJids(Collection<String> problemSetJids);
 
-    void createProblemSet(String archiveJid, String name, String description);
+    void createProblemSet(String archiveJid, String name, String description, String userJid, String userIpAddress);
+
+    void updateProblemSet(String problemSetJid, String archiveJid, String name, String description, String userJid, String userIpAddress);
 }

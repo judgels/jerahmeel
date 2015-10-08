@@ -68,6 +68,7 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         this.programmingSubmissionService = programmingSubmissionService;
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional
     public Result postSubmitProblem(long problemSetId, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -100,11 +101,13 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         return redirect(routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()));
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
     public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
         return listSubmissions(problemSetId, 0, "id", "desc", null);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
     public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -126,6 +129,7 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
     public Result viewSubmission(long problemSetId, long submissionId) throws ProblemSetNotFoundException, ProgrammingSubmissionNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);

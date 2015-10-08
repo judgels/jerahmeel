@@ -6,6 +6,7 @@ import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.descriptionLayout;
+import org.iatoki.judgels.play.views.html.layouts.headingWithActionAndBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.play.views.html.layouts.tabLayout;
@@ -28,11 +29,21 @@ final class ProblemSetControllerUtils {
         if (problemSet.getDescription().isEmpty()) {
             content.appendLayout(c -> descriptionLayout.render(problemSet.getDescription(), c));
         }
-        content.appendLayout(c -> headingWithBackLayout.render(
-                        problemSet.getName(),
-                        new InternalLink(Messages.get("archive.problemSet.backTo") + " " + problemSet.getParentArchive().getName(), routes.ArchiveController.viewArchives(problemSet.getParentArchive().getId())),
-                        c)
-        );
+
+        if (JerahmeelUtils.hasRole("admin")) {
+            content.appendLayout(c -> headingWithActionAndBackLayout.render(
+                            problemSet.getName(),
+                            new InternalLink(Messages.get("commons.button.edit"), routes.ProblemSetController.editProblemSet(problemSet.getId())),
+                            new InternalLink(Messages.get("archive.problemSet.backTo") + " " + problemSet.getParentArchive().getName(), routes.ArchiveController.viewArchives(problemSet.getParentArchive().getId())),
+                            c)
+            );
+        } else {
+            content.appendLayout(c -> headingWithBackLayout.render(
+                            problemSet.getName(),
+                            new InternalLink(Messages.get("archive.problemSet.backTo") + " " + problemSet.getParentArchive().getName(), routes.ArchiveController.viewArchives(problemSet.getParentArchive().getId())),
+                            c)
+            );
+        }
     }
 
     static void appendSubtabLayout(LazyHtml content, ProblemSet problemSet) {

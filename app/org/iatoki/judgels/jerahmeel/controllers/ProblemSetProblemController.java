@@ -16,7 +16,10 @@ import org.iatoki.judgels.jerahmeel.ProblemSetProblemStatus;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemType;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
+import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
+import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.forms.ProblemSetProblemAddForm;
 import org.iatoki.judgels.jerahmeel.forms.ProblemSetProblemEditForm;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
@@ -200,11 +203,15 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return redirect(mediaUrl);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result viewProblemSetProblems(long problemSetId) throws ProblemSetNotFoundException {
         return listProblemSetProblems(problemSetId, 0, "alias", "asc", "");
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result listProblemSetProblems(long problemSetId, long page, String orderBy, String orderDir, String filterString) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -216,6 +223,8 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return showListProblemSetProblems(problemSet, pageOfProblemSetProblems, orderBy, orderDir, filterString, problemSlugsMap);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result addProblemSetProblem(long problemSetId) throws ProblemSetNotFoundException {
@@ -225,6 +234,8 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return showAddProblemSetProblem(problemSet, problemSetProblemAddForm);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional
     @RequireCSRFCheck
     public Result postAddProblemSetProblem(long problemSetId) throws ProblemSetNotFoundException {
@@ -263,6 +274,8 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return redirect(routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()));
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional
     public Result removeProblemSetProblem(long problemSetId, long problemSetProblemId) throws ProblemSetNotFoundException, ProblemSetProblemNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -279,6 +292,8 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return redirect(routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()));
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     @AddCSRFToken
     public Result editProblemSetProblem(long problemSetId, long problemSetProblemId) throws ProblemSetNotFoundException, ProblemSetProblemNotFoundException {
@@ -298,6 +313,8 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         return showEditProblemSetProblem(problemSet, problemSetProblem, problemSetProblemEditForm);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
     @Transactional
     @RequireCSRFCheck
     public Result postEditProblemSetProblem(long problemSetId, long problemSetProblemId) throws ProblemSetNotFoundException, ProblemSetProblemNotFoundException {

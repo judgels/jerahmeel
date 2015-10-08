@@ -4,11 +4,6 @@
 
 @(currentArchive: Archive, childArchives: List[Archive], pageOfProblemSets: Page[ProblemSet], orderBy: String, orderDir: String, filterString: String)
 
-<div class="well">
-    @Html(currentArchive.getDescription)
-</div>
-
-
 @if(!childArchives.isEmpty) {
     @listArchivesView(currentArchive, childArchives)
 }

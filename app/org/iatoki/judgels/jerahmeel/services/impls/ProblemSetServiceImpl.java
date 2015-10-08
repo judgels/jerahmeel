@@ -22,7 +22,6 @@ import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetModel_;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel_;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
-import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
@@ -132,18 +131,36 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
-    public void createProblemSet(String archiveJid, String name, String description) {
+    public void createProblemSet(String archiveJid, String name, String description, String userJid, String userIpAddress) {
         ProblemSetModel problemSetModel = new ProblemSetModel();
         problemSetModel.archiveJid = archiveJid;
         problemSetModel.name = name;
         problemSetModel.description = description;
 
-        problemSetDao.persist(problemSetModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        problemSetDao.persist(problemSetModel, userJid, userIpAddress);
 
         String parentArchiveJid = problemSetModel.archiveJid;
         while ((parentArchiveJid != null) && !parentArchiveJid.isEmpty()) {
             ArchiveModel archiveModel = archiveDao.findByJid(parentArchiveJid);
-            archiveDao.edit(archiveModel, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            archiveDao.edit(archiveModel, userJid, userIpAddress);
+
+            parentArchiveJid = archiveModel.parentJid;
+        }
+    }
+
+    @Override
+    public void updateProblemSet(String problemSetJid, String archiveJid, String name, String description, String userJid, String userIpAddress) {
+        ProblemSetModel problemSetModel = problemSetDao.findByJid(problemSetJid);
+        problemSetModel.archiveJid = archiveJid;
+        problemSetModel.name = name;
+        problemSetModel.description = description;
+
+        problemSetDao.edit(problemSetModel, userJid, userIpAddress);
+
+        String parentArchiveJid = problemSetModel.archiveJid;
+        while ((parentArchiveJid != null) && !parentArchiveJid.isEmpty()) {
+            ArchiveModel archiveModel = archiveDao.findByJid(parentArchiveJid);
+            archiveDao.edit(archiveModel, userJid, userIpAddress);
 
             parentArchiveJid = archiveModel.parentJid;
         }

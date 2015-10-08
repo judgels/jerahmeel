@@ -148,7 +148,7 @@ archive.subArchives=SubArchives
 archive.home=Home
 archive.problemSets=Problemsets
 archive.create=Create Archive
-archive.update=Update Archive
+archive.edit=Edit Archive
 archive.config.general=General
 archive.parent.none=None
 archive.parent=Parent
@@ -163,6 +163,8 @@ archive.totalPoints=Total Points
 archive.problemSet=ProblemSet
 
 archive.problemSet.create=Create ProblemSet
+archive.problemSet.edit=Edit ProblemSet
+archive.problemSet.archive=Archive
 archive.problemSet.name=Name
 archive.problemSet.description=Description
 archive.problemSet.totalPoints=Total Points
@@ -188,6 +190,7 @@ problemSet.problem.slug=Slug
 problemSet.problem.jid=Problem Jid
 problemSet.problem.secret=Problem Secret
 
+error.problemSet.archiveNotExist=Archive doesn''t exist.
 
 submission.own=My Submissions
 submission.all=All Submissions
