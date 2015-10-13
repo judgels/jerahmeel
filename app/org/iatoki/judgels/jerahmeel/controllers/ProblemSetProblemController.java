@@ -166,7 +166,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         LazyHtml content = new LazyHtml(viewProblemSetProblemView.render(requestUrl, requestBody));
         content.appendLayout(c -> tabLayout.render(ImmutableList.of(new InternalLink(Messages.get("archives.problemSet.problems"), routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()))), c));
         content.appendLayout(c -> headingWithBackLayout.render(
-                    SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage()),
+                    problemSet.getName(),
                     new InternalLink(Messages.get("archive.problemSet.problem.backTo") + " " + problemSet.getParentArchive().getName(), routes.ArchiveController.viewArchives(problemSet.getParentArchive().getId())),
                 c)
         );
