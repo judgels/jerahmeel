@@ -39,7 +39,7 @@ public final class ProblemStatisticServiceImpl implements ProblemStatisticServic
     public ProblemStatistic getLatestProblemStatisticWithPagination(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         ProblemStatisticModel problemStatisticModel = problemStatisticDao.findSortedByFilters("time", "desc", "", 0, 1).get(0);
         long totalRowCount = problemStatisticEntryDao.countByFiltersEq(filterString, ImmutableMap.of(ProblemStatisticEntryModel_.problemStatisticJid, problemStatisticModel.jid));
-        List<ProblemStatisticEntryModel> problemStatisticEntryModels = problemStatisticEntryDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(ProblemStatisticEntryModel_.problemStatisticJid, problemStatisticModel.jid), pageIndex, pageSize);
+        List<ProblemStatisticEntryModel> problemStatisticEntryModels = problemStatisticEntryDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(ProblemStatisticEntryModel_.problemStatisticJid, problemStatisticModel.jid), pageIndex * pageSize, pageSize);
         List<ProblemStatisticEntry> problemStatisticEntries = problemStatisticEntryModels.stream().map(m -> new ProblemStatisticEntry(m.problemJid, m.totalSubmissions)).collect(Collectors.toList());
 
         return new ProblemStatistic(new Page<>(problemStatisticEntries, totalRowCount, pageIndex, pageSize), problemStatisticModel.time);

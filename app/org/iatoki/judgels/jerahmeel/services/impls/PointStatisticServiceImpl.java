@@ -39,7 +39,7 @@ public final class PointStatisticServiceImpl implements PointStatisticService {
     public PointStatistic getLatestPointStatisticWithPagination(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         PointStatisticModel pointStatisticModel = pointStatisticDao.findSortedByFilters("time", "desc", "", 0, 1).get(0);
         long totalRowCount = pointStatisticEntryDao.countByFiltersEq(filterString, ImmutableMap.of(PointStatisticEntryModel_.pointStatisticJid, pointStatisticModel.jid));
-        List<PointStatisticEntryModel> pointStatisticEntryModels = pointStatisticEntryDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(PointStatisticEntryModel_.pointStatisticJid, pointStatisticModel.jid), pageIndex, pageSize);
+        List<PointStatisticEntryModel> pointStatisticEntryModels = pointStatisticEntryDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(PointStatisticEntryModel_.pointStatisticJid, pointStatisticModel.jid), pageIndex * pageSize, pageSize);
         List<PointStatisticEntry> pointStatisticEntries = pointStatisticEntryModels.stream().map(m -> new PointStatisticEntry(m.userJid, m.totalPoints, m.totalProblems)).collect(Collectors.toList());
 
         return new PointStatistic(new Page<>(pointStatisticEntries, totalRowCount, pageIndex, pageSize), pointStatisticModel.time);

@@ -26,7 +26,7 @@
     <tbody>
         @for((problemStatisticEntry, i) <- problemStatistic.getPageOfProblemStatisticEntries.getData.zipWithIndex) {
             <tr>
-                <td>@(i+1).</td>
+                <td>@(problemStatistic.getPageOfProblemStatisticEntries.getCurrentFirstRowIndex + i + 1).</td>
                 <td>@problemTitlesMap.get(problemStatisticEntry.getProblemJid)</td>
                 <td>@problemStatisticEntry.getTotalSubmissions</td>
                 <td class="text-center">
