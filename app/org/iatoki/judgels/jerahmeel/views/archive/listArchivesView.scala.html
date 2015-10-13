@@ -11,7 +11,7 @@
         <div class="panel-body clearfix">
             <a href="@routes.ArchiveController.viewArchives(archive.getId)" class="panel-title">@archive.getName</a>
             @if(!archive.getDescription.isEmpty) {
-                <hr />
+                <hr class="training-divider"/>
                 <div class="small">
                     @Html(archive.getDescription)
                 </div>

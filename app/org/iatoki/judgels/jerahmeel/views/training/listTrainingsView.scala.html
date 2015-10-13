@@ -14,7 +14,7 @@
         <div class="panel-body clearfix">
             <a href="@routes.TrainingCourseController.viewCourses(curriculum.getId)" class="panel-title">@curriculum.getName</a>
             @if(!curriculum.getDescription.isEmpty) {
-                <hr />
+                <hr class="training-divider"/>
                 <div class="small">
                     @Html(curriculum.getDescription)
                 </div>
@@ -28,7 +28,7 @@
         <div class="panel-body clearfix">
             <a href="@routes.ArchiveController.viewArchives(archive.getId)" class="panel-title">@archive.getName</a>
             @if(!archive.getDescription.isEmpty) {
-                <hr />
+                <hr class="training-divider"/>
                 <div class="small">
                     @Html(archive.getDescription)
                 </div>
