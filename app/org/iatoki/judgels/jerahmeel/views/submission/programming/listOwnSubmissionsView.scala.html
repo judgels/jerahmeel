@@ -10,7 +10,7 @@
 
 @(pageOfProgrammingSubmissions: Page[ProgrammingSubmission], sessionJidToNameMap: Map[String, String], problemTitlesMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String)
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ProgrammingSubmissionController.listSubmissions(newPageIndex, newOrderBy, newOrderDir)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ProgrammingSubmissionController.listOwnSubmissions(newPageIndex, newOrderBy, newOrderDir)}
 
 <div class="clearfix"></div>
 

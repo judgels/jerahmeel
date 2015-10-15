@@ -10,7 +10,7 @@
 
 @(pageOfBundleSubmissions: Page[BundleSubmission], sessionJidToNameMap: Map[String, String], problemTitlesMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String)
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.BundleSubmissionController.listSubmissions(newPageIndex, newOrderBy, newOrderDir)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.BundleSubmissionController.listOwnSubmissions(newPageIndex, newOrderBy, newOrderDir)}
 
 <div class="clearfix"></div>
 
