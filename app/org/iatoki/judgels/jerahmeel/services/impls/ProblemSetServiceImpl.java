@@ -83,7 +83,7 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
             } else {
                 List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetModel.jid), 0, -1);
 
-                totalScore = ProblemSetProblemServiceUtils.getUserTotalScoreFromProblemSetProblemModels(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetProblemModels);
+                totalScore = ProblemSetScoreCacheUtils.getInstance().getUserTotalScoreFromProblemSetProblemModels(userJid, problemSetProblemModels);
 
                 ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, problemSetModel.jid, totalScore);
             }

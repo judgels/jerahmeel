@@ -55,7 +55,7 @@ public final class CourseServiceImpl implements CourseService {
     @Override
     public Page<Course> getPageOfCourses(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = courseDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
-        List<CourseModel> courseModels = courseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        List<CourseModel> courseModels = courseDao.findSortedByFilters(orderBy, orderDir, filterString, pageIndex * pageSize, pageSize);
 
         List<Course> courses = Lists.transform(courseModels, m -> CourseServiceUtils.createCourseFromModel(m));
 

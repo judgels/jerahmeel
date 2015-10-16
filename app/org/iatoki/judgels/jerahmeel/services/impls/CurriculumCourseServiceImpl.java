@@ -9,15 +9,8 @@ import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseWithProgress;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.CourseDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CurriculumCourseDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
@@ -45,32 +38,18 @@ import java.util.stream.Collectors;
 @Named("curriculumCourseService")
 public final class CurriculumCourseServiceImpl implements CurriculumCourseService {
 
-    private final BundleSubmissionDao bundleSubmissionDao;
-    private final BundleGradingDao bundleGradingDao;
-    private final ContainerScoreCacheDao containerScoreCacheDao;
-    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
-    private final CourseDao courseDao;
     private final CourseSessionDao courseSessionDao;
     private final CurriculumCourseDao curriculumCourseDao;
     private final SessionDependencyDao sessionDependencyDao;
     private final SessionProblemDao sessionProblemDao;
-    private final ProgrammingSubmissionDao programmingSubmissionDao;
-    private final ProgrammingGradingDao programmingGradingDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CurriculumCourseServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseDao courseDao, CourseSessionDao courseSessionDao, CurriculumCourseDao curriculumCourseDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, UserItemDao userItemDao) {
-        this.bundleSubmissionDao = bundleSubmissionDao;
-        this.bundleGradingDao = bundleGradingDao;
-        this.containerScoreCacheDao = containerScoreCacheDao;
-        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
-        this.courseDao = courseDao;
+    public CurriculumCourseServiceImpl(CourseSessionDao courseSessionDao, CurriculumCourseDao curriculumCourseDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         this.courseSessionDao = courseSessionDao;
         this.curriculumCourseDao = curriculumCourseDao;
         this.sessionDependencyDao = sessionDependencyDao;
         this.sessionProblemDao = sessionProblemDao;
-        this.programmingSubmissionDao = programmingSubmissionDao;
-        this.programmingGradingDao = programmingGradingDao;
         this.userItemDao = userItemDao;
     }
 
@@ -96,8 +75,8 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
     @Override
     public Page<CurriculumCourse> getPageOfCurriculumCourses(String curriculumJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = curriculumCourseDao.countByFilters(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of());
-        List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = curriculumCourseDao.countByFiltersEq(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid));
+        List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), pageIndex * pageSize, pageSize);
 
         List<CurriculumCourse> curriculumCourses = curriculumCourseModels.stream().map(m -> CurriculumCourseServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
@@ -106,8 +85,8 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
     @Override
     public Page<CurriculumCourseWithProgress> getPageOfCurriculumCoursesWithProgress(String userJid, String curriculumJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = curriculumCourseDao.countByFilters(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of());
-        List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = curriculumCourseDao.countByFiltersEq(filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid));
+        List<CurriculumCourseModel> curriculumCourseModels = curriculumCourseDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(CurriculumCourseModel_.curriculumJid, curriculumJid), pageIndex * pageSize, pageSize);
 
         List<String> courseJids = curriculumCourseModels.stream().map(m -> m.courseJid).collect(Collectors.toList());
         List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFiltersIn(orderBy, orderDir, "", ImmutableMap.of(CourseSessionModel_.courseJid, courseJids), 0, -1);
@@ -147,7 +126,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
             CourseProgressWithCompleted courseProgressWithCompleted = getUserProgressFromCourseSessionModels(userJid, currentCourseSessionModels);
 
-            double totalScore = CourseSessionServiceUtils.getUserTotalScoreFromCourseSessionModels(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, curriculumCourseModel.courseJid, currentCourseSessionModels, mapSessionJidToSessionProblemModels);
+            double totalScore = SessionScoreCacheUtils.getInstance().getUserTotalScoreFromCourseSessionModels(userJid, curriculumCourseModel.courseJid, currentCourseSessionModels, mapSessionJidToSessionProblemModels);
 
             curriculumCourseProgressBuilder.add(new CurriculumCourseWithProgress(CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel), courseProgressWithCompleted.courseProgress, courseProgressWithCompleted.completed, courseSessionModels.size(), totalScore));
         }

@@ -103,7 +103,7 @@ public final class UserServiceImpl implements UserService {
     @Override
     public Page<org.iatoki.judgels.jerahmeel.User> getPageOfUsers(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
         long totalPages = userDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
-        List<UserModel> userModels = userDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        List<UserModel> userModels = userDao.findSortedByFilters(orderBy, orderDir, filterString, pageIndex * pageSize, pageSize);
         List<org.iatoki.judgels.jerahmeel.User> users = Lists.transform(userModels, m -> UserServiceUtils.createUserFromUserModel(m));
         return new Page<>(users, totalPages, pageIndex, pageSize);
     }

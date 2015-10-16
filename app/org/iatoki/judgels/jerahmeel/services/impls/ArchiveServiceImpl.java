@@ -6,14 +6,6 @@ import org.iatoki.judgels.jerahmeel.Archive;
 import org.iatoki.judgels.jerahmeel.ArchiveNotFoundException;
 import org.iatoki.judgels.jerahmeel.ArchiveWithScore;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel_;
 import org.iatoki.judgels.jerahmeel.services.ArchiveService;
@@ -29,26 +21,10 @@ import java.util.Stack;
 public final class ArchiveServiceImpl implements ArchiveService {
 
     private final ArchiveDao archiveDao;
-    private final BundleGradingDao bundleGradingDao;
-    private final BundleSubmissionDao bundleSubmissionDao;
-    private final ContainerScoreCacheDao containerScoreCacheDao;
-    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
-    private final ProblemSetDao problemSetDao;
-    private final ProblemSetProblemDao problemSetProblemDao;
-    private final ProgrammingGradingDao programmingGradingDao;
-    private final ProgrammingSubmissionDao programmingSubmissionDao;
 
     @Inject
-    public ArchiveServiceImpl(ArchiveDao archiveDao, BundleGradingDao bundleGradingDao, BundleSubmissionDao bundleSubmissionDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingGradingDao programmingGradingDao, ProgrammingSubmissionDao programmingSubmissionDao) {
+    public ArchiveServiceImpl(ArchiveDao archiveDao) {
         this.archiveDao = archiveDao;
-        this.bundleGradingDao = bundleGradingDao;
-        this.bundleSubmissionDao = bundleSubmissionDao;
-        this.containerScoreCacheDao = containerScoreCacheDao;
-        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
-        this.problemSetDao = problemSetDao;
-        this.problemSetProblemDao = problemSetProblemDao;
-        this.programmingGradingDao = programmingGradingDao;
-        this.programmingSubmissionDao = programmingSubmissionDao;
     }
 
     @Override
@@ -98,7 +74,7 @@ public final class ArchiveServiceImpl implements ArchiveService {
 
         ImmutableList.Builder<ArchiveWithScore> directSubArchivesWithScore = ImmutableList.builder();
         for (Archive subArchive : directSubArchives) {
-            double totalScore = ArchiveServiceUtils.getArchiveScore(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, subArchive.getJid());
+            double totalScore = ProblemSetScoreCacheUtils.getInstance().getArchiveScore(userJid, subArchive.getJid());
 
             directSubArchivesWithScore.add(new ArchiveWithScore(subArchive, totalScore));
         }

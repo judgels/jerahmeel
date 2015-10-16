@@ -6,8 +6,20 @@ import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.jerahmeel.controllers.JerahmeelControllerUtils;
 import org.iatoki.judgels.jerahmeel.models.daos.ActivityLogDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
 import org.iatoki.judgels.jerahmeel.models.daos.AvatarCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.JidCacheDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.runnables.StatisticUpdater;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemScoreStatisticService;
@@ -16,6 +28,8 @@ import org.iatoki.judgels.jerahmeel.services.impls.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.services.impls.ProblemSetScoreCacheUtils;
+import org.iatoki.judgels.jerahmeel.services.impls.SessionScoreCacheUtils;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
 import org.iatoki.judgels.jophiel.runnables.UserActivityMessagePusher;
@@ -59,6 +73,8 @@ public final class Global extends AbstractGlobal {
     private void buildUtils(Injector injector) {
         JophielClientControllerUtils.buildInstance(JerahmeelProperties.getInstance().getJophielBaseUrl());
         JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemScoreStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
+        ProblemSetScoreCacheUtils.buildInstance(injector.instanceOf(ArchiveDao.class), injector.instanceOf(BundleSubmissionDao.class), injector.instanceOf(BundleGradingDao.class), injector.instanceOf(ContainerScoreCacheDao.class), injector.instanceOf(ContainerProblemScoreCacheDao.class), injector.instanceOf(ProblemSetDao.class), injector.instanceOf(ProblemSetProblemDao.class), injector.instanceOf(ProgrammingSubmissionDao.class), injector.instanceOf(ProgrammingGradingDao.class));
+        SessionScoreCacheUtils.buildInstance(injector.instanceOf(BundleSubmissionDao.class), injector.instanceOf(BundleGradingDao.class), injector.instanceOf(ContainerScoreCacheDao.class), injector.instanceOf(ContainerProblemScoreCacheDao.class), injector.instanceOf(CourseSessionDao.class), injector.instanceOf(ProgrammingSubmissionDao.class), injector.instanceOf(ProgrammingGradingDao.class), injector.instanceOf(SessionProblemDao.class), injector.instanceOf(UserItemDao.class));
     }
 
     private void scheduleThreads(Injector injector) {

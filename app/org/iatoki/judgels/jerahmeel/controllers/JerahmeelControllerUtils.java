@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 
 public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUtils {
 
-    private static JerahmeelControllerUtils INSTANCE;
+    private static JerahmeelControllerUtils instance;
 
     private final JophielClientAPI jophielClientAPI;
     private final JophielPublicAPI jophielPublicAPI;
@@ -76,6 +76,20 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         this.problemScoreStatisticService = problemScoreStatisticService;
         this.problemStatisticService = problemStatisticService;
         this.programmingSubmissionService = programmingSubmissionService;
+    }
+
+    public static synchronized void buildInstance(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+        if (instance != null) {
+            throw new UnsupportedOperationException("JerahmeelControllerUtils instance has already been built");
+        }
+        instance = new JerahmeelControllerUtils(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
+    }
+
+    static JerahmeelControllerUtils getInstance() {
+        if (instance == null) {
+            throw new UnsupportedOperationException("JerahmeelControllerUtils instance has not been built");
+        }
+        return instance;
     }
 
     @Override
@@ -157,13 +171,6 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         }
     }
 
-    public static synchronized void buildInstance(JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
-        if (INSTANCE != null) {
-            throw new UnsupportedOperationException("ControllerUtils instance has already been built");
-        }
-        INSTANCE = new JerahmeelControllerUtils(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
-    }
-
     private boolean isInTrainingMainPage() {
         return ControllerUtils.getCurrentUrl(Http.Context.current().request()).equals(routes.TrainingController.index().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()));
     }
@@ -208,12 +215,5 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         Collections.sort(submissionEntries);
 
         content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic, problemStatisticsTitleMap), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
-    }
-
-    static JerahmeelControllerUtils getInstance() {
-        if (INSTANCE == null) {
-            throw new UnsupportedOperationException("ControllerUtils instance has not been built");
-        }
-        return INSTANCE;
     }
 }

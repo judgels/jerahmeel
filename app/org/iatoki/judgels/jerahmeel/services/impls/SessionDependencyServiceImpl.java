@@ -64,8 +64,8 @@ public final class SessionDependencyServiceImpl implements SessionDependencyServ
 
     @Override
     public Page<SessionDependency> getPageOfSessionDependencies(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = sessionDependencyDao.countByFilters(filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid), ImmutableMap.of());
-        List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = sessionDependencyDao.countByFiltersEq(filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid));
+        List<SessionDependencyModel> sessionDependencyModels = sessionDependencyDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(SessionDependencyModel_.sessionJid, sessionJid), pageIndex * pageSize, pageSize);
 
         List<SessionDependency> sessionDependencies = sessionDependencyModels.stream().map(s -> new SessionDependency(s.id, s.sessionJid, s.dependedSessionJid, sessionDao.findByJid(s.dependedSessionJid).name)).collect(Collectors.toList());
 

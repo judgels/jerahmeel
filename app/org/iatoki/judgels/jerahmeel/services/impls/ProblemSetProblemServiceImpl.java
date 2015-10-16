@@ -8,12 +8,7 @@ import org.iatoki.judgels.jerahmeel.ProblemSetProblemNotFoundException;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemStatus;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemType;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetProblemModel_;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
@@ -30,20 +25,10 @@ import java.util.stream.Collectors;
 @Named("problemSetProblemService")
 public final class ProblemSetProblemServiceImpl implements ProblemSetProblemService {
 
-    private final BundleSubmissionDao bundleSubmissionDao;
-    private final BundleGradingDao bundleGradingDao;
-    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
-    private final ProgrammingSubmissionDao programmingSubmissionDao;
-    private final ProgrammingGradingDao programmingGradingDao;
     private final ProblemSetProblemDao problemSetProblemDao;
 
     @Inject
-    public ProblemSetProblemServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, ProblemSetProblemDao problemSetProblemDao) {
-        this.bundleSubmissionDao = bundleSubmissionDao;
-        this.bundleGradingDao = bundleGradingDao;
-        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
-        this.programmingSubmissionDao = programmingSubmissionDao;
-        this.programmingGradingDao = programmingGradingDao;
+    public ProblemSetProblemServiceImpl(ProblemSetProblemDao problemSetProblemDao) {
         this.problemSetProblemDao = problemSetProblemDao;
     }
 
@@ -64,8 +49,8 @@ public final class ProblemSetProblemServiceImpl implements ProblemSetProblemServ
 
     @Override
     public Page<ProblemSetProblem> getPageOfProblemSetProblems(String problemSetJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = problemSetProblemDao.countByFilters(filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid), ImmutableMap.of());
-        List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = problemSetProblemDao.countByFiltersEq(filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid));
+        List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid), pageIndex * pageSize, pageSize);
 
         List<ProblemSetProblem> problemSetProblems = problemSetProblemModels.stream().map(m -> ProblemSetProblemServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
@@ -75,12 +60,12 @@ public final class ProblemSetProblemServiceImpl implements ProblemSetProblemServ
 
     @Override
     public Page<ProblemSetProblemWithScore> getPageOfProblemSetProblemsWithScore(String userJid, String problemSetJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = problemSetProblemDao.countByFilters(filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid, ProblemSetProblemModel_.status, ProblemSetProblemStatus.VISIBLE.name()), ImmutableMap.of());
-        List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid, ProblemSetProblemModel_.status, ProblemSetProblemStatus.VISIBLE.name()), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = problemSetProblemDao.countByFiltersEq(filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid, ProblemSetProblemModel_.status, ProblemSetProblemStatus.VISIBLE.name()));
+        List<ProblemSetProblemModel> problemSetProblemModels = problemSetProblemDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(ProblemSetProblemModel_.problemSetJid, problemSetJid, ProblemSetProblemModel_.status, ProblemSetProblemStatus.VISIBLE.name()), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<ProblemSetProblemWithScore> problemSetProblemProgressBuilder = ImmutableList.builder();
         for (ProblemSetProblemModel problemSetProblemModel : problemSetProblemModels) {
-            double maxScore = ProblemSetProblemServiceUtils.getUserMaxScoreFromProblemSetProblemModel(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetProblemModel);
+            double maxScore = ProblemSetScoreCacheUtils.getInstance().getUserMaxScoreFromProblemSetProblemModel(userJid, problemSetProblemModel);
 
             problemSetProblemProgressBuilder.add(new ProblemSetProblemWithScore(ProblemSetProblemServiceUtils.createFromModel(problemSetProblemModel), maxScore));
         }

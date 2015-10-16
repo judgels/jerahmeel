@@ -1,6 +1,5 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
@@ -35,8 +34,8 @@ public final class CurriculumServiceImpl implements CurriculumService {
 
     @Override
     public Page<Curriculum> getPageOfCurriculums(long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = curriculumDao.countByFilters(filterString, ImmutableMap.of(), ImmutableMap.of());
-        List<CurriculumModel> curriculumModels = curriculumDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = curriculumDao.countByFilters(filterString);
+        List<CurriculumModel> curriculumModels = curriculumDao.findSortedByFilters(orderBy, orderDir, filterString, pageIndex * pageSize, pageSize);
 
         List<Curriculum> curriculums = Lists.transform(curriculumModels, m -> CurriculumServiceUtils.createCurriculumFromModel(m));
 

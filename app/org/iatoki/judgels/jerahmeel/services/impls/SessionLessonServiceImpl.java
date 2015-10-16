@@ -50,8 +50,8 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
 
     @Override
     public Page<SessionLesson> getPageOfSessionLessons(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of());
-        List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = sessionLessonDao.countByFiltersEq(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid));
+        List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid), pageIndex * pageSize, pageSize);
 
         List<SessionLesson> sessionLessons = sessionLessonModels.stream().map(m -> SessionLessonServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
@@ -60,8 +60,8 @@ public final class SessionLessonServiceImpl implements SessionLessonService {
 
     @Override
     public Page<SessionLessonWithProgress> getPageOfSessionLessonsWithProgress(String userJid, String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = sessionLessonDao.countByFilters(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()), ImmutableMap.of());
-        List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = sessionLessonDao.countByFiltersEq(filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()));
+        List<SessionLessonModel> sessionLessonModels = sessionLessonDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(SessionLessonModel_.sessionJid, sessionJid, SessionLessonModel_.status, SessionLessonStatus.VISIBLE.name()), pageIndex * pageSize, pageSize);
 
         ImmutableList.Builder<SessionLessonWithProgress> sessionLessonProgressBuilder = ImmutableList.builder();
         for (SessionLessonModel sessionLessonModel :  sessionLessonModels) {

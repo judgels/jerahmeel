@@ -170,7 +170,7 @@ public final class JerahmeelSubmissionServiceUtils {
 
             containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
         } else {
-            double problemSetScore = ProblemSetServiceUtils.getUserTotalScoreFromProblemSetModelAndProblemSetProblemModelsWithoutCache(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetModel, problemSetProblemDao.getByProblemSetJid(problemSetModel.jid));
+            double problemSetScore = ProblemSetScoreCacheUtils.getInstance().getUserTotalScoreFromProblemSetModelAndProblemSetProblemModelsWithoutCache(userJid, problemSetModel, problemSetProblemDao.getByProblemSetJid(problemSetModel.jid));
 
             ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, problemSetModel.jid, problemSetScore);
         }
@@ -183,7 +183,7 @@ public final class JerahmeelSubmissionServiceUtils {
 
                 containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
             } else {
-                double archiveScore = ArchiveServiceUtils.getArchiveScoreWithoutCache(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, archiveModel.jid);
+                double archiveScore = ProblemSetScoreCacheUtils.getInstance().getArchiveScoreWithoutCache(userJid, archiveModel.jid);
 
                 ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, archiveModel.jid, archiveScore);
             }
@@ -204,7 +204,7 @@ public final class JerahmeelSubmissionServiceUtils {
             containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
         } else {
             List<SessionProblemModel> sessionProblemModels = sessionProblemDao.getBySessionJid(containerJid);
-            double sessionScore = SessionProblemServiceUtils.getUserTotalScoreFromSessionProblemModelsWithoutCache(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, sessionProblemModels);
+            double sessionScore = SessionScoreCacheUtils.getInstance().getUserTotalScoreFromSessionProblemModelsWithoutCache(userJid, sessionProblemModels);
 
             ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, containerJid, sessionScore);
         }
@@ -247,7 +247,7 @@ public final class JerahmeelSubmissionServiceUtils {
 
                 containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
             } else {
-                double courseScore = CourseSessionServiceUtils.getUserTotalScoreFromCourseSessionModelsWithoutCache(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, mapCourseJidToCourseSessionModels.get(courseJid), mapSessionJidToSessionProblemModels);
+                double courseScore = SessionScoreCacheUtils.getInstance().getUserTotalScoreFromCourseSessionModelsWithoutCache(userJid, mapCourseJidToCourseSessionModels.get(courseJid), mapSessionJidToSessionProblemModels);
 
                 ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, courseJid, courseScore);
             }

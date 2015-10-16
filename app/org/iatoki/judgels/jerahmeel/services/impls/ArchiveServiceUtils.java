@@ -4,19 +4,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.iatoki.judgels.jerahmeel.Archive;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel_;
-import org.iatoki.judgels.jerahmeel.models.entities.ContainerScoreCacheModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetModel;
-import org.iatoki.judgels.jerahmeel.models.entities.ProblemSetModel_;
 
 import java.util.List;
 import java.util.Stack;
@@ -118,32 +107,5 @@ public final class ArchiveServiceUtils {
         }
 
         return intendedArchive;
-    }
-
-    static double getArchiveScore(ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ArchiveDao archiveDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, String userJid, String archiveJid) {
-        if (containerScoreCacheDao.existsByUserJidAndContainerJid(userJid, archiveJid)) {
-            ContainerScoreCacheModel containerScoreCacheModel = containerScoreCacheDao.getByUserJidAndContainerJid(userJid, archiveJid);
-            return containerScoreCacheModel.score;
-        }
-
-        double archiveScore = getArchiveScoreWithoutCache(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, archiveJid);
-
-        ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, archiveJid, archiveScore);
-
-        return archiveScore;
-    }
-
-    static double getArchiveScoreWithoutCache(ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ArchiveDao archiveDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, String userJid, String archiveJid) {
-        double archiveScore = 0;
-        List<ProblemSetModel> problemSetModels = problemSetDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ProblemSetModel_.archiveJid, archiveJid), 0, -1);
-        for (ProblemSetModel problemSetModel : problemSetModels) {
-            archiveScore += ProblemSetServiceUtils.getUserTotalScoreFromProblemSetModelAndProblemSetProblemModels(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, problemSetModel, problemSetProblemDao.getByProblemSetJid(problemSetModel.jid));
-        }
-        List<Archive> subArchives = getChildArchives(archiveDao, archiveJid);
-        for (Archive subArchive : subArchives) {
-            archiveScore += getArchiveScore(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, subArchive.getJid());
-        }
-
-        return archiveScore;
     }
 }

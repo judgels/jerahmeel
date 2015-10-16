@@ -10,11 +10,6 @@ import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
 import org.iatoki.judgels.jerahmeel.SessionProblemType;
 import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.SessionProblemModel;
@@ -34,21 +29,11 @@ import java.util.stream.Collectors;
 @Named("sessionProblemService")
 public final class SessionProblemServiceImpl implements SessionProblemService {
 
-    private final BundleSubmissionDao bundleSubmissionDao;
-    private final BundleGradingDao bundleGradingDao;
-    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
-    private final ProgrammingSubmissionDao programmingSubmissionDao;
-    private final ProgrammingGradingDao programmingGradingDao;
     private final SessionProblemDao sessionProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public SessionProblemServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
-        this.bundleSubmissionDao = bundleSubmissionDao;
-        this.bundleGradingDao = bundleGradingDao;
-        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
-        this.programmingSubmissionDao = programmingSubmissionDao;
-        this.programmingGradingDao = programmingGradingDao;
+    public SessionProblemServiceImpl(SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         this.sessionProblemDao = sessionProblemDao;
         this.userItemDao = userItemDao;
     }
@@ -70,8 +55,8 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
 
     @Override
     public Page<SessionProblem> getPageOfSessionProblems(String sessionJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = sessionProblemDao.countByFilters(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of());
-        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = sessionProblemDao.countByFiltersEq(filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid));
+        List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJid), pageIndex * pageSize, pageSize);
 
         List<SessionProblem> sessionProblems = sessionProblemModels.stream().map(m -> SessionProblemServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
@@ -96,7 +81,7 @@ public final class SessionProblemServiceImpl implements SessionProblemService {
                 }
             }
 
-            double maxScore = SessionProblemServiceUtils.getUserMaxScoreFromSessionProblemModel(containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, sessionProblemModel);
+            double maxScore = SessionScoreCacheUtils.getInstance().getUserMaxScoreFromSessionProblemModel(userJid, sessionProblemModel);
 
             sessionProblemProgressBuilder.add(new SessionProblemWithProgress(SessionProblemServiceUtils.createFromModel(sessionProblemModel), progress, maxScore));
         }

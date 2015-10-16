@@ -9,14 +9,7 @@ import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
 import org.iatoki.judgels.jerahmeel.CourseSessionWithProgress;
 import org.iatoki.judgels.jerahmeel.SessionProgress;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
-import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SessionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionDependencyDao;
 import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
@@ -42,30 +35,16 @@ import java.util.stream.Collectors;
 @Named("courseSessionService")
 public final class CourseSessionServiceImpl implements CourseSessionService {
 
-    private final BundleSubmissionDao bundleSubmissionDao;
-    private final BundleGradingDao bundleGradingDao;
-    private final ContainerScoreCacheDao containerScoreCacheDao;
-    private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
     private final CourseSessionDao courseSessionDao;
-    private final SessionDao sessionDao;
     private final SessionDependencyDao sessionDependencyDao;
     private final SessionProblemDao sessionProblemDao;
-    private final ProgrammingSubmissionDao programmingSubmissionDao;
-    private final ProgrammingGradingDao programmingGradingDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CourseSessionServiceImpl(BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseSessionDao courseSessionDao, SessionDao sessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, UserItemDao userItemDao) {
-        this.bundleSubmissionDao = bundleSubmissionDao;
-        this.bundleGradingDao = bundleGradingDao;
-        this.containerScoreCacheDao = containerScoreCacheDao;
-        this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
+    public CourseSessionServiceImpl(CourseSessionDao courseSessionDao, SessionDependencyDao sessionDependencyDao, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
         this.courseSessionDao = courseSessionDao;
-        this.sessionDao = sessionDao;
         this.sessionDependencyDao = sessionDependencyDao;
         this.sessionProblemDao = sessionProblemDao;
-        this.programmingSubmissionDao = programmingSubmissionDao;
-        this.programmingGradingDao = programmingGradingDao;
         this.userItemDao = userItemDao;
     }
 
@@ -91,8 +70,8 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
     @Override
     public Page<CourseSession> getPageOfCourseSessions(String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
-        List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = courseSessionDao.countByFiltersEq(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid));
+        List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), pageIndex * pageSize, pageSize);
 
         List<CourseSession> courseSessions = courseSessionModels.stream().map(m -> CourseSessionServiceUtils.createFromModel(m)).collect(Collectors.toList());
 
@@ -101,8 +80,8 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
     @Override
     public Page<CourseSessionWithProgress> getPageOfCourseSessionsWithProgress(String userJid, String courseJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString) {
-        long totalPages = courseSessionDao.countByFilters(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of());
-        List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFilters(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), ImmutableMap.of(), pageIndex * pageSize, pageSize);
+        long totalPages = courseSessionDao.countByFiltersEq(filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid));
+        List<CourseSessionModel> courseSessionModels = courseSessionDao.findSortedByFiltersEq(orderBy, orderDir, filterString, ImmutableMap.of(CourseSessionModel_.courseJid, courseJid), pageIndex * pageSize, pageSize);
 
         List<String> sessionJids = courseSessionModels.stream().map(m -> m.sessionJid).collect(Collectors.toList());
         List<SessionProblemModel> sessionProblemModels = sessionProblemDao.findSortedByFiltersIn(orderBy, orderDir, "", ImmutableMap.of(SessionProblemModel_.sessionJid, sessionJids), 0, -1);
@@ -133,7 +112,7 @@ public final class CourseSessionServiceImpl implements CourseSessionService {
 
             long totalProblems = currentSessionProblemModels.size();
             long solvedProblems = 0;
-            double totalScore = SessionProblemServiceUtils.getUserTotalScoreFromSessionProblemModels(containerScoreCacheDao, containerProblemScoreCacheDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, courseSessionModel.sessionJid, currentSessionProblemModels);
+            double totalScore = SessionScoreCacheUtils.getInstance().getUserTotalScoreFromSessionProblemModels(userJid, courseSessionModel.sessionJid, currentSessionProblemModels);
             for (SessionProblemModel sessionProblemModel : currentSessionProblemModels) {
                 if (userItemDao.existsByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), sessionProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                     solvedProblems++;
