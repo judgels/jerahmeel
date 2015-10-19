@@ -91,15 +91,15 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
 
         if (containerJid.startsWith(JerahmeelSubmissionServiceUtils.PROBLEM_SET_JID_PREFIX)) {
             if (scoreChanged) {
-                JerahmeelSubmissionServiceUtils.updateProblemSetAndParentsScoreCache(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, containerJid, deltaScore);
+                ProblemSetScoreCacheUtils.getInstance().updateProblemSetAndArchivesScoreCache(userJid, containerJid, deltaScore);
             }
             return;
         }
 
         if (scoreChanged) {
-            JerahmeelSubmissionServiceUtils.updateSessionAndParentsScoreCache(containerScoreCacheDao, containerProblemScoreCacheDao, courseSessionDao, sessionProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, containerJid, deltaScore);
+            SessionScoreCacheUtils.getInstance().updateSessionAndCourseScoreCache(userJid, containerJid, deltaScore);
         }
 
-        JerahmeelSubmissionServiceUtils.updateSessionProblemProgressWithProgrammingSubmissions(userItemDao, sessionProblemDao, userJid, containerJid, problemJid, submissions);
+        SessionProgressCacheUtils.getInstance().updateSessionProblemProgressWithProgrammingSubmissions(userJid, containerJid, problemJid, submissions);
     }
 }

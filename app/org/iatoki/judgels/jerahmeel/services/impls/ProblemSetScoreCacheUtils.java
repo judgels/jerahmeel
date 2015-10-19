@@ -14,6 +14,7 @@ import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
+import org.iatoki.judgels.jerahmeel.models.entities.ArchiveModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ContainerProblemScoreCacheModel;
@@ -155,5 +156,43 @@ public final class ProblemSetScoreCacheUtils {
 
         ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, problemSetProblemModel.problemJid, problemSetProblemModel.problemJid, maxScore);
         return maxScore;
+    }
+
+    void updateProblemSetAndArchivesScoreCache(String userJid, String problemSetJid, double deltaScore) {
+        ProblemSetModel problemSetModel = problemSetDao.findByJid(problemSetJid);
+        if (containerScoreCacheDao.existsByUserJidAndContainerJid(userJid, problemSetJid)) {
+            ContainerScoreCacheModel containerScoreCacheModel = containerScoreCacheDao.getByUserJidAndContainerJid(userJid, problemSetJid);
+            containerScoreCacheModel.score = containerScoreCacheModel.score + deltaScore;
+
+            containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
+        } else {
+            double problemSetScore = ProblemSetScoreCacheUtils.getInstance().getUserTotalScoreFromProblemSetModelAndProblemSetProblemModelsWithoutCache(userJid, problemSetModel, problemSetProblemDao.getByProblemSetJid(problemSetModel.jid));
+
+            ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, problemSetModel.jid, problemSetScore);
+        }
+
+        ArchiveModel archiveModel = archiveDao.findByJid(problemSetModel.archiveJid);
+        do {
+            updateArchiveScoreCache(userJid, archiveModel.jid, deltaScore);
+
+            if (archiveModel.parentJid.isEmpty()) {
+                archiveModel = null;
+            } else {
+                archiveModel = archiveDao.findByJid(archiveModel.parentJid);
+            }
+        } while (archiveModel != null);
+    }
+
+    void updateArchiveScoreCache(String userJid, String archiveJid, double deltaScore) {
+        if (containerScoreCacheDao.existsByUserJidAndContainerJid(userJid, archiveJid)) {
+            ContainerScoreCacheModel containerScoreCacheModel = containerScoreCacheDao.getByUserJidAndContainerJid(userJid, archiveJid);
+            containerScoreCacheModel.score = containerScoreCacheModel.score + deltaScore;
+
+            containerScoreCacheDao.edit(containerScoreCacheModel, "cacheAfterGradeUpdater", "localhost");
+        } else {
+            double archiveScore = ProblemSetScoreCacheUtils.getInstance().getArchiveScoreWithoutCache(userJid, archiveJid);
+
+            ContainerScoreCacheServiceUtils.addToContainerScoreCache(containerScoreCacheDao, userJid, archiveJid, archiveScore);
+        }
     }
 }

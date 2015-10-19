@@ -90,15 +90,15 @@ public final class BundleSubmissionServiceImpl extends AbstractBundleSubmissionS
 
         if (containerJid.startsWith(JerahmeelSubmissionServiceUtils.PROBLEM_SET_JID_PREFIX)) {
             if (scoreChanged) {
-                JerahmeelSubmissionServiceUtils.updateProblemSetAndParentsScoreCache(containerScoreCacheDao, containerProblemScoreCacheDao, archiveDao, problemSetDao, problemSetProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, containerJid, deltaScore);
+                ProblemSetScoreCacheUtils.getInstance().updateProblemSetAndArchivesScoreCache(userJid, containerJid, deltaScore);
             }
             return;
         }
 
         if (scoreChanged) {
-            JerahmeelSubmissionServiceUtils.updateSessionAndParentsScoreCache(containerScoreCacheDao, containerProblemScoreCacheDao, courseSessionDao, sessionProblemDao, bundleSubmissionDao, bundleGradingDao, programmingSubmissionDao, programmingGradingDao, userJid, containerJid, deltaScore);
+            SessionScoreCacheUtils.getInstance().updateSessionAndCourseScoreCache(userJid, containerJid, deltaScore);
         }
 
-        JerahmeelSubmissionServiceUtils.updateSessionProblemProgressWithBundleSubmissions(userItemDao, sessionProblemDao, userJid, containerJid, problemJid, submissions);
+        SessionProgressCacheUtils.getInstance().updateSessionProblemProgressWithBundleSubmissions(userJid, containerJid, problemJid, submissions);
     }
 }

@@ -29,6 +29,7 @@ import org.iatoki.judgels.jerahmeel.services.impls.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.ProblemSetScoreCacheUtils;
+import org.iatoki.judgels.jerahmeel.services.impls.SessionProgressCacheUtils;
 import org.iatoki.judgels.jerahmeel.services.impls.SessionScoreCacheUtils;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
@@ -73,8 +74,9 @@ public final class Global extends AbstractGlobal {
     private void buildUtils(Injector injector) {
         JophielClientControllerUtils.buildInstance(JerahmeelProperties.getInstance().getJophielBaseUrl());
         JerahmeelControllerUtils.buildInstance(injector.instanceOf(JophielClientAPI.class), injector.instanceOf(JophielPublicAPI.class), injector.instanceOf(BundleSubmissionService.class), injector.instanceOf(PointStatisticService.class), injector.instanceOf(ProblemScoreStatisticService.class), injector.instanceOf(ProblemStatisticService.class), injector.instanceOf(ProgrammingSubmissionService.class));
+        SessionProgressCacheUtils.buildInstance(injector.instanceOf(SessionProblemDao.class), injector.instanceOf(UserItemDao.class));
         ProblemSetScoreCacheUtils.buildInstance(injector.instanceOf(ArchiveDao.class), injector.instanceOf(BundleSubmissionDao.class), injector.instanceOf(BundleGradingDao.class), injector.instanceOf(ContainerScoreCacheDao.class), injector.instanceOf(ContainerProblemScoreCacheDao.class), injector.instanceOf(ProblemSetDao.class), injector.instanceOf(ProblemSetProblemDao.class), injector.instanceOf(ProgrammingSubmissionDao.class), injector.instanceOf(ProgrammingGradingDao.class));
-        SessionScoreCacheUtils.buildInstance(injector.instanceOf(BundleSubmissionDao.class), injector.instanceOf(BundleGradingDao.class), injector.instanceOf(ContainerScoreCacheDao.class), injector.instanceOf(ContainerProblemScoreCacheDao.class), injector.instanceOf(CourseSessionDao.class), injector.instanceOf(ProgrammingSubmissionDao.class), injector.instanceOf(ProgrammingGradingDao.class), injector.instanceOf(SessionProblemDao.class), injector.instanceOf(UserItemDao.class));
+        SessionScoreCacheUtils.buildInstance(injector.instanceOf(BundleSubmissionDao.class), injector.instanceOf(BundleGradingDao.class), injector.instanceOf(ContainerScoreCacheDao.class), injector.instanceOf(ContainerProblemScoreCacheDao.class), injector.instanceOf(CourseSessionDao.class), injector.instanceOf(ProgrammingSubmissionDao.class), injector.instanceOf(ProgrammingGradingDao.class), injector.instanceOf(SessionProblemDao.class));
     }
 
     private void scheduleThreads(Injector injector) {
