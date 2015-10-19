@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class CourseSessionWithProgress {
+public final class CourseSessionWithProgress {
 
     private final CourseSession courseSession;
     private final SessionProgress sessionProgress;

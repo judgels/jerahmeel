@@ -29,10 +29,10 @@
                 @if(sessionProblemWithProgress.getProblemProgress.equals(ProblemProgress.COMPLETED)) {
                     <span class="alert alert-success">
                     @Messages.get("training.problem.completed")
-                    [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScores]
+                    [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScore]
                     </span>
                 } else {
-                    @if(Double.compare(sessionProblemWithProgress.getScores, Double.NEGATIVE_INFINITY) == 0) {
+                    @if(Double.compare(SessionProblemWithProgress.MINIMUM_SCORE, sessionProblemWithProgress.getScore) == 0) {
                         @if(sessionProblemWithProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
                             <span class="alert alert-info">
                             @Messages.get("training.problem.viewed")
@@ -45,7 +45,7 @@
                     } else {
                         <span class="alert alert-info">
                             @Messages.get("training.problem.tried")
-                            [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScores]
+                            [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScore]
                         </span>
                     }
                 }

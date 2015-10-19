@@ -1,15 +1,17 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class SessionProblemWithProgress {
+public final class SessionProblemWithProgress {
+
+    public static final double MINIMUM_SCORE = -1234567890;
 
     private final SessionProblem sessionProblem;
     private final ProblemProgress problemProgress;
-    private final double scores;
+    private final double score;
 
-    public SessionProblemWithProgress(SessionProblem sessionProblem, ProblemProgress problemProgress, double scores) {
+    public SessionProblemWithProgress(SessionProblem sessionProblem, ProblemProgress problemProgress, double score) {
         this.sessionProblem = sessionProblem;
         this.problemProgress = problemProgress;
-        this.scores = scores;
+        this.score = score;
     }
 
     public SessionProblem getSessionProblem() {
@@ -20,7 +22,7 @@ public class SessionProblemWithProgress {
         return problemProgress;
     }
 
-    public double getScores() {
-        return scores;
+    public double getScore() {
+        return score;
     }
 }

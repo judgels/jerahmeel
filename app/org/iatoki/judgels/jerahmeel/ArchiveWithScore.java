@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class ArchiveWithScore {
+public final class ArchiveWithScore {
 
     private final Archive archive;
     private final double score;

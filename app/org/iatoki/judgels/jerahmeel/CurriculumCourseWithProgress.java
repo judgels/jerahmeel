@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel;
 
-public class CurriculumCourseWithProgress {
+public final class CurriculumCourseWithProgress {
 
     private final CurriculumCourse curriculumCourse;
     private final CourseProgress courseProgress;
