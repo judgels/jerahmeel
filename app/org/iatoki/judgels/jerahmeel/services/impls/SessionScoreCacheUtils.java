@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress;
+import org.iatoki.judgels.jerahmeel.ProblemScore;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
@@ -109,7 +109,7 @@ public final class SessionScoreCacheUtils {
         double totalScore = 0;
         for (SessionProblemModel sessionProblemModel : sessionProblemModels) {
             double sessionProblemScore = getUserMaxScoreFromSessionProblemModel(userJid, sessionProblemModel);
-            if (Double.compare(SessionProblemWithProgress.MINIMUM_SCORE, sessionProblemScore) != 0) {
+            if (Double.compare(ProblemScore.MINIMUM_SCORE, sessionProblemScore) != 0) {
                 totalScore += sessionProblemScore;
             }
         }
@@ -123,15 +123,9 @@ public final class SessionScoreCacheUtils {
             return containerProblemScoreCacheModel.score;
         }
 
-        double maxScore = SessionProblemWithProgress.MINIMUM_SCORE;
+        double maxScore = ProblemScore.MINIMUM_SCORE;
         if (sessionProblemModel.type.equals(ProblemType.BUNDLE.name())) {
             List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
-
-            if (bundleSubmissionModels.isEmpty()) {
-                ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, sessionProblemModel.sessionJid, sessionProblemModel.problemJid, SessionProblemWithProgress.MINIMUM_SCORE);
-
-                return SessionProblemWithProgress.MINIMUM_SCORE;
-            }
 
             Map<String, List<BundleGradingModel>> bundleGradingModels = bundleGradingDao.getBySubmissionJids(bundleSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
 
@@ -143,12 +137,6 @@ public final class SessionScoreCacheUtils {
             }
         } else if (sessionProblemModel.type.equals(ProblemType.PROGRAMMING.name())) {
             List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(sessionProblemModel.sessionJid, userJid, sessionProblemModel.problemJid);
-
-            if (programmingSubmissionModels.isEmpty()) {
-                ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, sessionProblemModel.sessionJid, sessionProblemModel.problemJid, SessionProblemWithProgress.MINIMUM_SCORE);
-
-                return SessionProblemWithProgress.MINIMUM_SCORE;
-            }
 
             Map<String, List<ProgrammingGradingModel>> gradingModels = programmingGradingDao.getBySubmissionJids(programmingSubmissionModels.stream().map(m -> m.jid).collect(Collectors.toList()));
 

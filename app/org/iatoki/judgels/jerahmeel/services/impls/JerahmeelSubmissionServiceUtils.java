@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.iatoki.judgels.jerahmeel.ProblemScore;
 import org.iatoki.judgels.jerahmeel.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
@@ -117,12 +118,7 @@ public final class JerahmeelSubmissionServiceUtils {
     }
 
     static double countBundleSubmissionsMaxScore(List<BundleSubmission> bundleSubmissions) {
-        if (bundleSubmissions.isEmpty()) {
-            System.out.println("APA SIH");
-            return 0;
-        }
-
-        double maxScore = Double.NEGATIVE_INFINITY;
+        double maxScore = ProblemScore.MINIMUM_SCORE;
         for (BundleSubmission bundleSubmission : bundleSubmissions) {
             if (bundleSubmission.getLatestScore() > maxScore) {
                 maxScore = bundleSubmission.getLatestScore();
@@ -133,11 +129,7 @@ public final class JerahmeelSubmissionServiceUtils {
     }
 
     static double countProgrammingSubmissionsMaxScore(List<ProgrammingSubmission> programmingSubmissions) {
-        if (programmingSubmissions.isEmpty()) {
-            return 0;
-        }
-
-        double maxScore = Double.NEGATIVE_INFINITY;
+        double maxScore = ProblemScore.MINIMUM_SCORE;
         for (ProgrammingSubmission programmingSubmission : programmingSubmissions) {
             if (programmingSubmission.getLatestScore() > maxScore) {
                 maxScore = programmingSubmission.getLatestScore();

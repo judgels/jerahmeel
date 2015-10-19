@@ -15,7 +15,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
 
     @Override
     public long getCodeDataVersion() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -30,6 +30,9 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
             migrateV3toV4();
         }
         if (databaseVersion < 5) {
+            migrateV4toV5();
+        }
+        if (databaseVersion < 6) {
             migrateV4toV5();
         }
     }

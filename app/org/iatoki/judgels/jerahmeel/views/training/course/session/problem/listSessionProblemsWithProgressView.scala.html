@@ -10,6 +10,7 @@
 @import org.iatoki.judgels.jerahmeel.CourseSession
 @import org.iatoki.judgels.jerahmeel.SessionProblemWithProgress
 @import org.iatoki.judgels.jerahmeel.ProblemProgress
+@import org.iatoki.judgels.jerahmeel.ProblemScore
 
 @(curriculum: Curriculum, curriculumCourse: CurriculumCourse, courseSession: CourseSession, pageOfSessionProblemsWithProgress: Page[SessionProblemWithProgress], orderBy: String, orderDir: String, filterString: String, problemTitlesMap: Map[String, String])
 
@@ -32,7 +33,7 @@
                     [@Messages.get("training.problem.points"): @sessionProblemWithProgress.getScore]
                     </span>
                 } else {
-                    @if(Double.compare(SessionProblemWithProgress.MINIMUM_SCORE, sessionProblemWithProgress.getScore) == 0) {
+                    @if(Double.compare(ProblemScore.MINIMUM_SCORE, sessionProblemWithProgress.getScore) == 0) {
                         @if(sessionProblemWithProgress.getProblemProgress.equals(ProblemProgress.VIEWED)) {
                             <span class="alert alert-info">
                             @Messages.get("training.problem.viewed")

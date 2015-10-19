@@ -3,8 +3,8 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.iatoki.judgels.jerahmeel.Archive;
+import org.iatoki.judgels.jerahmeel.ProblemScore;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblemType;
-import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
@@ -114,7 +114,7 @@ public final class ProblemSetScoreCacheUtils {
         double totalScore = 0;
         for (ProblemSetProblemModel problemSetProblemModel : problemSetProblemModels) {
             double problemSetProblemScore = getUserMaxScoreFromProblemSetProblemModel(userJid, problemSetProblemModel);
-            if (Double.compare(ProblemSetProblemWithScore.MINIMUM_SCORE, problemSetProblemScore) != 0) {
+            if (Double.compare(ProblemScore.MINIMUM_SCORE, problemSetProblemScore) != 0) {
                 totalScore += problemSetProblemScore;
             }
         }
@@ -128,15 +128,9 @@ public final class ProblemSetScoreCacheUtils {
             return containerProblemScoreCacheModel.score;
         }
 
-        double maxScore = ProblemSetProblemWithScore.MINIMUM_SCORE;
+        double maxScore = ProblemScore.MINIMUM_SCORE;
         if (problemSetProblemModel.type.equals(ProblemSetProblemType.BUNDLE.name())) {
             List<BundleSubmissionModel> bundleSubmissionModels = bundleSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-
-            if (bundleSubmissionModels.isEmpty()) {
-                ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, problemSetProblemModel.problemJid, problemSetProblemModel.problemJid, ProblemSetProblemWithScore.MINIMUM_SCORE);
-
-                return ProblemSetProblemWithScore.MINIMUM_SCORE;
-            }
 
             Map<String, List<BundleGradingModel>> gradingModelsMap = bundleGradingDao.getBySubmissionJids(Lists.transform(bundleSubmissionModels, m -> m.jid));
 
@@ -148,12 +142,6 @@ public final class ProblemSetScoreCacheUtils {
             }
         } else if (problemSetProblemModel.type.equals(ProblemSetProblemType.PROGRAMMING.name())) {
             List<ProgrammingSubmissionModel> programmingSubmissionModels = programmingSubmissionDao.getByContainerJidAndUserJidAndProblemJid(problemSetProblemModel.problemSetJid, userJid, problemSetProblemModel.problemJid);
-
-            if (programmingSubmissionModels.isEmpty()) {
-                ContainerProblemScoreCacheServiceUtils.addToContainerProblemScoreCache(containerProblemScoreCacheDao, userJid, problemSetProblemModel.problemJid, problemSetProblemModel.problemJid, ProblemSetProblemWithScore.MINIMUM_SCORE);
-
-                return ProblemSetProblemWithScore.MINIMUM_SCORE;
-            }
 
             Map<String, List<ProgrammingGradingModel>> gradingModelsMap = programmingGradingDao.getBySubmissionJids(Lists.transform(programmingSubmissionModels, m -> m.jid));
 

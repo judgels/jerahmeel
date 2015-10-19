@@ -2,8 +2,6 @@ package org.iatoki.judgels.jerahmeel;
 
 public final class SessionProblemWithProgress {
 
-    public static final double MINIMUM_SCORE = -1234567890;
-
     private final SessionProblem sessionProblem;
     private final ProblemProgress problemProgress;
     private final double score;

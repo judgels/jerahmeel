@@ -7,6 +7,7 @@
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.ProblemSet
 @import org.iatoki.judgels.jerahmeel.ProblemSetProblemWithScore
+@import org.iatoki.judgels.jerahmeel.ProblemScore
 
 @(problemSet: ProblemSet, pageOfProblemSetProblemsWithScore: Page[ProblemSetProblemWithScore], orderBy: String, orderDir: String, filterString: String, problemTitlesMap: Map[String, String])
 
@@ -23,7 +24,7 @@
         <div class="panel-body clearfix">
             <a href="@routes.ProblemSetProblemController.viewProblemSetProblem(problemSet.getId, problemSetProblemWithScore.getProblemSetProblem.getId)" class="panel-title">@problemSetProblemWithScore.getProblemSetProblem.getAlias. @problemTitlesMap.get(problemSetProblemWithScore.getProblemSetProblem.getProblemJid)</a>
             <div class="pull-right">
-                @if(Double.compare(ProblemSetProblemWithScore.MINIMUM_SCORE, problemSetProblemWithScore.getScore) == 0) {
+                @if(Double.compare(ProblemScore.MINIMUM_SCORE, problemSetProblemWithScore.getScore) == 0) {
                     <span class="alert alert-warning">
                         @Messages.get("archive.problemSet.problem.notTried")
                     </span>

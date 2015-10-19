@@ -2,8 +2,6 @@ package org.iatoki.judgels.jerahmeel;
 
 public final class ProblemSetProblemWithScore {
 
-    public static final double MINIMUM_SCORE = -1234567890;
-
     private final ProblemSetProblem problemSetProblem;
     private final double score;
 
