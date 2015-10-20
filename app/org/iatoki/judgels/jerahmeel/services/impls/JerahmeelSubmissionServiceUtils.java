@@ -17,6 +17,10 @@ public final class JerahmeelSubmissionServiceUtils {
     }
 
     static double countBundleSubmissionsMaxScore(List<BundleSubmission> bundleSubmissions) {
+        if (bundleSubmissions.isEmpty()) {
+            return 0;
+        }
+
         double maxScore = ProblemScore.MINIMUM_SCORE;
         for (BundleSubmission bundleSubmission : bundleSubmissions) {
             if (bundleSubmission.getLatestScore() > maxScore) {
@@ -28,6 +32,10 @@ public final class JerahmeelSubmissionServiceUtils {
     }
 
     static double countProgrammingSubmissionsMaxScore(List<ProgrammingSubmission> programmingSubmissions) {
+        if (programmingSubmissions.isEmpty()) {
+            return 0;
+        }
+
         double maxScore = ProblemScore.MINIMUM_SCORE;
         for (ProgrammingSubmission programmingSubmission : programmingSubmissions) {
             if (programmingSubmission.getLatestScore() > maxScore) {
