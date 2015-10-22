@@ -21,57 +21,16 @@ public final class ArchiveServiceUtils {
         return new Archive(archiveModel.id, archiveModel.jid, parentArchive, Lists.newArrayList(), archiveModel.name, archiveModel.description);
     }
 
-    static Archive createArchiveWithParentsFromModel(ArchiveDao archiveDao, ArchiveModel intendedArchiveModel) {
-        Stack<ArchiveModel> archiveModelStack = new Stack<>();
-        archiveModelStack.push(intendedArchiveModel);
-        while (!archiveModelStack.peek().parentJid.equals("")) {
-            archiveModelStack.push(archiveDao.findByJid(archiveModelStack.peek().parentJid));
-        }
-
-        Archive parentArchive = null;
-        Archive intendedArchive = null;
-        while (!archiveModelStack.isEmpty()) {
-            ArchiveModel currentArchiveModel = archiveModelStack.pop();
-
-            if (currentArchiveModel.jid.equals(intendedArchiveModel.jid) && (intendedArchive == null)) {
-                intendedArchive = ArchiveServiceUtils.createArchiveFromModel(currentArchiveModel, parentArchive);
-            } else {
-                Archive currentArchive = ArchiveServiceUtils.createArchiveFromModel(currentArchiveModel, parentArchive);
-
-                if (parentArchive != null) {
-                    parentArchive.getSubArchives().add(currentArchive);
-                }
-                parentArchive = currentArchive;
-            }
-        }
-
-        Stack<Archive> archiveStack = new Stack<>();
-        archiveStack.add(intendedArchive);
-
-        while (!archiveStack.isEmpty()) {
-            Archive currentArchive = archiveStack.pop();
-
-            List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, currentArchive.getJid()), 0, -1);
-            for (ArchiveModel archiveModel : archiveModels) {
-                Archive archive = ArchiveServiceUtils.createArchiveFromModel(archiveModel, currentArchive);
-                currentArchive.getSubArchives().add(archive);
-                archiveStack.push(archive);
-            }
-        }
-
-        return intendedArchive;
-    }
-
     static List<Archive> getChildArchives(ArchiveDao archiveDao, String parentJid) {
         List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("name", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, parentJid), 0, -1);
 
-        return archiveModels.stream().map(m -> createArchiveWithParentAndSubArchivesFromModel(archiveDao, m)).collect(Collectors.toList());
+        return archiveModels.stream().map(m -> createArchiveWithParentArchivesFromModel(archiveDao, m)).collect(Collectors.toList());
     }
 
-    static Archive createArchiveWithParentAndSubArchivesFromModel(ArchiveDao archiveDao, ArchiveModel intendedArchiveModel) {
+    static Archive createArchiveWithParentArchivesFromModel(ArchiveDao archiveDao, ArchiveModel intendedArchiveModel) {
         Stack<ArchiveModel> archiveModelStack = new Stack<>();
         archiveModelStack.push(intendedArchiveModel);
-        while (!archiveModelStack.peek().parentJid.equals("")) {
+        while (!archiveModelStack.peek().parentJid.isEmpty()) {
             archiveModelStack.push(archiveDao.findByJid(archiveModelStack.peek().parentJid));
         }
 
@@ -89,20 +48,6 @@ public final class ArchiveServiceUtils {
                     parentArchive.getSubArchives().add(currentArchive);
                 }
                 parentArchive = currentArchive;
-            }
-        }
-
-        Stack<Archive> archiveStack = new Stack<>();
-        archiveStack.add(intendedArchive);
-
-        while (!archiveStack.isEmpty()) {
-            Archive currentArchive = archiveStack.pop();
-
-            List<ArchiveModel> archiveModels = archiveDao.findSortedByFiltersEq("id", "asc", "", ImmutableMap.of(ArchiveModel_.parentJid, currentArchive.getJid()), 0, -1);
-            for (ArchiveModel archiveModel : archiveModels) {
-                Archive archive = ArchiveServiceUtils.createArchiveFromModel(archiveModel, currentArchive);
-                currentArchive.getSubArchives().add(archive);
-                archiveStack.push(archive);
             }
         }
 

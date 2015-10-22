@@ -90,7 +90,7 @@ public final class ArchiveServiceImpl implements ArchiveService {
             throw new ArchiveNotFoundException("Archive Not Found.");
         }
 
-        return ArchiveServiceUtils.createArchiveWithParentAndSubArchivesFromModel(archiveDao, intendedArchiveModel);
+        return ArchiveServiceUtils.createArchiveWithParentArchivesFromModel(archiveDao, intendedArchiveModel);
     }
 
     @Override

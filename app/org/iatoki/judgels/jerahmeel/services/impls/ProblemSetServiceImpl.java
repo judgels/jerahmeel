@@ -103,7 +103,7 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
         }
 
         ArchiveModel archiveModel = archiveDao.findByJid(problemSetModel.archiveJid);
-        Archive archive = ArchiveServiceUtils.createArchiveWithParentsFromModel(archiveDao, archiveModel);
+        Archive archive = ArchiveServiceUtils.createArchiveWithParentArchivesFromModel(archiveDao, archiveModel);
 
         return ProblemSetServiceUtils.createProblemSetFromModelAndArchive(problemSetModel, archive);
     }
@@ -113,7 +113,7 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
         ProblemSetModel problemSetModel = problemSetDao.findByJid(problemSetJid);
 
         ArchiveModel archiveModel = archiveDao.findByJid(problemSetModel.archiveJid);
-        Archive archive = ArchiveServiceUtils.createArchiveWithParentsFromModel(archiveDao, archiveModel);
+        Archive archive = ArchiveServiceUtils.createArchiveWithParentArchivesFromModel(archiveDao, archiveModel);
 
         return ProblemSetServiceUtils.createProblemSetFromModelAndArchive(problemSetModel, archive);
     }
