@@ -15,8 +15,8 @@ final class ProblemSetSubmissionControllerUtils {
 
     static void appendSubtabLayout(LazyHtml content, ProblemSet problemSet) {
         content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("archive.problemSet.submissions.programming"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId())),
-                        new InternalLink(Messages.get("archive.problemSet.submissions.bundle"), routes.ProblemSetBundleSubmissionController.viewSubmissions(problemSet.getId()))
+                        new InternalLink(Messages.get("archive.problemSet.submissions.programming"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())),
+                        new InternalLink(Messages.get("archive.problemSet.submissions.bundle"), routes.ProblemSetBundleSubmissionController.viewOwnSubmissions(problemSet.getId()))
                 ), c)
         );
     }

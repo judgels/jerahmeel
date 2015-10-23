@@ -172,6 +172,10 @@ archive.problemSet.backTo=Back to
 
 archive.problemSet.submissions.bundle=Non Programming Submissions
 archive.problemSet.submissions.programming=Programming Submissions
+archive.problemSet.submissions.bundle.own=Own
+archive.problemSet.submissions.bundle.all=All
+archive.problemSet.submissions.programming.own=Own
+archive.problemSet.submissions.programming.all=All
 archive.problemSet.isLocked=Chapter is still Locked
 archive.problemSet.problem.mustLogin=You must login to submit
 archive.problemSet.problem.backTo=Back to

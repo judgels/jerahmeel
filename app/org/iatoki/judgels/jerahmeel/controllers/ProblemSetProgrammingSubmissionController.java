@@ -13,24 +13,29 @@ import org.iatoki.judgels.jerahmeel.ProblemSetProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.programming.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.programming.listSubmissionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.forms.ListTableSelectionForm;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
+import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionException;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.ProgrammingSubmissionUtils;
 import org.iatoki.judgels.sandalphon.adapters.GradingEngineAdapterRegistry;
 import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
+import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Http;
@@ -40,6 +45,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.util.List;
 import java.util.Map;
 
 @Authenticated(value = {LoggedIn.class, HasRole.class})
@@ -98,18 +104,18 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
 
         JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(PROBLEM_SET, problemSet.getJid(), problemSet.getName(), PROBLEM, problemSetProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));
 
-        return redirect(routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()));
+        return redirect(routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId()));
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
-    public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
-        return listSubmissions(problemSetId, 0, "id", "desc", null);
+    public Result viewOwnSubmissions(long problemSetId) throws ProblemSetNotFoundException {
+        return listOwnSubmissions(problemSetId, 0, "id", "desc", null);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
-    public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String problemJid) throws ProblemSetNotFoundException {
+    public Result listOwnSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
 
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
@@ -118,12 +124,49 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         Map<String, String> problemJidToAliasMap = problemSetProblemService.getProgrammingProblemJidToAliasMapByProblemSetJid(problemSet.getJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(problemSet.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
+        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
+            appendSubtabLayout(content, problemSet);
+        }
         ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet);
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Problem Sets - Programming Submissions");
+
+        return JerahmeelControllerUtils.getInstance().lazyOk(content);
+    }
+
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional(readOnly = true)
+    public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
+        return listSubmissions(problemSetId, 0, "id", "desc", null, null);
+    }
+
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional(readOnly = true)
+    public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException {
+        ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
+
+        String actualUserJid = "(none)".equals(userJid) ? null : userJid;
+        String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
+
+        Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, problemSet.getJid());
+        Map<String, String> problemJidToAliasMap = problemSetProblemService.getProgrammingProblemJidToAliasMapByProblemSetJid(problemSet.getJid());
+        Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
+
+        LazyHtml content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfSubmissions, ImmutableList.of(), problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
+        appendSubtabLayout(content, problemSet);
+        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendTabLayout(content, problemSet);
+        JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
+        appendBreadcrumbsLayout(content, problemSet,
+                new InternalLink(Messages.get("archive.problemSet.submissions.programming.all"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()))
+        );
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Problem Sets - Programming Submissions");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
@@ -136,14 +179,21 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
 
         ProgrammingSubmission submission = programmingSubmissionService.findProgrammingSubmissionById(submissionId);
 
+        if (!JerahmeelControllerUtils.getInstance().isAdmin() && !submission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
+            return redirect(routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSetId));
+        }
+
         SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submission.getJid());
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
         ProblemSetProblem problemSetProblem = problemSetProblemService.findProblemSetProblemByProblemSetJidAndProblemJid(problemSet.getJid(), submission.getProblemJid());
         String problemSetProblemAlias = problemSetProblem.getAlias();
-        String problemsetProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+        String problemSetProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
-        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, problemSetProblemAlias, problemsetProblemName, gradingLanguageName, problemSet.getName()));
+        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, problemSetProblemAlias, problemSetProblemName, gradingLanguageName, problemSet.getName()));
+        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
+            appendSubtabLayout(content, problemSet);
+        }
         ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
@@ -155,11 +205,62 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional
+    public Result regradeSubmission(long problemSetId, long submissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException, ProgrammingSubmissionNotFoundException {
+        ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
+
+        ProgrammingSubmission submission = programmingSubmissionService.findProgrammingSubmissionById(submissionId);
+        SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submission.getJid());
+        programmingSubmissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(PROBLEM_SET, problemSet.getJid(), problemSet.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
+
+        return redirect(routes.ProblemSetProgrammingSubmissionController.listSubmissions(problemSetId, pageIndex, orderBy, orderDir, userJid, problemJid));
+    }
+
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional
+    public Result regradeSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException, ProgrammingSubmissionNotFoundException {
+        ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
+
+        ListTableSelectionForm data = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
+
+        List<ProgrammingSubmission> submissions;
+
+        if (data.selectAll) {
+            submissions = programmingSubmissionService.getProgrammingSubmissionsByFilters(orderBy, orderDir, userJid, problemJid, problemSet.getJid());
+        } else if (data.selectJids != null) {
+            submissions = programmingSubmissionService.getProgrammingSubmissionsByJids(data.selectJids);
+        } else {
+            return redirect(routes.ProblemSetProgrammingSubmissionController.listSubmissions(problemSetId, pageIndex, orderBy, orderDir, userJid, problemJid));
+        }
+
+        for (ProgrammingSubmission submission : submissions) {
+            SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submission.getJid());
+            programmingSubmissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+            JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(PROBLEM_SET, problemSet.getJid(), problemSet.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
+        }
+
+        return redirect(routes.ProblemSetProgrammingSubmissionController.listSubmissions(problemSetId, pageIndex, orderBy, orderDir, userJid, problemJid));
+    }
+
+    private void appendSubtabLayout(LazyHtml content, ProblemSet problemSet) {
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("archive.problemSet.submissions.programming.own"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())),
+                        new InternalLink(Messages.get("archive.problemSet.submissions.programming.all"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()))
+                ), c)
+        );
+    }
+
     private void appendBreadcrumbsLayout(LazyHtml content, ProblemSet problemSet, InternalLink... lastLinks) {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = ProblemSetControllerUtils.getBreadcrumbsBuilder(problemSet);
         breadcrumbsBuilder.add(new InternalLink(problemSet.getName(), routes.ProblemSetController.jumpToProblems(problemSet.getId())));
         breadcrumbsBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions"), routes.ProblemSetController.jumpToSubmissions(problemSet.getId())));
-        breadcrumbsBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions.programming"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId())));
+        breadcrumbsBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions.programming"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())));
         breadcrumbsBuilder.add(lastLinks);
 
         JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());
