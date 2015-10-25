@@ -7,6 +7,7 @@ GET         /authRole                                                           
 GET         /afterLogin                                                                                                                     @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.afterLogin(returnUri ?= "")
 POST        /viewAs                                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.postViewAs()
 GET         /resetViewAs                                                                                                                    @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.resetViewAs()
+GET         /localLogout                                                                                                                         @org.iatoki.judgels.jerahmeel.controllers.ApplicationController.logout(returnUri ?= "")
 
 GET         /training/curriculums/:curriculumId/courses                                                                                     @org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController.viewCourses(curriculumId: Long)
 GET         /training/curriculums/:curriculumId/courses/                                                                                    @org.iatoki.judgels.jerahmeel.controllers.TrainingCourseController.listCourses(curriculumId: Long, pageIndex: Long ?= 0, orderBy ?= "alias", orderDir ?= "asc", filterString ?= "")
