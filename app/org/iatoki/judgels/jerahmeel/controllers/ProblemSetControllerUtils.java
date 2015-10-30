@@ -46,11 +46,19 @@ final class ProblemSetControllerUtils {
         }
     }
 
-    static void appendSubtabLayout(LazyHtml content, ProblemSet problemSet) {
+    static void appendProblemSubtabLayout(LazyHtml content, ProblemSet problemSet) {
         content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
                 new InternalLink(Messages.get("commons.view"), routes.ProblemSetProblemController.viewVisibleProblemSetProblems(problemSet.getId())),
                 new InternalLink(Messages.get("commons.manage"), routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()))
         ), c));
+    }
+
+    static void appendSubmissionSubtabLayout(LazyHtml content, ProblemSet problemSet) {
+        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                        new InternalLink(Messages.get("archive.problemSet.submissions.programming"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())),
+                        new InternalLink(Messages.get("archive.problemSet.submissions.bundle"), routes.ProblemSetBundleSubmissionController.viewOwnSubmissions(problemSet.getId()))
+                ), c)
+        );
     }
 
     static ImmutableList.Builder<InternalLink> getBreadcrumbsBuilder(ProblemSet problemSet) {

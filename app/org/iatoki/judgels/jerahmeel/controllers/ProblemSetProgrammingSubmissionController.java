@@ -21,6 +21,7 @@ import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.programming.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.programming.listSubmissionsView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.programming.listSubmissionsWithActionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -126,10 +127,8 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
 
         LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(problemSet.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
-            appendSubtabLayout(content, problemSet);
-        }
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet);
@@ -139,14 +138,12 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
-    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
         return listSubmissions(problemSetId, 0, "id", "desc", null, null);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
-    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -158,10 +155,15 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         Map<String, String> problemJidToAliasMap = problemSetProblemService.getProgrammingProblemJidToAliasMapByProblemSetJid(problemSet.getJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfSubmissions, ImmutableList.of(), problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        LazyHtml content;
+        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
+            content = new LazyHtml(listSubmissionsWithActionsView.render(problemSet.getId(), pageOfSubmissions, ImmutableList.of(), problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        } else {
+            content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfSubmissions, ImmutableList.of(), problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        }
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
         appendSubtabLayout(content, problemSet);
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet,
@@ -194,7 +196,7 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         if (JerahmeelControllerUtils.getInstance().isAdmin()) {
             appendSubtabLayout(content, problemSet);
         }
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet,

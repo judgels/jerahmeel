@@ -38,8 +38,6 @@ import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
 import org.iatoki.judgels.play.views.html.layouts.heading3WithActionLayout;
-import org.iatoki.judgels.play.views.html.layouts.headingWithBackLayout;
-import org.iatoki.judgels.play.views.html.layouts.tabLayout;
 import play.data.DynamicForm;
 import play.data.Form;
 import play.db.jpa.Transactional;
@@ -102,7 +100,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         }
 
         if (JerahmeelUtils.hasRole("admin")) {
-            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
+            ProblemSetControllerUtils.appendProblemSubtabLayout(content, problemSet);
         }
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
@@ -164,12 +162,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         session("problemJid", problemSetProblem.getProblemJid());
 
         LazyHtml content = new LazyHtml(viewProblemSetProblemView.render(requestUrl, requestBody));
-        content.appendLayout(c -> tabLayout.render(ImmutableList.of(new InternalLink(Messages.get("archives.problemSet.problems"), routes.ProblemSetProblemController.viewProblemSetProblems(problemSet.getId()))), c));
-        content.appendLayout(c -> headingWithBackLayout.render(
-                    problemSet.getName(),
-                    new InternalLink(Messages.get("archive.problemSet.problem.backTo") + " " + problemSet.getParentArchive().getName(), routes.ArchiveController.viewArchives(problemSet.getParentArchive().getId())),
-                c)
-        );
+        ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet,
                 new InternalLink(problemSetProblem.getAlias(), routes.ProblemSetProblemController.viewProblemSetProblem(problemSet.getId(), problemSetProblem.getId()))
@@ -348,7 +341,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         LazyHtml content = new LazyHtml(listProblemSetProblemsView.render(problemSet.getId(), pageOfProblemSetProblems, orderBy, orderDir, filterString, problemSlugsMap));
         content.appendLayout(c -> heading3WithActionLayout.render(Messages.get("archive.problemSet.problems"), new InternalLink(Messages.get("commons.add"), routes.ProblemSetProblemController.addProblemSetProblem(problemSet.getId())), c));
         if (JerahmeelUtils.hasRole("admin")) {
-            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
+            ProblemSetControllerUtils.appendProblemSubtabLayout(content, problemSet);
         }
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
@@ -363,7 +356,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
     private Result showAddProblemSetProblem(ProblemSet problemSet, Form<ProblemSetProblemAddForm> problemSetProblemAddForm) {
         LazyHtml content = new LazyHtml(addProblemSetProblemView.render(problemSet.getId(), problemSetProblemAddForm));
         if (JerahmeelUtils.hasRole("admin")) {
-            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
+            ProblemSetControllerUtils.appendProblemSubtabLayout(content, problemSet);
         }
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
@@ -379,7 +372,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
     private Result showEditProblemSetProblem(ProblemSet problemSet, ProblemSetProblem problemSetProblem, Form<ProblemSetProblemEditForm> problemSetProblemEditForm) {
         LazyHtml content = new LazyHtml(editProblemSetProblemView.render(problemSetProblemEditForm, problemSet.getId(), problemSetProblem));
         if (JerahmeelUtils.hasRole("admin")) {
-            ProblemSetControllerUtils.appendSubtabLayout(content, problemSet);
+            ProblemSetControllerUtils.appendProblemSubtabLayout(content, problemSet);
         }
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);

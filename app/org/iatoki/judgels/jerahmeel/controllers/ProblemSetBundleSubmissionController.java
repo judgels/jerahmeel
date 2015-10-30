@@ -19,6 +19,7 @@ import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.bundle.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.bundle.listSubmissionsView;
+import org.iatoki.judgels.jerahmeel.views.html.archive.problemset.submission.bundle.listSubmissionsWithActionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -115,7 +116,7 @@ public final class ProblemSetBundleSubmissionController extends AbstractJudgelsC
         if (JerahmeelControllerUtils.getInstance().isAdmin()) {
             appendSubtabLayout(content, problemSet);
         }
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet);
@@ -125,14 +126,12 @@ public final class ProblemSetBundleSubmissionController extends AbstractJudgelsC
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
-    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
         return listSubmissions(problemSetId, 0, "id", "desc", null, null);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
-    @Authorized(value = "admin")
     @Transactional(readOnly = true)
     public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -143,10 +142,15 @@ public final class ProblemSetBundleSubmissionController extends AbstractJudgelsC
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, problemSet.getJid());
         Map<String, String> problemJidToAliasMap = problemSetProblemService.getBundleProblemJidToAliasMapByProblemSetJid(problemSet.getJid());
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfBundleSubmissions, ImmutableList.of(), problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        LazyHtml content;
+        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
+            content = new LazyHtml(listSubmissionsWithActionsView.render(problemSet.getId(), pageOfBundleSubmissions, ImmutableList.of(), problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        } else {
+            content = new LazyHtml(listSubmissionsView.render(problemSet.getId(), pageOfBundleSubmissions, ImmutableList.of(), problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+        }
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
         appendSubtabLayout(content, problemSet);
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet,
@@ -180,10 +184,8 @@ public final class ProblemSetBundleSubmissionController extends AbstractJudgelsC
         String problemSetProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
 
         LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, BundleSubmissionUtils.parseGradingResult(bundleSubmission), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), problemSetProblemAlias, problemSetProblemName, problemSet.getName()));
-        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
-            appendSubtabLayout(content, problemSet);
-        }
-        ProblemSetSubmissionControllerUtils.appendSubtabLayout(content, problemSet);
+        appendSubtabLayout(content, problemSet);
+        ProblemSetControllerUtils.appendSubmissionSubtabLayout(content, problemSet);
         ProblemSetControllerUtils.appendTabLayout(content, problemSet);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, problemSet,
