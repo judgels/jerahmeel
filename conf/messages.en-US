@@ -3,7 +3,11 @@ training.curriculums=Curriculums
 training.courses=Courses
 training.sessions=Chapters
 training.submissions.bundle=Non Programming Submissions
+training.submissions.bundle.own=Own
+training.submissions.bundle.all=All
 training.submissions.programming=Programming Submissions
+training.submissions.programming.own=Own
+training.submissions.programming.all=All
 training.session.isLocked=Chapter is still Locked
 training.session.problem.mustLogin=You must login to submit
 

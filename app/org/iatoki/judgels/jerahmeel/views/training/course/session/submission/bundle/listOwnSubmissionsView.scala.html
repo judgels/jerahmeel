@@ -10,9 +10,9 @@
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfBundleSubmissions: Page[BundleSubmission], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfBundleSubmissions: Page[BundleSubmission], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
 
-<form class="form-inline pull-right" method="GET" action="@routes.TrainingBundleSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
+<form class="form-inline pull-right" method="GET" action="@routes.TrainingBundleSubmissionController.listOwnSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
     <div class="form-group">
         <label for="problemJid">@Messages.get("problem.problem")</label>
         <select name="problemJid" class="form-control selectpicker col-md-3">
@@ -26,7 +26,7 @@
     <button type="submit" class="btn btn-primary">Filter</button>
 </form>
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingBundleSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir, problemJid)}
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.TrainingBundleSubmissionController.listOwnSubmissions(curriculumId, curriculumCourseId, courseSessionId, newPageIndex, newOrderBy, newOrderDir, problemJid)}
 
 <div class="clearfix"></div>
 
@@ -49,6 +49,7 @@
                 <td><small>@submission.getLatestScore</small></td>
                 <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
                 <td class="text-center">
+                    <a href="@routes.TrainingBundleSubmissionController.viewSubmission(curriculumId, curriculumCourseId, courseSessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                 </td>
             </tr>
         }

@@ -141,7 +141,7 @@ public final class CourseController extends AbstractJudgelsController {
 
     private Result showEditCourseGeneral(Form<CourseUpsertForm> courseUpsertForm, Course course) {
         LazyHtml content = new LazyHtml(editCourseGeneralView.render(courseUpsertForm, course.getId()));
-        CourseControllerUtils.appendUpdateLayout(content, course);
+        CourseControllerUtils.appendTabLayout(content, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
                 new InternalLink(Messages.get("course.update"), routes.CourseController.editCourseGeneral(course.getId()))

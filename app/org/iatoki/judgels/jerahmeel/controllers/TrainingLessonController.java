@@ -101,18 +101,18 @@ public final class TrainingLessonController extends AbstractJudgelsController {
         if (!JerahmeelUtils.isGuest()) {
             Page<SessionLessonWithProgress> pageOfSessionLessonsWithProgress = sessionLessonService.getPageOfSessionLessonsWithProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> lessonJids = pageOfSessionLessonsWithProgress.getData().stream().map(cp -> cp.getSessionLesson().getLessonJid()).collect(Collectors.toList());
-            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listSessionLessonsWithProgressView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessonsWithProgress, orderBy, orderDir, filterString, lessonTitlesMap));
         } else {
             Page<SessionLesson> pageOfSessionLessons = sessionLessonService.getPageOfSessionLessons(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> lessonJids = pageOfSessionLessons.getData().stream().map(cp -> cp.getLessonJid()).collect(Collectors.toList());
-            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> lessonTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(lessonJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listSessionLessonsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSessionLessons, orderBy, orderDir, filterString, lessonTitlesMap));
         }
 
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
@@ -141,14 +141,14 @@ public final class TrainingLessonController extends AbstractJudgelsController {
 
         param.setLessonSecret(sessionLesson.getLessonSecret());
         param.setCurrentMillis(System.currentTimeMillis());
-        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
         param.setSwitchStatementLanguageUrl(routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
 
         String requestUrl = sandalphonClientAPI.getLessonStatementRenderAPIEndpoint(sessionLesson.getLessonJid());
         String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
         LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody, sessionLesson.getId()));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(sessionLesson.getAlias(), routes.TrainingLessonController.viewLesson(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionLesson.getId()))

@@ -84,7 +84,7 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
         DynamicForm dForm = DynamicForm.form().bindFromRequest();
 
-        BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, SessionControllerUtils.getCurrentStatementLanguage());
+        BundleAnswer answer = bundleSubmissionService.createBundleAnswerFromNewSubmission(dForm, StatementControllerUtils.getCurrentStatementLanguage());
         String submissionJid = bundleSubmissionService.submit(sessionProblem.getProblemJid(), session.getJid(), answer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
         bundleSubmissionService.storeSubmissionFiles(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, submissionJid, answer);
 
@@ -113,7 +113,7 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
         LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), pageOfBundleSubmissions, userJids, problemJidToAliasMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
         appendSubtabLayout(content, session);
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming BundleSubmissions");
@@ -134,11 +134,11 @@ public final class SessionBundleSubmissionController extends AbstractJudgelsCont
 
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), bundleSubmission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
+        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), StatementControllerUtils.getCurrentStatementLanguage());
 
         LazyHtml content = new LazyHtml(bundleSubmissionView.render(bundleSubmission, BundleSubmissionUtils.parseGradingResult(bundleSubmission), bundleAnswer, JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getAuthorJid()), sessionProblemAlias, sessionProblemName, session.getName()));
         appendSubtabLayout(content, session);
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(sessionProblemAlias, routes.SessionBundleSubmissionController.viewSubmission(session.getId(), bundleSubmission.getId()))

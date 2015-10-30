@@ -6,6 +6,7 @@ import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
 import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.SubmissionSource;
 import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
+import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.jerahmeel.ProblemSetNotFoundException;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
@@ -137,13 +138,11 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
     public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
         return listSubmissions(problemSetId, 0, "id", "desc", null, null);
     }
 
-    @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
     public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
@@ -251,11 +250,13 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
     }
 
     private void appendSubtabLayout(LazyHtml content, ProblemSet problemSet) {
-        content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                        new InternalLink(Messages.get("archive.problemSet.submissions.programming.own"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())),
-                        new InternalLink(Messages.get("archive.problemSet.submissions.programming.all"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()))
-                ), c)
-        );
+        if (!JerahmeelUtils.isGuest()) {
+            content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
+                            new InternalLink(Messages.get("archive.problemSet.submissions.programming.own"), routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSet.getId())),
+                            new InternalLink(Messages.get("archive.problemSet.submissions.programming.all"), routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSet.getId()))
+                    ), c)
+            );
+        }
     }
 
     private void appendBreadcrumbsLayout(LazyHtml content, ProblemSet problemSet, InternalLink... lastLinks) {

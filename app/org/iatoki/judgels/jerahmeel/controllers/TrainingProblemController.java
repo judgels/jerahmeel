@@ -105,18 +105,18 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         if (!JerahmeelUtils.isGuest()) {
             Page<SessionProblemWithProgress> pageOfSessionProblemsWithProgress = sessionProblemService.getPageOfSessionProblemsWithProgress(IdentityUtils.getUserJid(), courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> problemJids = pageOfSessionProblemsWithProgress.getData().stream().map(cp -> cp.getSessionProblem().getProblemJid()).collect(Collectors.toList());
-            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listSessionProblemsWithProgressView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblemsWithProgress, orderBy, orderDir, filterString, problemTitlesMap));
         } else {
             Page<SessionProblem> pageOfSessionProblems = sessionProblemService.getPageOfSessionProblems(courseSession.getSessionJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> problemJids = pageOfSessionProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
-            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listSessionProblemsView.render(curriculum, curriculumCourse, courseSession, pageOfSessionProblems, orderBy, orderDir, filterString, problemTitlesMap));
         }
 
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");
@@ -154,7 +154,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
 
             param.setProblemSecret(sessionProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.TrainingBundleSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
             param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
@@ -166,7 +166,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
 
             param.setProblemSecret(sessionProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.TrainingProgrammingSubmissionController.postSubmitProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
             param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
@@ -181,7 +181,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
         session("problemJid", sessionProblem.getProblemJid());
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody, sessionProblem.getId()));
-        SessionControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
                 new InternalLink(sessionProblem.getAlias(), routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()))
@@ -195,7 +195,7 @@ public final class TrainingProblemController extends AbstractJudgelsController {
     @Authenticated(value = GuestView.class)
     public Result switchLanguage() {
         String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
-        SessionControllerUtils.setCurrentStatementLanguage(languageCode);
+        StatementControllerUtils.setCurrentStatementLanguage(languageCode);
 
         return redirect(request().getHeader("Referer"));
     }

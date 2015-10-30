@@ -165,7 +165,7 @@ public final class SessionController extends AbstractJudgelsController {
 
     private Result showEditSessionGeneral(Form<SessionUpsertForm> sessionUpsertForm, Session session) {
         LazyHtml content = new LazyHtml(editSessionGeneralView.render(sessionUpsertForm, session.getId()));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
                 new InternalLink(Messages.get("session.update"), routes.SessionController.editSessionGeneral(session.getId()))

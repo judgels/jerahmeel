@@ -72,7 +72,7 @@ public final class TrainingCourseController extends AbstractJudgelsController {
             content = new LazyHtml(listCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString));
         }
 
-        CurriculumControllerUtils.appendViewLayout(content, curriculum);
+        TrainingCurriculumControllerUtils.appendTabLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");

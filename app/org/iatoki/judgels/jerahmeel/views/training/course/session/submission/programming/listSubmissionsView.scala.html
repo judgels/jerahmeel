@@ -10,7 +10,7 @@
 @import org.iatoki.judgels.jerahmeel.JerahmeelUtils
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
-@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSubmissions: Page[ProgrammingSubmission], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, problemJid: String)
+@(curriculumId: Long, curriculumCourseId: Long, courseSessionId: Long, pageOfSubmissions: Page[ProgrammingSubmission], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
 
 <form class="form-inline pull-right" method="GET" action="@routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, null)">
     <div class="form-group">
@@ -53,7 +53,6 @@
                 <td><small>@submission.getLatestScore</small></td>
                 <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
                 <td class="text-center">
-                    <a href="@routes.TrainingProgrammingSubmissionController.viewSubmission(curriculumId, curriculumCourseId, courseSessionId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
                 </td>
             </tr>
         }

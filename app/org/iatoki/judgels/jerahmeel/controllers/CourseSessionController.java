@@ -196,7 +196,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
     private Result showListAddSessions(Course course, Form<CourseSessionAddForm> courseSessionAddForm, Page<CourseSession> pageOfCourseSessions, Map<String, Session> sessionsMap, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listAddCourseSessionsView.render(course.getId(), pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString, courseSessionAddForm));
-        CourseControllerUtils.appendUpdateLayout(content, course);
+        CourseControllerUtils.appendTabLayout(content, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, course,
                 new InternalLink(Messages.get("commons.view"), routes.CourseSessionController.viewSessions(course.getId()))
@@ -208,7 +208,7 @@ public final class CourseSessionController extends AbstractJudgelsController {
 
     private Result showEditSession(Course course, CourseSession courseSession, Form<CourseSessionEditForm> courseSessionEditForm) {
         LazyHtml content = new LazyHtml(editCourseSessionView.render(courseSessionEditForm, course.getId(), courseSession.getId()));
-        CourseControllerUtils.appendUpdateLayout(content, course);
+        CourseControllerUtils.appendTabLayout(content, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, course,
                 new InternalLink(Messages.get("commons.update"), routes.CourseSessionController.editSession(course.getId(), courseSession.getId()))

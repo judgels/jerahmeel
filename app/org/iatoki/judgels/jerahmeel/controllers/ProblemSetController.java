@@ -52,6 +52,10 @@ public final class ProblemSetController extends AbstractJudgelsController {
     }
 
     public Result jumpToSubmissions(long problemSetId) {
+        if (!JerahmeelUtils.isGuest()) {
+            return redirect(routes.ProblemSetProgrammingSubmissionController.viewSubmissions(problemSetId));
+        }
+
         return redirect(routes.ProblemSetProgrammingSubmissionController.viewOwnSubmissions(problemSetId));
     }
 

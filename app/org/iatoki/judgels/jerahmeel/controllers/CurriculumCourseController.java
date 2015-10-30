@@ -195,7 +195,7 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
     private Result showListAddCourses(Curriculum curriculum, Form<CurriculumCourseAddForm> curriculumCourseAddForm, Page<CurriculumCourse> pageOfCurriculumCourses, Map<String, Course> coursesMap, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listAddCurriculumCoursesView.render(curriculum.getId(), pageOfCurriculumCourses, coursesMap, orderBy, orderDir, filterString, curriculumCourseAddForm));
-        CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
+        CurriculumControllerUtils.appendTabLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Curriculums");
@@ -205,7 +205,7 @@ public final class CurriculumCourseController extends AbstractJudgelsController 
 
     private Result showEditCourse(Curriculum curriculum, CurriculumCourse curriculumCourse, Form<CurriculumCourseEditForm> curriculumCourseEditForm) {
         LazyHtml content = new LazyHtml(editCurriculumCourseView.render(curriculumCourseEditForm, curriculum.getId(), curriculumCourse.getId()));
-        CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
+        CurriculumControllerUtils.appendTabLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum,
                 new InternalLink(Messages.get("commons.update"), routes.CurriculumCourseController.editCourse(curriculum.getId(), curriculumCourse.getId()))

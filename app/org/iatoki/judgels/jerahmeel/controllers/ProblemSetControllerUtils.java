@@ -22,9 +22,7 @@ final class ProblemSetControllerUtils {
     static void appendTabLayout(LazyHtml content, ProblemSet problemSet) {
         ImmutableList.Builder<InternalLink> tabLinksBuilder = ImmutableList.builder();
         tabLinksBuilder.add(new InternalLink(Messages.get("archive.problemSet.problems"), routes.ProblemSetController.jumpToProblems(problemSet.getId())));
-        if (!JerahmeelUtils.isGuest()) {
-            tabLinksBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions"), routes.ProblemSetController.jumpToSubmissions(problemSet.getId())));
-        }
+        tabLinksBuilder.add(new InternalLink(Messages.get("archive.problemSet.submissions"), routes.ProblemSetController.jumpToSubmissions(problemSet.getId())));
         content.appendLayout(c -> tabLayout.render(tabLinksBuilder.build(), c));
         if (!problemSet.getDescription().isEmpty()) {
             content.appendLayout(c -> descriptionHtmlLayout.render(problemSet.getDescription(), c));

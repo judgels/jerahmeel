@@ -126,7 +126,7 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         LazyHtml content = new LazyHtml(listSubmissionsView.render(session.getId(), pageOfSubmissions, userJids, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
         appendSubtabLayout(content, session);
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
@@ -143,12 +143,12 @@ public final class SessionProgrammingSubmissionController extends AbstractJudgel
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(submission.getAuthorJid());
         SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), submission.getProblemJid());
         String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), SessionControllerUtils.getCurrentStatementLanguage());
+        String sessionProblemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), StatementControllerUtils.getCurrentStatementLanguage());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(submission.getGradingLanguage()).getName();
 
         LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(submission.getGradingEngine()).renderViewSubmission(submission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
         appendSubtabLayout(content, session);
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(sessionProblemAlias, routes.SessionProgrammingSubmissionController.viewSubmission(session.getId(), submission.getId()))

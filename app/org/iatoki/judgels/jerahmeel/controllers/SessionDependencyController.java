@@ -116,7 +116,7 @@ public final class SessionDependencyController extends AbstractJudgelsController
 
     private Result showListAddDependencies(Session session, Form<SessionDependencyAddForm> sessionDependencyAddForm, Page<SessionDependency> pageOfSessionDependencies, String orderBy, String orderDir, String filterString) {
         LazyHtml content = new LazyHtml(listAddDependenciesView.render(session.getId(), pageOfSessionDependencies, orderBy, orderDir, filterString, sessionDependencyAddForm));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Courses");

@@ -88,13 +88,13 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
         if (!JerahmeelUtils.isGuest()) {
             Page<ProblemSetProblemWithScore> pageOfProblemSetProblemsWithScore = problemSetProblemService.getPageOfProblemSetProblemsWithScore(IdentityUtils.getUserJid(), problemSet.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> problemJids = pageOfProblemSetProblemsWithScore.getData().stream().map(cp -> cp.getProblemSetProblem().getProblemJid()).collect(Collectors.toList());
-            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listVisibleProblemSetProblemsWithScoreView.render(problemSet, pageOfProblemSetProblemsWithScore, orderBy, orderDir, filterString, problemTitlesMap));
         } else {
             Page<ProblemSetProblem> pageOfProblemSetProblems = problemSetProblemService.getPageOfProblemSetProblems(problemSet.getJid(), page, PAGE_SIZE, orderBy, orderDir, filterString);
             List<String> problemJids = pageOfProblemSetProblems.getData().stream().map(cp -> cp.getProblemJid()).collect(Collectors.toList());
-            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), SessionControllerUtils.getCurrentStatementLanguage());
+            Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), StatementControllerUtils.getCurrentStatementLanguage());
 
             content = new LazyHtml(listVisibleProblemSetProblemsView.render(problemSet, pageOfProblemSetProblems, orderBy, orderDir, filterString, problemTitlesMap));
         }
@@ -135,7 +135,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
 
             param.setProblemSecret(problemSetProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.ProblemSetProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.ProblemSetBundleSubmissionController.postSubmitProblem(problemSet.getId(), problemSetProblem.getProblemJid()).absoluteURL(request(), request().secure()));
             param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
@@ -147,7 +147,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
 
             param.setProblemSecret(problemSetProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.ProblemSetProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.ProblemSetProgrammingSubmissionController.postSubmitProblem(problemSet.getId(), problemSetProblem.getProblemJid()).absoluteURL(request(), request().secure()));
             param.setReasonNotAllowedToSubmit(reasonNotAllowedToSubmit);
@@ -176,7 +176,7 @@ public final class ProblemSetProblemController extends AbstractJudgelsController
     @Authenticated(value = GuestView.class)
     public Result switchLanguage() {
         String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
-        SessionControllerUtils.setCurrentStatementLanguage(languageCode);
+        StatementControllerUtils.setCurrentStatementLanguage(languageCode);
 
         return redirect(request().getHeader("Referer"));
     }

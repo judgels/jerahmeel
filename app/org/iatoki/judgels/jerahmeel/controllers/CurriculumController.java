@@ -141,7 +141,7 @@ public final class CurriculumController extends AbstractJudgelsController {
 
     private Result showEditCurriculumGeneral(Form<CurriculumUpsertForm> curriculumUpsertForm, Curriculum curriculum) {
         LazyHtml content = new LazyHtml(editCurriculumGeneralView.render(curriculumUpsertForm, curriculum.getId()));
-        CurriculumControllerUtils.appendUpdateLayout(content, curriculum);
+        CurriculumControllerUtils.appendTabLayout(content, curriculum);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content,
                 new InternalLink(Messages.get("curriculum.update"), routes.CurriculumController.editCurriculumGeneral(curriculum.getId()))

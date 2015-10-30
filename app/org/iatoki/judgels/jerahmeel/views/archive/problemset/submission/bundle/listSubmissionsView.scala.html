@@ -11,8 +11,6 @@
 
 @(problemSetId: Long, pageOfBundleSubmissions: Page[BundleSubmission], userJids: List[String], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
 
-<script type="text/javascript" src="@controllers.routes.Assets.at("lib/jquery/jquery.min.js")"></script>
-
 <form class="form-inline pull-right" method="GET" action="@routes.ProblemSetBundleSubmissionController.listSubmissions(problemSetId, pageIndex, orderBy, orderDir, null, null)">
     <div class="form-group">
         <label for="problemJid">@Messages.get("problem.problem")</label>
@@ -27,17 +25,7 @@
     <button type="submit" class="btn btn-primary">Filter</button>
 </form>
 
-@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.SessionBundleSubmissionController.listSubmissions(problemSetId, newPageIndex, newOrderBy, newOrderDir, userJid, problemJid)}
-
-<script type="text/javascript">
-    $(document).ready(function() {
-        $('#regradeButton').on('click', function() {
-            if ($('#selectAll').prop('checked')) {
-                return confirm('Will regrade ALL submissions in ALL pages. Are you sure?');
-            }
-        });
-    });
-</script>
+@listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ProblemSetBundleSubmissionController.listSubmissions(problemSetId, newPageIndex, newOrderBy, newOrderDir, userJid, problemJid)}
 
 <div class="clearfix"></div>
 

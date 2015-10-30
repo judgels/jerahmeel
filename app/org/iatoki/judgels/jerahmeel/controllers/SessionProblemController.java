@@ -103,7 +103,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
             param.setProblemSecret(sessionProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.SessionBundleSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
 
@@ -114,7 +114,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
             param.setProblemSecret(sessionProblem.getProblemSecret());
             param.setCurrentMillis(System.currentTimeMillis());
-            param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+            param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
             param.setSwitchStatementLanguageUrl(routes.TrainingProblemController.switchLanguage().absoluteURL(request(), request().secure()));
             param.setPostSubmitUrl(routes.SessionProgrammingSubmissionController.postSubmitProblem(session.getId(), sessionProblem.getProblemJid()).absoluteURL(request(), request().secure()));
             param.setReasonNotAllowedToSubmit("");
@@ -127,7 +127,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
         }
 
         LazyHtml content = new LazyHtml(viewProblemView.render(requestUrl, requestBody));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(sessionProblem.getAlias(), routes.SessionProblemController.viewSessionProblem(session.getId(), sessionProblem.getId()))
@@ -154,7 +154,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     public Result switchLanguage() {
         String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
-        SessionControllerUtils.setCurrentStatementLanguage(languageCode);
+        StatementControllerUtils.setCurrentStatementLanguage(languageCode);
 
         return redirect(request().getHeader("Referer"));
     }
@@ -273,7 +273,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
     private Result showListSessionProblems(Session session, Page<SessionProblem> pageOfSessionProblems, String orderBy, String orderDir, String filterString, Map<String, String> problemSlugsMap) {
         LazyHtml content = new LazyHtml(listSessionProblemsView.render(session.getId(), pageOfSessionProblems, orderBy, orderDir, filterString, problemSlugsMap));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.problems"), new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.addSessionProblem(session.getId())), c));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Problems");
@@ -283,7 +283,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     private Result showAddSessionProblem(Session session, Form<SessionProblemAddForm> sessionProblemAddForm) {
         LazyHtml content = new LazyHtml(addSessionProblemView.render(session.getId(), sessionProblemAddForm));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(Messages.get("commons.add"), routes.SessionProblemController.addSessionProblem(session.getId()))
@@ -295,7 +295,7 @@ public final class SessionProblemController extends AbstractJudgelsController {
 
     private Result showEditSessionProblem(Session session, SessionProblem sessionProblem, Form<SessionProblemEditForm> sessionProblemEditForm) {
         LazyHtml content = new LazyHtml(editSessionProblemView.render(sessionProblemEditForm, session.getId(), sessionProblem));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(Messages.get("commons.update"), routes.SessionProblemController.editSessionProblem(session.getId(), sessionProblem.getId()))

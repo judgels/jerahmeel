@@ -92,7 +92,7 @@ public final class TrainingSessionController extends AbstractJudgelsController {
             content = new LazyHtml(listCourseSessionsView.render(curriculum.getId(), curriculumCourse.getId(), pageOfCourseSessions, sessionsMap, orderBy, orderDir, filterString));
         }
 
-        CourseControllerUtils.appendViewLayout(content, curriculum, curriculumCourse, course);
+        TrainingCourseControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Training");

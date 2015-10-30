@@ -97,14 +97,14 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
         param.setLessonSecret(sessionLesson.getLessonSecret());
         param.setCurrentMillis(System.currentTimeMillis());
-        param.setStatementLanguage(SessionControllerUtils.getCurrentStatementLanguage());
+        param.setStatementLanguage(StatementControllerUtils.getCurrentStatementLanguage());
         param.setSwitchStatementLanguageUrl(routes.SessionLessonController.switchLanguage().absoluteURL(request(), request().secure()));
 
         String requestUrl = sandalphonClientAPI.getLessonStatementRenderAPIEndpoint(sessionLesson.getLessonJid());
         String requestBody = sandalphonClientAPI.constructLessonStatementRenderAPIRequestBody(sessionLesson.getLessonJid(), param);
 
         LazyHtml content = new LazyHtml(viewLessonView.render(requestUrl, requestBody));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(sessionLesson.getAlias(), routes.SessionLessonController.viewSessionLesson(session.getId(), sessionLesson.getId()))
@@ -131,7 +131,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     public Result switchLanguage() {
         String languageCode = DynamicForm.form().bindFromRequest().get("langCode");
-        SessionControllerUtils.setCurrentStatementLanguage(languageCode);
+        StatementControllerUtils.setCurrentStatementLanguage(languageCode);
 
         return redirect(request().getHeader("Referer"));
     }
@@ -251,7 +251,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
     private Result showListSessionLessons(Session session, Page<SessionLesson> currentPage, String orderBy, String orderDir, String filterString, Map<String, String> lessonSlugsMap) {
         LazyHtml content = new LazyHtml(listSessionLessonsView.render(session.getId(), currentPage, orderBy, orderDir, filterString, lessonSlugsMap));
         content.appendLayout(c -> headingWithActionLayout.render(Messages.get("session.lessons"), new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.addSessionLesson(session.getId())), c));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Lessons");
@@ -261,7 +261,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     private Result showAddSessionLesson(Session session, Form<SessionLessonAddForm> form) {
         LazyHtml content = new LazyHtml(addSessionLessonView.render(session.getId(), form));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
               new InternalLink(Messages.get("commons.add"), routes.SessionLessonController.addSessionLesson(session.getId()))
@@ -273,7 +273,7 @@ public final class SessionLessonController extends AbstractJudgelsController {
 
     private Result showEditSessionLesson(Session session, SessionLesson sessionLesson, Form<SessionLessonEditForm> form) {
         LazyHtml content = new LazyHtml(editSessionLessonView.render(form, session.getId(), sessionLesson));
-        SessionControllerUtils.appendUpdateLayout(content, session);
+        SessionControllerUtils.appendTabLayout(content, session);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
         appendBreadcrumbsLayout(content, session,
                 new InternalLink(Messages.get("commons.update"), routes.SessionLessonController.editSessionLesson(session.getId(), sessionLesson.getId()))
