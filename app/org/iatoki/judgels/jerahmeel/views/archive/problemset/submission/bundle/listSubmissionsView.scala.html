@@ -3,10 +3,11 @@
 @import org.iatoki.judgels.play.views.html.table.tableHeadersView
 @import org.iatoki.judgels.play.views.html.table.paginationView
 @import scala.collection.JavaConversions
+@import org.iatoki.judgels.play.IdentityUtils
 @import org.iatoki.judgels.play.JudgelsPlayUtils
-@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.sandalphon.BundleSubmission
+@import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl
 @import org.iatoki.judgels.jerahmeel.controllers.routes
 
 @(problemSetId: Long, pageOfBundleSubmissions: Page[BundleSubmission], userJids: List[String], problemJidToAliasMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
@@ -50,6 +51,9 @@
                 <td><small>@submission.getLatestScore</small></td>
                 <td><small><time class="display-time" datetime="@JudgelsPlayUtils.formatISOUTCDateTime(submission.getTime.getTime)">@JudgelsPlayUtils.formatDetailedDateTime(submission.getTime.getTime)</time></small></td>
                 <td class="text-center">
+                    @if(submission.getAuthorJid.equals(IdentityUtils.getUserJid)) {
+                        <a href="@routes.ProblemSetBundleSubmissionController.viewSubmission(problemSetId, submission.getId)"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></a>
+                    }
                 </td>
             </tr>
         }
