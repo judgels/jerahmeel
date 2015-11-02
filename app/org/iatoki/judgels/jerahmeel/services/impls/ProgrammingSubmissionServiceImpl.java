@@ -2,6 +2,7 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.gabriel.GradingResult;
+import org.iatoki.judgels.jerahmeel.JerahmeelJidUtils;
 import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
 import org.iatoki.judgels.jerahmeel.models.daos.ArchiveDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
@@ -89,7 +90,7 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
         boolean scoreChanged = previousScore != newScore;
         double deltaScore = newScore - previousScore;
 
-        if (containerJid.startsWith(JerahmeelSubmissionServiceUtils.PROBLEM_SET_JID_PREFIX)) {
+        if (containerJid.startsWith(JerahmeelJidUtils.PROBLEM_SET_JID_PREFIX)) {
             if (scoreChanged) {
                 ProblemSetScoreCacheUtils.getInstance().updateProblemSetAndArchivesScoreCache(userJid, containerJid, deltaScore);
             }

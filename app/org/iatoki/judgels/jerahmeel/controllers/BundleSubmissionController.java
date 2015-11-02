@@ -3,6 +3,8 @@ package org.iatoki.judgels.jerahmeel.controllers;
 import com.google.common.collect.ImmutableList;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
+import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
+import org.iatoki.judgels.jerahmeel.JerahmeelJidUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
@@ -11,6 +13,7 @@ import org.iatoki.judgels.jerahmeel.SessionProblem;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
+import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
 import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
@@ -21,11 +24,13 @@ import org.iatoki.judgels.jerahmeel.services.SessionService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.submission.bundle.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.submission.bundle.listSubmissionsView;
+import org.iatoki.judgels.jerahmeel.views.html.submission.bundle.listSubmissionsWithActionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.Page;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
+import org.iatoki.judgels.play.forms.ListTableSelectionForm;
 import org.iatoki.judgels.play.views.html.layouts.heading3Layout;
 import org.iatoki.judgels.sandalphon.BundleAnswer;
 import org.iatoki.judgels.sandalphon.BundleSubmission;
@@ -33,6 +38,7 @@ import org.iatoki.judgels.sandalphon.BundleSubmissionNotFoundException;
 import org.iatoki.judgels.sandalphon.BundleSubmissionUtils;
 import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.views.html.problem.bundle.submission.bundleSubmissionView;
+import play.data.Form;
 import play.db.jpa.Transactional;
 import play.i18n.Messages;
 import play.mvc.Result;
@@ -51,6 +57,10 @@ import java.util.stream.Collectors;
 public final class BundleSubmissionController extends AbstractJudgelsController {
 
     private static final long PAGE_SIZE = 20;
+    private static final String SUBMISSION = "submission";
+    private static final String PROBLEM = "problem";
+    private static final String SESSION = "session";
+    private static final String PROBLEM_SET = "problem set";
 
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
     private final FileSystemProvider bundleSubmissionRemoteFileSystemProvider;
@@ -137,7 +147,12 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
         Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
-        LazyHtml content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir, JerahmeelControllerUtils.getInstance().isAdmin()));
+        LazyHtml content;
+        if (JerahmeelControllerUtils.getInstance().isAdmin()) {
+            content = new LazyHtml(listSubmissionsWithActionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir));
+        } else {
+            content = new LazyHtml(listSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir));
+        }
         SubmissionControllerUtils.appendAllSubtabLayout(content);
         if (!JerahmeelUtils.isGuest()) {
             SubmissionControllerUtils.appendTabLayout(content);
@@ -177,12 +192,77 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional
+    public Result regradeSubmission(String containerJid, long bundleSubmissionId, long pageIndex, String orderBy, String orderDir) throws BundleSubmissionNotFoundException {
+        String containerName = "";
+        String logKey = "";
+        if (containerJid.startsWith(JerahmeelJidUtils.PROBLEM_SET_JID_PREFIX)) {
+            if (!problemSetService.problemSetExistsByJid(containerJid)) {
+                return notFound();
+            }
+
+            ProblemSet problemSet = problemSetService.findProblemSetByJid(containerJid);
+            containerName = problemSet.getName();
+            logKey = PROBLEM_SET;
+        } else {
+            if (!sessionService.sessionExistsByJid(containerJid)) {
+                return notFound();
+            }
+
+            Session session = sessionService.findSessionByJid(containerJid);
+            containerName = session.getName();
+            logKey = SESSION;
+        }
+
+        BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
+        BundleAnswer bundleAnswer;
+        try {
+            bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(logKey, containerJid, containerName, PROBLEM, bundleSubmission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(bundleSubmission.getProblemJid()), SUBMISSION, bundleSubmission.getJid(), bundleSubmission.getId() + ""));
+
+        return redirect(routes.BundleSubmissionController.listSubmissions(pageIndex, orderBy, orderDir));
+    }
+
+    @Authenticated(value = {LoggedIn.class, HasRole.class})
+    @Authorized(value = "admin")
+    @Transactional
+    public Result regradeSubmissions(long pageIndex, String orderBy, String orderDir) throws BundleSubmissionNotFoundException {
+        ListTableSelectionForm listTableSelectionData = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
+        List<BundleSubmission> bundleSubmissions;
+
+        if (listTableSelectionData.selectJids != null) {
+            bundleSubmissions = bundleSubmissionService.getBundleSubmissionsByJids(listTableSelectionData.selectJids);
+        } else {
+            return redirect(routes.BundleSubmissionController.listSubmissions(pageIndex, orderBy, orderDir));
+        }
+
+        for (BundleSubmission bundleSubmission : bundleSubmissions) {
+            BundleAnswer bundleAnswer;
+            try {
+                bundleAnswer = bundleSubmissionService.createBundleAnswerFromPastSubmission(bundleSubmissionLocalFileSystemProvider, bundleSubmissionRemoteFileSystemProvider, bundleSubmission.getJid());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            bundleSubmissionService.regrade(bundleSubmission.getJid(), bundleAnswer, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+        }
+
+        return redirect(routes.BundleSubmissionController.listSubmissions(pageIndex, orderBy, orderDir));
+    }
+
     private LazyHtml getViewSubmissionContent(BundleSubmission bundleSubmission) {
         String containerJid;
         String containerName;
         String problemAlias;
         String problemName;
-        if (bundleSubmission.getContainerJid().startsWith("JIDPRSE")) {
+        if (bundleSubmission.getContainerJid().startsWith(JerahmeelJidUtils.PROBLEM_SET_JID_PREFIX)) {
             ProblemSet problemSet = problemSetService.findProblemSetByJid(bundleSubmission.getContainerJid());
             containerJid = problemSet.getJid();
             containerName = problemSet.getName();

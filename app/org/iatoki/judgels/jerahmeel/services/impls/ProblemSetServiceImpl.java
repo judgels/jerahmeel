@@ -95,6 +95,11 @@ public final class ProblemSetServiceImpl implements ProblemSetService {
     }
 
     @Override
+    public boolean problemSetExistsByJid(String problemSetJid) {
+        return problemSetDao.existsByJid(problemSetJid);
+    }
+
+    @Override
     public ProblemSet findProblemSetById(long problemSetId) throws ProblemSetNotFoundException {
         ProblemSetModel problemSetModel = problemSetDao.findById(problemSetId);
 

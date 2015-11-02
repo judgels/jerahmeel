@@ -23,6 +23,7 @@ import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvid
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
@@ -167,11 +168,13 @@ public final class TrainingBundleSubmissionController extends AbstractJudgelsCon
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result viewSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         return listSubmissions(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "desc", null, null);
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result listSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);

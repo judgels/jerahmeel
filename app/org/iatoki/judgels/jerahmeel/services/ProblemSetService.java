@@ -15,6 +15,8 @@ public interface ProblemSetService {
 
     Page<ProblemSetWithScore> getPageOfProblemSetsWithScore(Archive archive, String userJid, long pageIndex, long pageSize, String orderBy, String orderDir, String filterString);
 
+    boolean problemSetExistsByJid(String problemSetJid);
+
     ProblemSet findProblemSetById(long problemSetId) throws ProblemSetNotFoundException;
 
     ProblemSet findProblemSetByJid(String problemSetJid);

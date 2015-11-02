@@ -10,8 +10,6 @@ import java.util.List;
 
 public final class JerahmeelSubmissionServiceUtils {
 
-    static final String PROBLEM_SET_JID_PREFIX = "JIDPRSE";
-
     private JerahmeelSubmissionServiceUtils() {
         // prevent instantiation
     }

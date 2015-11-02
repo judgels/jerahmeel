@@ -15,6 +15,7 @@ import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemP
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authorized;
+import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
@@ -138,11 +139,13 @@ public final class ProblemSetProgrammingSubmissionController extends AbstractJud
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result viewSubmissions(long problemSetId) throws ProblemSetNotFoundException {
         return listSubmissions(problemSetId, 0, "id", "desc", null, null);
     }
 
+    @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
     public Result listSubmissions(long problemSetId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws ProblemSetNotFoundException {
         ProblemSet problemSet = problemSetService.findProblemSetById(problemSetId);
