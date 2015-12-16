@@ -96,7 +96,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
     public void appendSidebarLayout(LazyHtml content) {
         content.appendLayout(c -> contentLayout.render(c));
 
-        if (Http.Context.current().session().containsKey("problemJid")) {
+        if (Http.Context.current().session().containsKey("problemJid") && false) {
             String problemJid = Http.Context.current().session().get("problemJid");
             Http.Context.current().session().remove("problemJid");
 
