@@ -1,8 +1,10 @@
-package org.iatoki.judgels.jerahmeel.config;
+package org.iatoki.judgels.jerahmeel;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.google.inject.util.Providers;
+import com.typesafe.config.Config;
+import com.typesafe.config.ConfigFactory;
 import org.iatoki.judgels.AWSFileSystemProvider;
 import org.iatoki.judgels.FileSystemProvider;
 import org.iatoki.judgels.LocalFileSystemProvider;
@@ -13,11 +15,20 @@ import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonFactory;
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielFactory;
-import org.iatoki.judgels.jerahmeel.JerahmeelProperties;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
 import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
+import org.iatoki.judgels.play.JudgelsPlayProperties;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
+import org.iatoki.judgels.play.general.GeneralName;
+import org.iatoki.judgels.play.general.GeneralVersion;
+import org.iatoki.judgels.play.migration.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
 
@@ -25,6 +36,21 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
     @Override
     protected void manualBinding() {
+        org.iatoki.judgels.jerahmeel.BuildInfo$ buildInfo = org.iatoki.judgels.jerahmeel.BuildInfo$.MODULE$;
+
+        bindConstant().annotatedWith(GeneralName.class).to(buildInfo.name());
+        bindConstant().annotatedWith(GeneralVersion.class).to(buildInfo.version());
+
+        // <DEPRECATED>
+        Config config = ConfigFactory.load();
+        JudgelsPlayProperties.buildInstance(buildInfo.name(), buildInfo.version(), config);
+        JerahmeelProperties.buildInstance(config);
+        bind(JerahmeelSingletonsBuilder.class).asEagerSingleton();
+        bind(JerahmeelThreadsScheduler.class).asEagerSingleton();
+        // </DEPRECATED>
+
+        bind(BaseDataMigrationService.class).to(JerahmeelDataMigrationServiceImpl.class);
+
         bind(JophielAuthAPI.class).toInstance(jophielAuthAPI());
         bind(JophielClientAPI.class).toInstance(jophielClientAPI());
         bind(JophielPublicAPI.class).toInstance(jophielPublicAPI());

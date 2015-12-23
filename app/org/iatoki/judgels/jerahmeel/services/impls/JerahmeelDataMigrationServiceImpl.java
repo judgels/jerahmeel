@@ -2,7 +2,7 @@ package org.iatoki.judgels.jerahmeel.services.impls;
 
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
-import org.iatoki.judgels.play.services.impls.AbstractBaseDataMigrationServiceImpl;
+import org.iatoki.judgels.play.migration.AbstractBaseDataMigrationServiceImpl;
 import play.db.jpa.JPA;
 
 import java.sql.Connection;

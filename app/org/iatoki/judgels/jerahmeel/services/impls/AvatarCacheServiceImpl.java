@@ -1,7 +1,6 @@
 package org.iatoki.judgels.jerahmeel.services.impls;
 
 import org.iatoki.judgels.jerahmeel.models.entities.AvatarCacheModel;
-import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.models.daos.BaseAvatarCacheDao;
 import org.iatoki.judgels.jophiel.services.impls.AbstractBaseAvatarCacheServiceImpl;
 
@@ -13,7 +12,7 @@ public final class AvatarCacheServiceImpl extends AbstractBaseAvatarCacheService
         super(avatarCacheDao);
     }
 
-    public static synchronized void buildInstance(JophielAuthAPI jophiel, BaseAvatarCacheDao<AvatarCacheModel> avatarCacheDao) {
+    public static synchronized void buildInstance(BaseAvatarCacheDao<AvatarCacheModel> avatarCacheDao) {
         if (INSTANCE != null) {
             throw new UnsupportedOperationException("AvatarCacheService instance has already been built");
         }
