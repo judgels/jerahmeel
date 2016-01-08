@@ -4,7 +4,7 @@ require(["jquery"], function( __tes__ ) {
             url: lessonUpdateViewUrl,
             type: 'POST',
             data: {
-                sessionLessonId: sessionLessonId
+                chapterLessonId: chapterLessonId
             },
             contentType: 'application/x-www-form-urlencoded',
         });

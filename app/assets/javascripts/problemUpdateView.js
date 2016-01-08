@@ -4,7 +4,7 @@ require(["jquery"], function( __tes__ ) {
             url: problemUpdateViewUrl,
             type: 'POST',
             data: {
-                sessionProblemId: sessionProblemId
+                chapterProblemId: chapterProblemId
             },
             contentType: 'application/x-www-form-urlencoded',
         });

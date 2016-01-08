@@ -8,8 +8,8 @@ import org.iatoki.judgels.jerahmeel.JerahmeelJidUtils;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionProblem;
+import org.iatoki.judgels.jerahmeel.Chapter;
+import org.iatoki.judgels.jerahmeel.ChapterProblem;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -19,8 +19,8 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.ChapterProblemService;
+import org.iatoki.judgels.jerahmeel.services.ChapterService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.submission.bundle.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.submission.bundle.listSubmissionsView;
@@ -59,7 +59,7 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     private static final long PAGE_SIZE = 20;
     private static final String SUBMISSION = "submission";
     private static final String PROBLEM = "problem";
-    private static final String SESSION = "session";
+    private static final String CHAPTER = "chapter";
     private static final String PROBLEM_SET = "problem set";
 
     private final FileSystemProvider bundleSubmissionLocalFileSystemProvider;
@@ -67,18 +67,18 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
     private final BundleSubmissionService bundleSubmissionService;
     private final ProblemSetProblemService problemSetProblemService;
     private final ProblemSetService problemSetService;
-    private final SessionProblemService sessionProblemService;
-    private final SessionService sessionService;
+    private final ChapterProblemService chapterProblemService;
+    private final ChapterService chapterService;
 
     @Inject
-    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public BundleSubmissionController(@BundleSubmissionLocalFileSystemProvider FileSystemProvider bundleSubmissionLocalFileSystemProvider, @BundleSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider bundleSubmissionRemoteFileSystemProvider, BundleSubmissionService bundleSubmissionService, ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, ChapterProblemService chapterProblemService, ChapterService chapterService) {
         this.bundleSubmissionLocalFileSystemProvider = bundleSubmissionLocalFileSystemProvider;
         this.bundleSubmissionRemoteFileSystemProvider = bundleSubmissionRemoteFileSystemProvider;
         this.bundleSubmissionService = bundleSubmissionService;
         this.problemSetProblemService = problemSetProblemService;
         this.problemSetService = problemSetService;
-        this.sessionProblemService = sessionProblemService;
-        this.sessionService = sessionService;
+        this.chapterProblemService = chapterProblemService;
+        this.chapterService = chapterService;
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
@@ -93,7 +93,7 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), null, null);
         List<String> problemJids = pageOfBundleSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(chapterService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
         LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfBundleSubmissions, jidToNameMap, problemTitlesMap, pageIndex, orderBy, orderDir));
         SubmissionControllerUtils.appendOwnSubtabLayout(content);
@@ -145,7 +145,7 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
         Page<BundleSubmission> pageOfBundleSubmissions = bundleSubmissionService.getPageOfBundleSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, null, null, null);
         List<String> problemJids = pageOfBundleSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(chapterService, problemSetService, pageOfBundleSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
 
         LazyHtml content;
         if (JerahmeelControllerUtils.getInstance().isAdmin()) {
@@ -207,13 +207,13 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
             containerName = problemSet.getName();
             logKey = PROBLEM_SET;
         } else {
-            if (!sessionService.sessionExistsByJid(containerJid)) {
+            if (!chapterService.chapterExistsByJid(containerJid)) {
                 return notFound();
             }
 
-            Session session = sessionService.findSessionByJid(containerJid);
-            containerName = session.getName();
-            logKey = SESSION;
+            Chapter chapter = chapterService.findChapterByJid(containerJid);
+            containerName = chapter.getName();
+            logKey = CHAPTER;
         }
 
         BundleSubmission bundleSubmission = bundleSubmissionService.findBundleSubmissionById(bundleSubmissionId);
@@ -271,13 +271,13 @@ public final class BundleSubmissionController extends AbstractJudgelsController 
             problemAlias = problemSetProblem.getAlias();
             problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         } else {
-            Session session = sessionService.findSessionByJid(bundleSubmission.getContainerJid());
-            containerJid = session.getJid();
-            containerName = session.getName();
+            Chapter chapter = chapterService.findChapterByJid(bundleSubmission.getContainerJid());
+            containerJid = chapter.getJid();
+            containerName = chapter.getName();
 
-            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(containerJid, bundleSubmission.getProblemJid());
-            problemAlias = sessionProblem.getAlias();
-            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+            ChapterProblem chapterProblem = chapterProblemService.findChapterProblemByChapterJidAndProblemJid(containerJid, bundleSubmission.getProblemJid());
+            problemAlias = chapterProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(chapterProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         }
 
         BundleAnswer bundleAnswer;

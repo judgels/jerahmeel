@@ -17,7 +17,7 @@ final class CourseControllerUtils {
     static void appendTabLayout(LazyHtml content, Course course) {
         content.appendLayout(c -> tabLayout.render(ImmutableList.of(
                     new InternalLink(Messages.get("course.update"), routes.CourseController.editCourseGeneral(course.getId())),
-                    new InternalLink(Messages.get("course.sessions"), routes.CourseController.jumpToSessions(course.getId()))
+                    new InternalLink(Messages.get("course.chapters"), routes.CourseController.jumpToChapters(course.getId()))
               ), c)
         );
         content.appendLayout(c -> headingLayout.render(Messages.get("course.course") + " #" + course.getId() + ": " + course.getName(), c));

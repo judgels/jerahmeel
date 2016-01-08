@@ -15,30 +15,30 @@
 @for(curriculumCourseWithProgress <- pageOfCurriculumCoursesWithProgress.getData()) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourseWithProgress.getCurriculumCourse.getId)" class="panel-title">
+            <a href="@routes.TrainingChapterController.viewChapters(curriculumId, curriculumCourseWithProgress.getCurriculumCourse.getId)" class="panel-title">
                 @{curriculumCourseWithProgress.getCurriculumCourse.getAlias}. @coursesMap.get(curriculumCourseWithProgress.getCurriculumCourse.getCourseJid).getName
             </a>
             <div class="pull-right">
                 @if(curriculumCourseWithProgress.getCourseProgress.equals(CourseProgress.LOCKED)) {
                     <span class="alert alert-danger">
-                        @Messages.get("training.course.locked") [- / @curriculumCourseWithProgress.getTotalSessions]
+                        @Messages.get("training.course.locked") [- / @curriculumCourseWithProgress.getTotalChapters]
                     </span>
                 } else {
                     @if(curriculumCourseWithProgress.getCourseProgress.equals(CourseProgress.COMPLETED)) {
                         <span class="alert alert-success">
                             @Messages.get("training.course.completed")
-                            [@curriculumCourseWithProgress.getCompletedSessions / @curriculumCourseWithProgress.getTotalSessions]
+                            [@curriculumCourseWithProgress.getCompletedChapters / @curriculumCourseWithProgress.getTotalChapters]
                         </span>
                     } else {
                         @if(curriculumCourseWithProgress.getCourseProgress.equals(CourseProgress.IN_PROGRESS)) {
                             <span class="alert alert-info">
                                 @Messages.get("training.course.inProgress")
-                                [@curriculumCourseWithProgress.getCompletedSessions / @curriculumCourseWithProgress.getTotalSessions]
+                                [@curriculumCourseWithProgress.getCompletedChapters / @curriculumCourseWithProgress.getTotalChapters]
                             </span>
                         } else {
                             <span class="alert alert-warning">
                                 @Messages.get("training.course.available")
-                                [@curriculumCourseWithProgress.getCompletedSessions / @curriculumCourseWithProgress.getTotalSessions]
+                                [@curriculumCourseWithProgress.getCompletedChapters / @curriculumCourseWithProgress.getTotalChapters]
                             </span>
                         }
                     }

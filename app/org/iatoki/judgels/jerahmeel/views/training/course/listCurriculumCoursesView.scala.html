@@ -13,7 +13,7 @@
 @for(curriculumCourse <- pageOfCurriculumCourses.getData) {
     <div class="panel panel-default">
         <div class="panel-body clearfix">
-            <a href="@routes.TrainingSessionController.viewSessions(curriculumId, curriculumCourse.getId)" class="panel-title">
+            <a href="@routes.TrainingChapterController.viewChapters(curriculumId, curriculumCourse.getId)" class="panel-title">
                 @{curriculumCourse.getAlias}. @coursesMap.get(curriculumCourse.getCourseJid).getName
             </a>
         </div>
