@@ -1,15 +1,15 @@
 training.training=Training
 training.curriculums=Curriculums
 training.courses=Courses
-training.sessions=Chapters
+training.chapters=Chapters
 training.submissions.bundle=Non Programming Submissions
 training.submissions.bundle.own=Own
 training.submissions.bundle.all=All
 training.submissions.programming=Programming Submissions
 training.submissions.programming.own=Own
 training.submissions.programming.all=All
-training.session.isLocked=Chapter is still Locked
-training.session.problem.mustLogin=You must login to submit
+training.chapter.isLocked=Chapter is still Locked
+training.chapter.problem.mustLogin=You must login to submit
 
 curriculum.curriculum=Curriculum
 curriculum.curriculums=Curriculums
@@ -28,7 +28,7 @@ course.course=Course
 course.courses=Courses
 course.name=Name
 course.description=Description
-course.sessions=Chapters
+course.chapters=Chapters
 course.jid=Course Jid
 course.alias=Alias
 course.completeable=Completeable?
@@ -37,58 +37,58 @@ course.list=Courses
 course.create=Create Course
 course.update=Update Course
 
-error.course.sessionExist=Chapter already Existed
+error.course.chapterExist=Chapter already Existed
 error.course.invalidJid=Invalid Course
-error.course.session.duplicateAlias=Alias already Existed
+error.course.chapter.duplicateAlias=Alias already Existed
 
-session.session=Chapter
-session.sessions=Chapters
-session.name=Name
-session.description=Description
-session.dependencies=Dependencies
-session.jid=Chapter Jid
-session.alias=Alias
-session.completeable=Completeable?
+chapter.chapter=Chapter
+chapter.chapters=Chapters
+chapter.name=Name
+chapter.description=Description
+chapter.dependencies=Dependencies
+chapter.jid=Chapter Jid
+chapter.alias=Alias
+chapter.completeable=Completeable?
 
-session.list=Chapters
-session.create=Create Chapter
-session.update=Update Chapter
+chapter.list=Chapters
+chapter.create=Create Chapter
+chapter.update=Update Chapter
 
-error.session.invalidJid=Invalid Chapter
+error.chapter.invalidJid=Invalid Chapter
 
-session.lesson=Lesson
-session.lessons=Lessons
-session.lesson.alias=Alias
-session.lesson.name=Name
-session.lesson.status=Status
-session.lesson.jid=Lesson Jid
-session.lesson.secret=Lesson Secret
+chapter.lesson=Lesson
+chapter.lessons=Lessons
+chapter.lesson.alias=Alias
+chapter.lesson.name=Name
+chapter.lesson.status=Status
+chapter.lesson.jid=Lesson Jid
+chapter.lesson.secret=Lesson Secret
 
-session.lesson.create=Create
+chapter.lesson.create=Create
 
-error.session.lessonExist=Lesson Already Existed.
-error.session.lesson.duplicateAlias=Alias already Existed
+error.chapter.lessonExist=Lesson Already Existed.
+error.chapter.lesson.duplicateAlias=Alias already Existed
 error.lesson.invalid=Invalid Lesson.
 
-session.problem=Problem
-session.problems=Problems
-session.problem.alias=Alias
-session.problem.name=Name
-session.problem.type=Type
-session.problem.status=Status
-session.problem.slug=Slug
-session.problem.jid=Problem Jid
-session.problem.secret=Problem Secret
+chapter.problem=Problem
+chapter.problems=Problems
+chapter.problem.alias=Alias
+chapter.problem.name=Name
+chapter.problem.type=Type
+chapter.problem.status=Status
+chapter.problem.slug=Slug
+chapter.problem.jid=Problem Jid
+chapter.problem.secret=Problem Secret
 
-session.problem.create=Create
+chapter.problem.create=Create
 
-error.session.problemExist=Problem Already Existed.
-error.session.problem.duplicateAlias=Alias already Existed
+error.chapter.problemExist=Problem Already Existed.
+error.chapter.problem.duplicateAlias=Alias already Existed
 error.problem.invalid=Invalid Problem
 
-session.submissions=Submissions
-session.submissions.bundle=Bundle Submissions
-session.submissions.programming=Programming Submissions
+chapter.submissions=Submissions
+chapter.submissions.bundle=Bundle Submissions
+chapter.submissions.programming=Programming Submissions
 
 submission.submissions=Submissions
 submission.author=Author
@@ -128,11 +128,11 @@ training.course.available=Available
 training.course.locked=Locked
 training.course.totalPoints=Total Points
 
-training.session.completed=Completed
-training.session.inProgress=In Progress
-training.session.available=Available
-training.session.locked=Submissions Locked
-training.session.totalPoints=Total Points
+training.chapter.completed=Completed
+training.chapter.inProgress=In Progress
+training.chapter.available=Available
+training.chapter.locked=Submissions Locked
+training.chapter.totalPoints=Total Points
 
 training.lesson.viewed=Viewed
 training.lesson.notViewed=Not Viewed

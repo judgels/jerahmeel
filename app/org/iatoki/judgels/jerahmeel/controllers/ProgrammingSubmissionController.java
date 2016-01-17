@@ -11,8 +11,8 @@ import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.ProblemSet;
 import org.iatoki.judgels.jerahmeel.ProblemSetNotFoundException;
 import org.iatoki.judgels.jerahmeel.ProblemSetProblem;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionProblem;
+import org.iatoki.judgels.jerahmeel.Chapter;
+import org.iatoki.judgels.jerahmeel.ChapterProblem;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -22,8 +22,8 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetProblemService;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.ChapterProblemService;
+import org.iatoki.judgels.jerahmeel.services.ChapterService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.views.html.submission.programming.listOwnSubmissionsView;
 import org.iatoki.judgels.jerahmeel.views.html.submission.programming.listSubmissionsView;
@@ -59,7 +59,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
     private static final String SUBMISSION = "submission";
     private static final String PROBLEM = "problem";
-    private static final String SESSION = "session";
+    private static final String CHAPTER = "chapter";
     private static final String PROBLEM_SET = "problem set";
     private static final long PAGE_SIZE = 20;
 
@@ -68,18 +68,18 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
     private final FileSystemProvider programmingSubmissionLocalFileSystemProvider;
     private final FileSystemProvider programmingSubmissionRemoteFileSystemProvider;
     private final ProgrammingSubmissionService programmingSubmissionService;
-    private final SessionProblemService sessionProblemService;
-    private final SessionService sessionService;
+    private final ChapterProblemService chapterProblemService;
+    private final ChapterService chapterService;
 
     @Inject
-    public ProgrammingSubmissionController(ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, SessionProblemService sessionProblemService, SessionService sessionService) {
+    public ProgrammingSubmissionController(ProblemSetProblemService problemSetProblemService, ProblemSetService problemSetService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService, ChapterProblemService chapterProblemService, ChapterService chapterService) {
         this.problemSetProblemService = problemSetProblemService;
         this.problemSetService = problemSetService;
         this.programmingSubmissionLocalFileSystemProvider = programmingSubmissionLocalFileSystemProvider;
         this.programmingSubmissionRemoteFileSystemProvider = programmingSubmissionRemoteFileSystemProvider;
         this.programmingSubmissionService = programmingSubmissionService;
-        this.sessionProblemService = sessionProblemService;
-        this.sessionService = sessionService;
+        this.chapterProblemService = chapterProblemService;
+        this.chapterService = chapterService;
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
@@ -95,7 +95,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
         List<String> problemJids = pageOfProgrammingSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(chapterService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
         LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(pageOfProgrammingSubmissions, jidToNameMap, problemTitlesMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir));
@@ -148,7 +148,7 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
 
         List<String> problemJids = pageOfProgrammingSubmissions.getData().stream().map(s -> s.getProblemJid()).collect(Collectors.toList());
         Map<String, String> problemTitlesMap = SandalphonResourceDisplayNameUtils.buildTitlesMap(JidCacheServiceImpl.getInstance().getDisplayNames(problemJids), "en-US");
-        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(sessionService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
+        Map<String, String> jidToNameMap = SubmissionControllerUtils.getJidToNameMap(chapterService, problemSetService, pageOfProgrammingSubmissions.getData().stream().map(s -> s.getContainerJid()).collect(Collectors.toList()));
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
         LazyHtml content;
@@ -210,13 +210,13 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
             containerName = problemSet.getName();
             logKey = PROBLEM_SET;
         } else {
-            if (!sessionService.sessionExistsByJid(containerJid)) {
+            if (!chapterService.chapterExistsByJid(containerJid)) {
                 return notFound();
             }
 
-            Session session = sessionService.findSessionByJid(containerJid);
-            containerName = session.getName();
-            logKey = SESSION;
+            Chapter chapter = chapterService.findChapterByJid(containerJid);
+            containerName = chapter.getName();
+            logKey = CHAPTER;
         }
 
         ProgrammingSubmission submission = programmingSubmissionService.findProgrammingSubmissionById(submissionId);
@@ -264,13 +264,13 @@ public final class ProgrammingSubmissionController extends AbstractJudgelsContro
             problemAlias = problemSetProblem.getAlias();
             problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(problemSetProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         } else {
-            Session session = sessionService.findSessionByJid(programmingSubmission.getContainerJid());
-            containerJid = session.getJid();
-            containerName = session.getName();
+            Chapter chapter = chapterService.findChapterByJid(programmingSubmission.getContainerJid());
+            containerJid = chapter.getJid();
+            containerName = chapter.getName();
 
-            SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(containerJid, programmingSubmission.getProblemJid());
-            problemAlias = sessionProblem.getAlias();
-            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
+            ChapterProblem chapterProblem = chapterProblemService.findChapterProblemByChapterJidAndProblemJid(containerJid, programmingSubmission.getProblemJid());
+            problemAlias = chapterProblem.getAlias();
+            problemName = SandalphonResourceDisplayNameUtils.parseTitleByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(chapterProblem.getProblemJid()), DeprecatedControllerUtils.getHardcodedDefaultLanguage());
         }
 
         SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, programmingSubmission.getJid());

@@ -3,7 +3,7 @@ package org.iatoki.judgels.jerahmeel.controllers;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.services.ProblemSetService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.ChapterService;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
 import org.iatoki.judgels.play.views.html.layouts.subtabLayout;
@@ -20,12 +20,12 @@ final class SubmissionControllerUtils {
         // prevent instantiation
     }
 
-    static Map<String, String> getJidToNameMap(SessionService sessionService, ProblemSetService problemSetService, List<String> jids) {
-        Map<String, String> sessionJidToNameMap = sessionService.getSessionJidToNameMapBySessionJids(jids.stream().filter(s -> s.startsWith("JIDSESS")).collect(Collectors.toList()));
+    static Map<String, String> getJidToNameMap(ChapterService chapterService, ProblemSetService problemSetService, List<String> jids) {
+        Map<String, String> chapterJidToNameMap = chapterService.getChapterJidToNameMapByChapterJids(jids.stream().filter(s -> s.startsWith("JIDSESS")).collect(Collectors.toList()));
         Map<String, String> problemSetJidToNameMap = problemSetService.getProblemSetJidToNameMapByProblemSetJids(jids.stream().filter(s -> s.startsWith("JIDPRSE")).collect(Collectors.toList()));
 
         ImmutableMap.Builder<String, String> jidToNameMapBuilder = ImmutableMap.builder();
-        jidToNameMapBuilder.putAll(sessionJidToNameMap);
+        jidToNameMapBuilder.putAll(chapterJidToNameMap);
         jidToNameMapBuilder.putAll(problemSetJidToNameMap);
 
         return jidToNameMapBuilder.build();

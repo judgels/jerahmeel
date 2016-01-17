@@ -4,15 +4,15 @@ public final class CurriculumCourseWithProgress {
 
     private final CurriculumCourse curriculumCourse;
     private final CourseProgress courseProgress;
-    private final long completedSessions;
-    private final long totalSessions;
+    private final long completedChapters;
+    private final long totalChapters;
     private final double totalScores;
 
-    public CurriculumCourseWithProgress(CurriculumCourse curriculumCourse, CourseProgress courseProgress, long completedSessions, long totalSessions, double totalScores) {
+    public CurriculumCourseWithProgress(CurriculumCourse curriculumCourse, CourseProgress courseProgress, long completedChapters, long totalChapters, double totalScores) {
         this.curriculumCourse = curriculumCourse;
         this.courseProgress = courseProgress;
-        this.completedSessions = completedSessions;
-        this.totalSessions = totalSessions;
+        this.completedChapters = completedChapters;
+        this.totalChapters = totalChapters;
         this.totalScores = totalScores;
     }
 
@@ -24,12 +24,12 @@ public final class CurriculumCourseWithProgress {
         return courseProgress;
     }
 
-    public long getCompletedSessions() {
-        return completedSessions;
+    public long getCompletedChapters() {
+        return completedChapters;
     }
 
-    public long getTotalSessions() {
-        return totalSessions;
+    public long getTotalChapters() {
+        return totalChapters;
     }
 
     public double getTotalScores() {

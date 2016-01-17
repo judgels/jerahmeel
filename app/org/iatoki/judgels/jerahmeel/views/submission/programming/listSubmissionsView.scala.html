@@ -10,7 +10,7 @@
 @import org.iatoki.judgels.play.Page
 @import org.iatoki.judgels.sandalphon.ProgrammingSubmission
 
-@(pageOfProgrammingSubmissions: Page[ProgrammingSubmission], sessionJidToNameMap: Map[String, String], problemTitlesMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String)
+@(pageOfProgrammingSubmissions: Page[ProgrammingSubmission], chapterJidToNameMap: Map[String, String], problemTitlesMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String)
 
 @listFunc(newPageIndex: scala.Long, newOrderBy: String, newOrderDir: String, newFilterString: String) = @{routes.ProgrammingSubmissionController.listSubmissions(newPageIndex, newOrderBy, newOrderDir)}
 
@@ -36,7 +36,7 @@
             <tr>
                 <td><small>@submission.getId</small></td>
                 <td><small>@authorDisplayNamesMap.get(submission.getAuthorJid)</small></td>
-                <td><small>@sessionJidToNameMap.get(submission.getContainerJid)</small></td>
+                <td><small>@chapterJidToNameMap.get(submission.getContainerJid)</small></td>
                 <td><small>@problemTitlesMap.get(submission.getProblemJid)</small></td>
                 <td><small>@gradingLanguageToNameMap.get(submission.getGradingLanguage)</small></td>
                 <td><small>@submission.getLatestVerdict.getName</small></td>

@@ -7,18 +7,18 @@ import org.iatoki.judgels.gabriel.GradingLanguageRegistry;
 import org.iatoki.judgels.gabriel.SubmissionSource;
 import org.iatoki.judgels.jerahmeel.Course;
 import org.iatoki.judgels.jerahmeel.CourseNotFoundException;
-import org.iatoki.judgels.jerahmeel.CourseSession;
-import org.iatoki.judgels.jerahmeel.CourseSessionNotFoundException;
+import org.iatoki.judgels.jerahmeel.CourseChapter;
+import org.iatoki.judgels.jerahmeel.CourseChapterNotFoundException;
 import org.iatoki.judgels.jerahmeel.Curriculum;
 import org.iatoki.judgels.jerahmeel.CurriculumCourse;
 import org.iatoki.judgels.jerahmeel.CurriculumCourseNotFoundException;
 import org.iatoki.judgels.jerahmeel.CurriculumNotFoundException;
 import org.iatoki.judgels.jerahmeel.JerahmeelActivityKeys;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
-import org.iatoki.judgels.jerahmeel.Session;
-import org.iatoki.judgels.jerahmeel.SessionNotFoundException;
-import org.iatoki.judgels.jerahmeel.SessionProblem;
-import org.iatoki.judgels.jerahmeel.SessionProblemStatus;
+import org.iatoki.judgels.jerahmeel.Chapter;
+import org.iatoki.judgels.jerahmeel.ChapterNotFoundException;
+import org.iatoki.judgels.jerahmeel.ChapterProblem;
+import org.iatoki.judgels.jerahmeel.ChapterProblemStatus;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
@@ -27,16 +27,16 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.GuestView;
 import org.iatoki.judgels.jerahmeel.controllers.securities.HasRole;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.services.CourseService;
-import org.iatoki.judgels.jerahmeel.services.CourseSessionService;
+import org.iatoki.judgels.jerahmeel.services.CourseChapterService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumCourseService;
 import org.iatoki.judgels.jerahmeel.services.CurriculumService;
-import org.iatoki.judgels.jerahmeel.services.SessionDependencyService;
-import org.iatoki.judgels.jerahmeel.services.SessionProblemService;
-import org.iatoki.judgels.jerahmeel.services.SessionService;
+import org.iatoki.judgels.jerahmeel.services.ChapterDependencyService;
+import org.iatoki.judgels.jerahmeel.services.ChapterProblemService;
+import org.iatoki.judgels.jerahmeel.services.ChapterService;
 import org.iatoki.judgels.jerahmeel.services.impls.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listOwnSubmissionsView;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listSubmissionsView;
-import org.iatoki.judgels.jerahmeel.views.html.training.course.session.submission.programming.listSubmissionsWithActionsView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.chapter.submission.programming.listOwnSubmissionsView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.chapter.submission.programming.listSubmissionsView;
+import org.iatoki.judgels.jerahmeel.views.html.training.course.chapter.submission.programming.listSubmissionsWithActionsView;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;
@@ -72,28 +72,28 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
     private static final String SUBMISSION = "submission";
     private static final String PROGRAMMING_FILES = "programming_files";
     private static final String PROBLEM = "problem";
-    private static final String SESSION = "session";
+    private static final String CHAPTER = "chapter";
 
     private final CourseService courseService;
-    private final CourseSessionService courseSessionService;
+    private final CourseChapterService courseChapterService;
     private final CurriculumCourseService curriculumCourseService;
     private final CurriculumService curriculumService;
-    private final SessionDependencyService sessionDependencyService;
-    private final SessionProblemService sessionProblemService;
-    private final SessionService sessionService;
+    private final ChapterDependencyService chapterDependencyService;
+    private final ChapterProblemService chapterProblemService;
+    private final ChapterService chapterService;
     private final FileSystemProvider programmingSubmissionLocalFileSystemProvider;
     private final FileSystemProvider programmingSubmissionRemoteFileSystemProvider;
     private final ProgrammingSubmissionService programmingSubmissionService;
 
     @Inject
-    public TrainingProgrammingSubmissionController(CourseService courseService, CourseSessionService courseSessionService, CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, SessionDependencyService sessionDependencyService, SessionProblemService sessionProblemService, SessionService sessionService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService) {
+    public TrainingProgrammingSubmissionController(CourseService courseService, CourseChapterService courseChapterService, CurriculumCourseService curriculumCourseService, CurriculumService curriculumService, ChapterDependencyService chapterDependencyService, ChapterProblemService chapterProblemService, ChapterService chapterService, @ProgrammingSubmissionLocalFileSystemProvider FileSystemProvider programmingSubmissionLocalFileSystemProvider, @ProgrammingSubmissionRemoteFileSystemProvider @Nullable FileSystemProvider programmingSubmissionRemoteFileSystemProvider, ProgrammingSubmissionService programmingSubmissionService) {
         this.courseService = courseService;
-        this.courseSessionService = courseSessionService;
+        this.courseChapterService = courseChapterService;
         this.curriculumCourseService = curriculumCourseService;
         this.curriculumService = curriculumService;
-        this.sessionDependencyService = sessionDependencyService;
-        this.sessionProblemService = sessionProblemService;
-        this.sessionService = sessionService;
+        this.chapterDependencyService = chapterDependencyService;
+        this.chapterProblemService = chapterProblemService;
+        this.chapterService = chapterService;
         this.programmingSubmissionLocalFileSystemProvider = programmingSubmissionLocalFileSystemProvider;
         this.programmingSubmissionRemoteFileSystemProvider = programmingSubmissionRemoteFileSystemProvider;
         this.programmingSubmissionService = programmingSubmissionService;
@@ -101,19 +101,19 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional
-    public Result postSubmitProblem(long curriculumId, long curriculumCourseId, long courseSessionId, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseSessionNotFoundException {
+    public Result postSubmitProblem(long curriculumId, long curriculumCourseId, long courseChapterId, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseChapterNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid()) || !sessionDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseSession.getSessionJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid()) || !chapterDependencyService.isDependenciesFulfilled(IdentityUtils.getUserJid(), courseChapter.getChapterJid())) {
             return notFound();
         }
 
-        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(courseSession.getSessionJid(), problemJid);
+        ChapterProblem chapterProblem = chapterProblemService.findChapterProblemByChapterJidAndProblemJid(courseChapter.getChapterJid(), problemJid);
 
-        if (sessionProblem.getStatus() != SessionProblemStatus.VISIBLE) {
+        if (chapterProblem.getStatus() != ChapterProblemStatus.VISIBLE) {
             return notFound();
         }
 
@@ -125,142 +125,142 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
         String submissionJid;
         try {
             SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromNewSubmission(body);
-            submissionJid = programmingSubmissionService.submit(problemJid, courseSession.getSessionJid(), gradingEngine, gradingLanguage, null, submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
+            submissionJid = programmingSubmissionService.submit(problemJid, courseChapter.getChapterJid(), gradingEngine, gradingLanguage, null, submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
             ProgrammingSubmissionUtils.storeSubmissionFiles(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submissionJid, submissionSource);
 
         } catch (ProgrammingSubmissionException e) {
             flash("submissionError", e.getMessage());
 
-            return redirect(routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), sessionProblem.getId()));
+            return redirect(routes.TrainingProblemController.viewProblem(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId(), chapterProblem.getId()));
         }
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(SESSION, courseSession.getSessionJid(), session.getName(), PROBLEM, sessionProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.SUBMIT.construct(CHAPTER, courseChapter.getChapterJid(), chapter.getName(), PROBLEM, chapterProblem.getProblemJid(), SandalphonResourceDisplayNameUtils.parseSlugByLanguage(JidCacheServiceImpl.getInstance().getDisplayName(chapterProblem.getProblemJid())), SUBMISSION, submissionJid, PROGRAMMING_FILES));
 
-        return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()));
+        return redirect(routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId()));
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
-    public Result viewOwnSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        return listOwnSubmissions(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "desc", null);
+    public Result viewOwnSubmissions(long curriculumId, long curriculumCourseId, long courseChapterId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException {
+        return listOwnSubmissions(curriculumId, curriculumCourseId, courseChapterId, 0, "id", "desc", null);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
-    public Result listOwnSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
+    public Result listOwnSubmissions(long curriculumId, long curriculumCourseId, long courseChapterId, long pageIndex, String orderBy, String orderDir, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid())) {
             return notFound();
         }
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
-        Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.getProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
+        Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, IdentityUtils.getUserJid(), actualProblemJid, chapter.getJid());
+        Map<String, String> problemJidToAliasMap = chapterProblemService.getProgrammingProblemJidToAliasMapByChapterJid(chapter.getJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
-        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
+        LazyHtml content = new LazyHtml(listOwnSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualProblemJid));
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        TrainingSessionControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseChapter);
+        TrainingChapterControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseChapter);
+        TrainingChapterControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
-                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter,
+                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId()))
         );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Chapters - Programming Submissions");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
-    public Result viewSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
-        return listSubmissions(curriculumId, curriculumCourseId, courseSessionId, 0, "id", "desc", null, null);
+    public Result viewSubmissions(long curriculumId, long curriculumCourseId, long courseChapterId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException {
+        return listSubmissions(curriculumId, curriculumCourseId, courseChapterId, 0, "id", "desc", null, null);
     }
 
     @Authenticated(value = GuestView.class)
     @Transactional(readOnly = true)
-    public Result listSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException {
+    public Result listSubmissions(long curriculumId, long curriculumCourseId, long courseChapterId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid())) {
             return notFound();
         }
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
         String actualUserJid = "(none)".equals(userJid) ? null : userJid;
         String actualProblemJid = "(none)".equals(problemJid) ? null : problemJid;
 
-        Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, session.getJid());
-        Map<String, String> problemJidToAliasMap = sessionProblemService.getProgrammingProblemJidToAliasMapBySessionJid(session.getJid());
+        Page<ProgrammingSubmission> pageOfSubmissions = programmingSubmissionService.getPageOfProgrammingSubmissions(pageIndex, PAGE_SIZE, orderBy, orderDir, actualUserJid, actualProblemJid, chapter.getJid());
+        Map<String, String> problemJidToAliasMap = chapterProblemService.getProgrammingProblemJidToAliasMapByChapterJid(chapter.getJid());
         Map<String, String> gradingLanguageToNameMap = GradingLanguageRegistry.getInstance().getGradingLanguages();
 
         LazyHtml content;
         if (JerahmeelControllerUtils.getInstance().isAdmin()) {
-            content = new LazyHtml(listSubmissionsWithActionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+            content = new LazyHtml(listSubmissionsWithActionsView.render(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         } else {
-            content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
+            content = new LazyHtml(listSubmissionsView.render(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId(), pageOfSubmissions, problemJidToAliasMap, gradingLanguageToNameMap, pageIndex, orderBy, orderDir, actualUserJid, actualProblemJid));
         }
         content.appendLayout(c -> heading3Layout.render(Messages.get("submission.submissions"), c));
-        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        TrainingSessionControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        appendSubtabLayout(content, curriculum, curriculumCourse, course, courseChapter);
+        TrainingChapterControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseChapter);
+        TrainingChapterControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
-                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter,
+                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId()))
         );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Chapters - Programming Submissions");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Transactional(readOnly = true)
-    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long submissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+    public Result viewSubmission(long curriculumId, long curriculumCourseId, long courseChapterId, long submissionId) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException, ProgrammingSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid())) {
             return notFound();
         }
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
         ProgrammingSubmission programmingSubmission = programmingSubmissionService.findProgrammingSubmissionById(submissionId);
 
         if (!JerahmeelControllerUtils.getInstance().isAdmin() && !programmingSubmission.getAuthorJid().equals(IdentityUtils.getUserJid())) {
-            return redirect(routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()));
+            return redirect(routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId()));
         }
 
         SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, programmingSubmission.getJid());
         String authorName = JidCacheServiceImpl.getInstance().getDisplayName(programmingSubmission.getAuthorJid());
-        SessionProblem sessionProblem = sessionProblemService.findSessionProblemBySessionJidAndProblemJid(session.getJid(), programmingSubmission.getProblemJid());
-        String sessionProblemAlias = sessionProblem.getAlias();
-        String sessionProblemName = JidCacheServiceImpl.getInstance().getDisplayName(sessionProblem.getProblemJid());
+        ChapterProblem chapterProblem = chapterProblemService.findChapterProblemByChapterJidAndProblemJid(chapter.getJid(), programmingSubmission.getProblemJid());
+        String chapterProblemAlias = chapterProblem.getAlias();
+        String chapterProblemName = JidCacheServiceImpl.getInstance().getDisplayName(chapterProblem.getProblemJid());
         String gradingLanguageName = GradingLanguageRegistry.getInstance().getLanguage(programmingSubmission.getGradingLanguage()).getName();
 
-        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(programmingSubmission.getGradingEngine()).renderViewSubmission(programmingSubmission, submissionSource, authorName, sessionProblemAlias, sessionProblemName, gradingLanguageName, session.getName()));
-        TrainingSessionControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseSession);
-        TrainingSessionControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseSession, session);
+        LazyHtml content = new LazyHtml(GradingEngineAdapterRegistry.getInstance().getByGradingEngineName(programmingSubmission.getGradingEngine()).renderViewSubmission(programmingSubmission, submissionSource, authorName, chapterProblemAlias, chapterProblemName, gradingLanguageName, chapter.getName()));
+        TrainingChapterControllerUtils.appendSubmissionSubtabLayout(content, curriculum, curriculumCourse, course, courseChapter);
+        TrainingChapterControllerUtils.appendTabLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter);
         JerahmeelControllerUtils.getInstance().appendSidebarLayout(content);
-        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseSession, session,
-                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                new InternalLink(programmingSubmission.getId() + "", routes.TrainingProgrammingSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseSession.getId(), programmingSubmission.getId()))
+        appendBreadcrumbsLayout(content, curriculum, curriculumCourse, course, courseChapter, chapter,
+                new InternalLink(Messages.get("training.submissions.programming"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId())),
+                new InternalLink(programmingSubmission.getId() + "", routes.TrainingProgrammingSubmissionController.viewSubmission(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId(), programmingSubmission.getId()))
         );
-        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Sessions - Programming Submissions - View");
+        JerahmeelControllerUtils.getInstance().appendTemplateLayout(content, "Chapters - Programming Submissions - View");
 
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
@@ -268,79 +268,79 @@ public final class TrainingProgrammingSubmissionController extends AbstractJudge
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Authorized(value = "admin")
     @Transactional
-    public Result regradeSubmission(long curriculumId, long curriculumCourseId, long courseSessionId, long programmingSubmissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+    public Result regradeSubmission(long curriculumId, long curriculumCourseId, long courseChapterId, long programmingSubmissionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException, ProgrammingSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid())) {
             return notFound();
         }
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
         ProgrammingSubmission submission = programmingSubmissionService.findProgrammingSubmissionById(programmingSubmissionId);
         SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submission.getJid());
         programmingSubmissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(SESSION, session.getJid(), session.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
+        JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(CHAPTER, chapter.getJid(), chapter.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
 
-        return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+        return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseChapterId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
     @Authenticated(value = {LoggedIn.class, HasRole.class})
     @Authorized(value = "admin")
     @Transactional
-    public Result regradeSubmissions(long curriculumId, long curriculumCourseId, long courseSessionId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseSessionNotFoundException, SessionNotFoundException, ProgrammingSubmissionNotFoundException {
+    public Result regradeSubmissions(long curriculumId, long curriculumCourseId, long courseChapterId, long pageIndex, String orderBy, String orderDir, String userJid, String problemJid) throws CurriculumNotFoundException, CurriculumCourseNotFoundException, CourseNotFoundException, CourseChapterNotFoundException, ChapterNotFoundException, ProgrammingSubmissionNotFoundException {
         Curriculum curriculum = curriculumService.findCurriculumById(curriculumId);
         CurriculumCourse curriculumCourse = curriculumCourseService.findCurriculumCourseByCurriculumCourseId(curriculumCourseId);
-        CourseSession courseSession = courseSessionService.findCourseSessionById(courseSessionId);
+        CourseChapter courseChapter = courseChapterService.findCourseChapterById(courseChapterId);
 
-        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseSession.getCourseJid())) {
+        if (!curriculum.getJid().equals(curriculumCourse.getCurriculumJid()) || !curriculumCourse.getCourseJid().equals(courseChapter.getCourseJid())) {
             return notFound();
         }
 
         Course course = courseService.findCourseByJid(curriculumCourse.getCourseJid());
-        Session session = sessionService.findSessionByJid(courseSession.getSessionJid());
+        Chapter chapter = chapterService.findChapterByJid(courseChapter.getChapterJid());
 
         ListTableSelectionForm data = Form.form(ListTableSelectionForm.class).bindFromRequest().get();
 
         List<ProgrammingSubmission> submissions;
 
         if (data.selectAll) {
-            submissions = programmingSubmissionService.getProgrammingSubmissionsByFilters(orderBy, orderDir, userJid, problemJid, session.getJid());
+            submissions = programmingSubmissionService.getProgrammingSubmissionsByFilters(orderBy, orderDir, userJid, problemJid, chapter.getJid());
         } else if (data.selectJids != null) {
             submissions = programmingSubmissionService.getProgrammingSubmissionsByJids(data.selectJids);
         } else {
-            return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+            return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseChapterId, pageIndex, orderBy, orderDir, userJid, problemJid));
         }
 
         for (ProgrammingSubmission submission : submissions) {
             SubmissionSource submissionSource = ProgrammingSubmissionUtils.createSubmissionSourceFromPastSubmission(programmingSubmissionLocalFileSystemProvider, programmingSubmissionRemoteFileSystemProvider, submission.getJid());
             programmingSubmissionService.regrade(submission.getJid(), submissionSource, IdentityUtils.getUserJid(), IdentityUtils.getIpAddress());
 
-            JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(SESSION, session.getJid(), session.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
+            JerahmeelControllerUtils.getInstance().addActivityLog(JerahmeelActivityKeys.REGRADE.construct(CHAPTER, chapter.getJid(), chapter.getName(), PROBLEM, submission.getProblemJid(), JidCacheServiceImpl.getInstance().getDisplayName(submission.getProblemJid()), SUBMISSION, submission.getJid(), submission.getId() + ""));
         }
 
-        return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseSessionId, pageIndex, orderBy, orderDir, userJid, problemJid));
+        return redirect(routes.TrainingProgrammingSubmissionController.listSubmissions(curriculumId, curriculumCourseId, courseChapterId, pageIndex, orderBy, orderDir, userJid, problemJid));
     }
 
-    private void appendSubtabLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession) {
+    private void appendSubtabLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseChapter courseChapter) {
         if (!JerahmeelUtils.isGuest()) {
             content.appendLayout(c -> subtabLayout.render(ImmutableList.of(
-                            new InternalLink(Messages.get("training.submissions.programming.own"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())),
-                            new InternalLink(Messages.get("training.submissions.programming.all"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId()))
+                            new InternalLink(Messages.get("training.submissions.programming.own"), routes.TrainingProgrammingSubmissionController.viewOwnSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId())),
+                            new InternalLink(Messages.get("training.submissions.programming.all"), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId()))
                     ), c)
             );
         }
     }
 
-    private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseSession courseSession, Session session, InternalLink... lastLinks) {
+    private void appendBreadcrumbsLayout(LazyHtml content, Curriculum curriculum, CurriculumCourse curriculumCourse, Course course, CourseChapter courseChapter, Chapter chapter, InternalLink... lastLinks) {
         ImmutableList.Builder<InternalLink> breadcrumbsBuilder = TrainingControllerUtils.getBreadcrumbsBuilder();
         breadcrumbsBuilder.add(new InternalLink(curriculum.getName(), routes.TrainingCourseController.viewCourses(curriculum.getId())));
-        breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingSessionController.viewSessions(curriculum.getId(), curriculumCourse.getId())));
-        breadcrumbsBuilder.add(new InternalLink(session.getName(), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseSession.getId())));
+        breadcrumbsBuilder.add(new InternalLink(course.getName(), routes.TrainingChapterController.viewChapters(curriculum.getId(), curriculumCourse.getId())));
+        breadcrumbsBuilder.add(new InternalLink(chapter.getName(), routes.TrainingProgrammingSubmissionController.viewSubmissions(curriculum.getId(), curriculumCourse.getId(), courseChapter.getId())));
         breadcrumbsBuilder.add(lastLinks);
 
         JerahmeelControllerUtils.getInstance().appendBreadcrumbsLayout(content, breadcrumbsBuilder.build());

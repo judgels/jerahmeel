@@ -7,19 +7,19 @@ import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.CourseChapterDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ChapterProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.services.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.services.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.services.impls.ProblemSetScoreCacheUtils;
-import org.iatoki.judgels.jerahmeel.services.impls.SessionProgressCacheUtils;
-import org.iatoki.judgels.jerahmeel.services.impls.SessionScoreCacheUtils;
+import org.iatoki.judgels.jerahmeel.services.impls.ChapterProgressCacheUtils;
+import org.iatoki.judgels.jerahmeel.services.impls.ChapterScoreCacheUtils;
 import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
 import org.iatoki.judgels.jophiel.services.impls.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.jerahmeel.controllers.JerahmeelControllerUtils;
@@ -47,9 +47,9 @@ public final class JerahmeelSingletonsBuilder {
             JidCacheDao jidCacheDao, AvatarCacheDao avatarCacheDao, ActivityLogDao activityLogDao,
             JophielClientAPI jophielClientAPI, JophielPublicAPI jophielPublicAPI,
             BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService,
-            SessionProblemDao sessionProblemDao, UserItemDao userItemDao,
+            ChapterProblemDao chapterProblemDao, UserItemDao userItemDao,
             ArchiveDao archiveDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao,
-            CourseSessionDao courseSessionDao) {
+            CourseChapterDao courseChapterDao) {
 
         JidCacheServiceImpl.buildInstance(jidCacheDao);
         AvatarCacheServiceImpl.buildInstance(avatarCacheDao);
@@ -58,8 +58,8 @@ public final class JerahmeelSingletonsBuilder {
 
         JophielClientControllerUtils.buildInstance(JerahmeelProperties.getInstance().getJophielBaseUrl());
         JerahmeelControllerUtils.buildInstance(jophielClientAPI, jophielPublicAPI, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
-        SessionProgressCacheUtils.buildInstance(sessionProblemDao, userItemDao);
+        ChapterProgressCacheUtils.buildInstance(chapterProblemDao, userItemDao);
         ProblemSetScoreCacheUtils.buildInstance(archiveDao, bundleSubmissionDao, bundleGradingDao, containerScoreCacheDao, containerProblemScoreCacheDao, problemSetDao, problemSetProblemDao, programmingSubmissionDao, programmingGradingDao);
-        SessionScoreCacheUtils.buildInstance(bundleSubmissionDao, bundleGradingDao, containerScoreCacheDao, containerProblemScoreCacheDao, courseSessionDao, programmingSubmissionDao, programmingGradingDao, sessionProblemDao);
+        ChapterScoreCacheUtils.buildInstance(bundleSubmissionDao, bundleGradingDao, containerScoreCacheDao, containerProblemScoreCacheDao, courseChapterDao, programmingSubmissionDao, programmingGradingDao, chapterProblemDao);
     }
 }

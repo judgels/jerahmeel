@@ -9,12 +9,12 @@ import org.iatoki.judgels.jerahmeel.models.daos.BundleGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ContainerScoreCacheDao;
-import org.iatoki.judgels.jerahmeel.models.daos.CourseSessionDao;
+import org.iatoki.judgels.jerahmeel.models.daos.CourseChapterDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProblemSetProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingGradingDao;
 import org.iatoki.judgels.jerahmeel.models.daos.ProgrammingSubmissionDao;
-import org.iatoki.judgels.jerahmeel.models.daos.SessionProblemDao;
+import org.iatoki.judgels.jerahmeel.models.daos.ChapterProblemDao;
 import org.iatoki.judgels.jerahmeel.models.daos.UserItemDao;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingGradingModel;
 import org.iatoki.judgels.jerahmeel.models.entities.ProgrammingSubmissionModel;
@@ -37,28 +37,28 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
     private final BundleGradingDao bundleGradingDao;
     private final ContainerScoreCacheDao containerScoreCacheDao;
     private final ContainerProblemScoreCacheDao containerProblemScoreCacheDao;
-    private final CourseSessionDao courseSessionDao;
+    private final CourseChapterDao courseChapterDao;
     private final ProblemSetDao problemSetDao;
     private final ProblemSetProblemDao problemSetProblemDao;
     private final ProgrammingSubmissionDao programmingSubmissionDao;
     private final ProgrammingGradingDao programmingGradingDao;
-    private final SessionProblemDao sessionProblemDao;
+    private final ChapterProblemDao chapterProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public ProgrammingSubmissionServiceImpl(ArchiveDao archiveDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseSessionDao courseSessionDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, SessionProblemDao sessionProblemDao, UserItemDao userItemDao) {
+    public ProgrammingSubmissionServiceImpl(ArchiveDao archiveDao, BundleSubmissionDao bundleSubmissionDao, BundleGradingDao bundleGradingDao, ContainerScoreCacheDao containerScoreCacheDao, ContainerProblemScoreCacheDao containerProblemScoreCacheDao, CourseChapterDao courseChapterDao, ProblemSetDao problemSetDao, ProblemSetProblemDao problemSetProblemDao, ProgrammingSubmissionDao programmingSubmissionDao, ProgrammingGradingDao programmingGradingDao, SealtielClientAPI sealtielClientAPI, @GabrielClientJid String gabrielClientJid, ChapterProblemDao chapterProblemDao, UserItemDao userItemDao) {
         super(programmingSubmissionDao, programmingGradingDao, sealtielClientAPI, gabrielClientJid);
         this.archiveDao = archiveDao;
         this.bundleSubmissionDao = bundleSubmissionDao;
         this.bundleGradingDao = bundleGradingDao;
         this.containerScoreCacheDao = containerScoreCacheDao;
         this.containerProblemScoreCacheDao = containerProblemScoreCacheDao;
-        this.courseSessionDao = courseSessionDao;
+        this.courseChapterDao = courseChapterDao;
         this.problemSetDao = problemSetDao;
         this.problemSetProblemDao = problemSetProblemDao;
         this.programmingSubmissionDao = programmingSubmissionDao;
         this.programmingGradingDao = programmingGradingDao;
-        this.sessionProblemDao = sessionProblemDao;
+        this.chapterProblemDao = chapterProblemDao;
         this.userItemDao = userItemDao;
     }
 
@@ -98,9 +98,9 @@ public final class ProgrammingSubmissionServiceImpl extends AbstractProgrammingS
         }
 
         if (scoreChanged) {
-            SessionScoreCacheUtils.getInstance().updateSessionAndCourseScoreCache(userJid, containerJid, deltaScore);
+            ChapterScoreCacheUtils.getInstance().updateChapterAndCourseScoreCache(userJid, containerJid, deltaScore);
         }
 
-        SessionProgressCacheUtils.getInstance().updateSessionProblemProgressWithProgrammingSubmissions(userJid, containerJid, problemJid, submissions);
+        ChapterProgressCacheUtils.getInstance().updateChapterProblemProgressWithProgrammingSubmissions(userJid, containerJid, problemJid, submissions);
     }
 }

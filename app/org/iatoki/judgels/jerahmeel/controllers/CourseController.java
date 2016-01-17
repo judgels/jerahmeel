@@ -65,8 +65,8 @@ public final class CourseController extends AbstractJudgelsController {
         return JerahmeelControllerUtils.getInstance().lazyOk(content);
     }
 
-    public Result jumpToSessions(long courseId) {
-        return redirect(routes.CourseSessionController.viewSessions(courseId));
+    public Result jumpToChapters(long courseId) {
+        return redirect(routes.CourseChapterController.viewChapters(courseId));
     }
 
     @Transactional(readOnly = true)

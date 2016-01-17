@@ -110,7 +110,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         if (isAdmin()) {
             internalLinkBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), routes.CurriculumController.viewCurriculums()));
             internalLinkBuilder.add(new InternalLink(Messages.get("course.courses"), routes.CourseController.viewCourses()));
-            internalLinkBuilder.add(new InternalLink(Messages.get("session.sessions"), routes.SessionController.viewSessions()));
+            internalLinkBuilder.add(new InternalLink(Messages.get("chapter.chapters"), routes.ChapterController.viewChapters()));
             internalLinkBuilder.add(new InternalLink(Messages.get("user.users"), routes.UserController.index()));
         }
         LazyHtml sidebarContent;

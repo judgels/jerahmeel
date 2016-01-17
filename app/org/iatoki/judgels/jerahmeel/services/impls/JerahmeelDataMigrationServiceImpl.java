@@ -15,7 +15,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
 
     @Override
     public long getCodeDataVersion() {
-        return 7;
+        return 6;
     }
 
     @Override
@@ -29,9 +29,36 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
         if (databaseVersion < 4) {
             migrateV3toV4();
         }
-        if (databaseVersion < 7) {
+        if (databaseVersion < 5) {
             migrateV4toV5();
         }
+        if (databaseVersion < 6) {
+            migrateV5toV6();
+        }
+    }
+
+    private void migrateV5toV6() throws SQLException {
+        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        Connection connection = session.getJdbcConnectionAccess().obtainConnection();
+
+        Statement statement = connection.createStatement();
+
+        statement.execute("ALTER TABLE jerahmeel_course_session CHANGE sessionJid chapterJid VARCHAR(255);");
+        statement.execute("RENAME TABLE jerahmeel_course_session TO jerahmeel_course_chapter;");
+
+        statement.execute("RENAME TABLE jerahmeel_session TO jerahmeel_chapter;");
+
+        statement.execute("ALTER TABLE jerahmeel_session_dependency CHANGE dependedSessionJid dependedChapterJid VARCHAR(255);");
+        statement.execute("ALTER TABLE jerahmeel_session_dependency CHANGE sessionJid chapterJid VARCHAR(255);");
+        statement.execute("RENAME TABLE jerahmeel_session_dependency TO jerahmeel_chapter_dependency;");
+
+        statement.execute("ALTER TABLE jerahmeel_session_lesson CHANGE sessionJid chapterJid VARCHAR(255);");
+        statement.execute("RENAME TABLE jerahmeel_session_lesson TO jerahmeel_chapter_lesson;");
+
+        statement.execute("ALTER TABLE jerahmeel_session_problem CHANGE sessionJid chapterJid VARCHAR(255);");
+        statement.execute("RENAME TABLE jerahmeel_session_problem TO jerahmeel_chapter_problem;");
+
+
     }
 
     private void migrateV4toV5() throws SQLException {
