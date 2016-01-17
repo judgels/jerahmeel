@@ -92,6 +92,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         return instance;
     }
 
+    @SuppressWarnings("checkstyle:simplifybooleanexpression")
     @Override
     public void appendSidebarLayout(LazyHtml content) {
         content.appendLayout(c -> contentLayout.render(c));
