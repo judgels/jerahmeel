@@ -15,13 +15,14 @@ import org.iatoki.judgels.api.sandalphon.SandalphonClientAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonFactory;
 import org.iatoki.judgels.api.sealtiel.SealtielClientAPI;
 import org.iatoki.judgels.api.sealtiel.SealtielFactory;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionLocalFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.config.BundleSubmissionRemoteFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.config.GabrielClientJid;
-import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionLocalFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.config.ProgrammingSubmissionRemoteFileSystemProvider;
-import org.iatoki.judgels.jerahmeel.services.impls.JerahmeelDataMigrationServiceImpl;
-import org.iatoki.judgels.jerahmeel.services.impls.UserServiceImpl;
+import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionRemoteFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionServiceImpl;
+import org.iatoki.judgels.jerahmeel.submission.programming.GabrielClientJid;
+import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionLocalFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionRemoteFileSystemProvider;
+import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionServiceImpl;
+import org.iatoki.judgels.jerahmeel.user.UserServiceImpl;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
 import org.iatoki.judgels.play.JudgelsPlayProperties;
@@ -31,6 +32,8 @@ import org.iatoki.judgels.play.general.GeneralVersion;
 import org.iatoki.judgels.play.migration.BaseDataMigrationService;
 import org.iatoki.judgels.sandalphon.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
+import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
 
 public class JerahmeelModule extends AbstractJudgelsPlayModule {
 
@@ -50,6 +53,9 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         // </DEPRECATED>
 
         bind(BaseDataMigrationService.class).to(JerahmeelDataMigrationServiceImpl.class);
+
+        bind(BundleSubmissionService.class).to(BundleSubmissionServiceImpl.class);
+        bind(ProgrammingSubmissionService.class).to(ProgrammingSubmissionServiceImpl.class);
 
         bind(JophielAuthAPI.class).toInstance(jophielAuthAPI());
         bind(JophielClientAPI.class).toInstance(jophielClientAPI());

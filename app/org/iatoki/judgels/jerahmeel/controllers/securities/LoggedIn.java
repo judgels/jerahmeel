@@ -9,7 +9,7 @@ public class LoggedIn extends BaseLoggedIn {
     @Override
     public Call getRedirectCall(Http.Context context) {
         context.session().remove("role");
-        return org.iatoki.judgels.jerahmeel.controllers.routes.ApplicationController.auth(context.request().uri());
+        return org.iatoki.judgels.jerahmeel.routes.ApplicationController.auth(context.request().uri());
     }
 
     @Override

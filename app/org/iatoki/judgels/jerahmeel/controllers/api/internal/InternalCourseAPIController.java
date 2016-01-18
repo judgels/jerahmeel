@@ -1,20 +1,18 @@
 package org.iatoki.judgels.jerahmeel.controllers.api.internal;
 
 import org.iatoki.judgels.AutoComplete;
-import org.iatoki.judgels.jerahmeel.Course;
+import org.iatoki.judgels.jerahmeel.course.Course;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.services.CourseService;
+import org.iatoki.judgels.jerahmeel.course.CourseService;
 import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Named
 public final class InternalCourseAPIController extends AbstractJudgelsAPIController {
 
     private final CourseService courseService;

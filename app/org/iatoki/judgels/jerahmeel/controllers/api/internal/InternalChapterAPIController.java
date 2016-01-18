@@ -1,27 +1,25 @@
 package org.iatoki.judgels.jerahmeel.controllers.api.internal;
 
 import org.iatoki.judgels.AutoComplete;
-import org.iatoki.judgels.jerahmeel.CourseChapter;
-import org.iatoki.judgels.jerahmeel.CourseChapterNotFoundException;
-import org.iatoki.judgels.jerahmeel.Chapter;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.course.chapter.CourseChapter;
+import org.iatoki.judgels.jerahmeel.course.chapter.CourseChapterNotFoundException;
+import org.iatoki.judgels.jerahmeel.chapter.Chapter;
+import org.iatoki.judgels.jerahmeel.user.item.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.services.CourseChapterService;
-import org.iatoki.judgels.jerahmeel.services.ChapterDependencyService;
-import org.iatoki.judgels.jerahmeel.services.ChapterService;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.course.chapter.CourseChapterService;
+import org.iatoki.judgels.jerahmeel.chapter.dependency.ChapterDependencyService;
+import org.iatoki.judgels.jerahmeel.chapter.ChapterService;
+import org.iatoki.judgels.jerahmeel.user.item.UserItemService;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Named
 public final class InternalChapterAPIController extends AbstractJudgelsAPIController {
 
     private final CourseChapterService courseChapterService;

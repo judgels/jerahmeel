@@ -3,6 +3,7 @@ package org.iatoki.judgels.jerahmeel;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.iatoki.judgels.api.jophiel.JophielUser;
+import org.iatoki.judgels.jerahmeel.user.User;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
 import play.mvc.Http;

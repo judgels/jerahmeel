@@ -1,21 +1,19 @@
 package org.iatoki.judgels.jerahmeel.controllers.api.internal;
 
-import org.iatoki.judgels.jerahmeel.ChapterProblem;
-import org.iatoki.judgels.jerahmeel.ChapterProblemNotFoundException;
-import org.iatoki.judgels.jerahmeel.UserItemStatus;
+import org.iatoki.judgels.jerahmeel.chapter.problem.ChapterProblem;
+import org.iatoki.judgels.jerahmeel.chapter.problem.ChapterProblemNotFoundException;
+import org.iatoki.judgels.jerahmeel.user.item.UserItemStatus;
 import org.iatoki.judgels.jerahmeel.controllers.securities.Authenticated;
 import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
-import org.iatoki.judgels.jerahmeel.services.ChapterProblemService;
-import org.iatoki.judgels.jerahmeel.services.UserItemService;
+import org.iatoki.judgels.jerahmeel.chapter.problem.ChapterProblemService;
+import org.iatoki.judgels.jerahmeel.user.item.UserItemService;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.controllers.apis.AbstractJudgelsAPIController;
 import play.db.jpa.Transactional;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
-@Named
 public final class InternalProblemAPIController extends AbstractJudgelsAPIController {
 
     private final ChapterProblemService chapterProblemService;
