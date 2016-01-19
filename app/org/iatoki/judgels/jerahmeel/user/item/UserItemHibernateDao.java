@@ -1,8 +1,5 @@
 package org.iatoki.judgels.jerahmeel.user.item;
 
-import org.iatoki.judgels.jerahmeel.user.item.UserItemDao;
-import org.iatoki.judgels.jerahmeel.user.item.UserItemModel;
-import org.iatoki.judgels.jerahmeel.user.item.UserItemModel_;
 import org.iatoki.judgels.play.model.AbstractHibernateDao;
 import play.db.jpa.JPA;
 

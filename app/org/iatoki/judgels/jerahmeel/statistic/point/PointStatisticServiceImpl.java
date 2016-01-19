@@ -1,14 +1,6 @@
 package org.iatoki.judgels.jerahmeel.statistic.point;
 
 import com.google.common.collect.ImmutableMap;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatistic;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntry;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticDao;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntryDao;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntryModel;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntryModel_;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticModel;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticService;
 import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;

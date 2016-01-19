@@ -1,7 +1,5 @@
 package org.iatoki.judgels.jerahmeel;
 
-import org.iatoki.judgels.jerahmeel.JerahmeelModule;
-
 public final class JerahmeelJedisModule extends JerahmeelModule {
 
     @Override

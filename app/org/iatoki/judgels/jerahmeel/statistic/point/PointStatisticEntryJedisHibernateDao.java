@@ -1,7 +1,5 @@
 package org.iatoki.judgels.jerahmeel.statistic.point;
 
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntryDao;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticEntryModel;
 import org.iatoki.judgels.play.model.AbstractJedisHibernateDao;
 import redis.clients.jedis.JedisPool;
 

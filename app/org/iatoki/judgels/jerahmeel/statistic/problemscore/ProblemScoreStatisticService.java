@@ -1,8 +1,6 @@
 package org.iatoki.judgels.jerahmeel.statistic.problemscore;
 
 import com.google.inject.ImplementedBy;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatistic;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatisticEntry;
 
 import java.util.List;
 

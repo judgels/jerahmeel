@@ -2,8 +2,6 @@ package org.iatoki.judgels.jerahmeel.user;
 
 import com.google.inject.ImplementedBy;
 import org.iatoki.judgels.api.jophiel.JophielUser;
-import org.iatoki.judgels.jerahmeel.user.User;
-import org.iatoki.judgels.jerahmeel.user.UserNotFoundException;
 import org.iatoki.judgels.jophiel.services.BaseUserService;
 import org.iatoki.judgels.play.Page;
 

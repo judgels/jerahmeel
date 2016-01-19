@@ -1,7 +1,5 @@
 package org.iatoki.judgels.jerahmeel.user;
 
-import org.iatoki.judgels.jerahmeel.user.User;
-import org.iatoki.judgels.jerahmeel.user.UserModel;
 import org.iatoki.judgels.jophiel.UserTokens;
 
 import java.util.Arrays;

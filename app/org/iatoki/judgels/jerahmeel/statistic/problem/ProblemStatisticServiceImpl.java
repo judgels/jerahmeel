@@ -3,12 +3,6 @@ package org.iatoki.judgels.jerahmeel.statistic.problem;
 import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemStatistic;
 import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemStatisticEntry;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticDao;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticEntryDao;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticEntryModel;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticEntryModel_;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticModel;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticService;
 import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
