@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.avatar;
 
-import org.iatoki.judgels.jophiel.models.daos.hibernate.AbstractAvatarCacheHibernateDao;
+import org.iatoki.judgels.jophiel.avatar.AbstractAvatarCacheHibernateDao;
 
 import javax.inject.Singleton;
 

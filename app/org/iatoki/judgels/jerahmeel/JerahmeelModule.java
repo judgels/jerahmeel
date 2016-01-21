@@ -24,16 +24,16 @@ import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmission
 import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionServiceImpl;
 import org.iatoki.judgels.jerahmeel.user.UserServiceImpl;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
-import org.iatoki.judgels.jophiel.services.BaseUserService;
+import org.iatoki.judgels.jophiel.user.BaseUserService;
 import org.iatoki.judgels.play.JudgelsPlayProperties;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.play.general.GeneralName;
 import org.iatoki.judgels.play.general.GeneralVersion;
 import org.iatoki.judgels.play.migration.BaseDataMigrationService;
-import org.iatoki.judgels.sandalphon.SandalphonBundleProblemGrader;
-import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
-import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
-import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.SandalphonBundleProblemGrader;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.BundleProblemGrader;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
 
 public class JerahmeelModule extends AbstractJudgelsPlayModule {
 

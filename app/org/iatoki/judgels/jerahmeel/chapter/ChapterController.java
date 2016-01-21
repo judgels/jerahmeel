@@ -11,7 +11,7 @@ import org.iatoki.judgels.jerahmeel.user.item.UserItemService;
 import org.iatoki.judgels.jerahmeel.chapter.html.createChapterView;
 import org.iatoki.judgels.jerahmeel.chapter.html.editChapterGeneralView;
 import org.iatoki.judgels.jerahmeel.chapter.html.listChaptersView;
-import org.iatoki.judgels.jophiel.BasicActivityKeys;
+import org.iatoki.judgels.jophiel.activity.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;

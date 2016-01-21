@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.submission.bundle;
 
-import org.iatoki.judgels.sandalphon.models.daos.hibernate.AbstractBundleSubmissionHibernateDao;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.AbstractBundleSubmissionHibernateDao;
 
 import javax.inject.Singleton;
 

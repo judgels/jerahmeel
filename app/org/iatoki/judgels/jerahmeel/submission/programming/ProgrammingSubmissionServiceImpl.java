@@ -19,9 +19,9 @@ import org.iatoki.judgels.jerahmeel.scorecache.ProblemSetScoreCacheUtils;
 import org.iatoki.judgels.jerahmeel.submission.JerahmeelSubmissionServiceUtils;
 import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.user.item.UserItemDao;
-import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
-import org.iatoki.judgels.sandalphon.services.impls.AbstractProgrammingSubmissionServiceImpl;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.AbstractProgrammingSubmissionServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

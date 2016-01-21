@@ -18,17 +18,17 @@ import org.iatoki.judgels.jerahmeel.statistic.point.html.pointStatisticView;
 import org.iatoki.judgels.jerahmeel.statistic.problemscore.html.problemScoreStatisticLayout;
 import org.iatoki.judgels.jerahmeel.statistic.problem.html.problemStatisticView;
 import org.iatoki.judgels.jerahmeel.statistic.submission.html.recentSubmissionView;
-import org.iatoki.judgels.jophiel.ActivityKey;
-import org.iatoki.judgels.jophiel.UserActivityMessage;
-import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
-import org.iatoki.judgels.jophiel.forms.SearchProfileForm;
-import org.iatoki.judgels.jophiel.forms.ViewpointForm;
-import org.iatoki.judgels.jophiel.services.impls.UserActivityMessageServiceImpl;
-import org.iatoki.judgels.jophiel.views.html.client.linkedClientsLayout;
-import org.iatoki.judgels.jophiel.views.html.isLoggedInLayout;
-import org.iatoki.judgels.jophiel.views.html.isLoggedOutLayout;
-import org.iatoki.judgels.jophiel.views.html.profile.searchProfileLayout;
-import org.iatoki.judgels.jophiel.views.html.viewas.viewAsLayout;
+import org.iatoki.judgels.jophiel.activity.ActivityKey;
+import org.iatoki.judgels.jophiel.activity.UserActivityMessage;
+import org.iatoki.judgels.jophiel.JophielClientControllerUtils;
+import org.iatoki.judgels.jophiel.profile.SearchProfileForm;
+import org.iatoki.judgels.jophiel.viewpoint.ViewpointForm;
+import org.iatoki.judgels.jophiel.activity.UserActivityMessageServiceImpl;
+import org.iatoki.judgels.jophiel.client.html.linkedClientsLayout;
+import org.iatoki.judgels.jophiel.logincheck.html.isLoggedInLayout;
+import org.iatoki.judgels.jophiel.logincheck.html.isLoggedOutLayout;
+import org.iatoki.judgels.jophiel.profile.html.searchProfileLayout;
+import org.iatoki.judgels.jophiel.viewpoint.html.viewAsLayout;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
@@ -42,10 +42,10 @@ import org.iatoki.judgels.play.views.html.layouts.menusLayout;
 import org.iatoki.judgels.play.views.html.layouts.profileView;
 import org.iatoki.judgels.play.views.html.layouts.sidebarLayout;
 import org.iatoki.judgels.play.views.html.layouts.threeWidgetLayout;
-import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
-import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
 import play.data.Form;
 import play.i18n.Messages;
 import play.mvc.Http;
@@ -120,8 +120,8 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
             sidebarContent = new LazyHtml(profileView.render(
                     IdentityUtils.getUsername(),
                     IdentityUtils.getUserRealName(),
-                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
-                    org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.logout(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
+                    org.iatoki.judgels.jophiel.routes.JophielClientController.profile().absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure()),
+                    org.iatoki.judgels.jophiel.routes.JophielClientController.logout(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
                 ));
         }
         if (JerahmeelUtils.trullyHasRole("admin")) {

@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.submission.bundle;
 
-import org.iatoki.judgels.sandalphon.models.daos.jedishibernate.AbstractBundleSubmissionJedisHibernateDao;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.AbstractBundleSubmissionJedisHibernateDao;
 import redis.clients.jedis.JedisPool;
 
 import javax.inject.Inject;

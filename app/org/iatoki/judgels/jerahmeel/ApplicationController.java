@@ -10,8 +10,8 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.user.UserService;
 import org.iatoki.judgels.jerahmeel.avatar.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.jid.JidCacheServiceImpl;
-import org.iatoki.judgels.jophiel.controllers.JophielClientControllerUtils;
-import org.iatoki.judgels.jophiel.forms.ViewpointForm;
+import org.iatoki.judgels.jophiel.JophielClientControllerUtils;
+import org.iatoki.judgels.jophiel.viewpoint.ViewpointForm;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
 import org.iatoki.judgels.play.controllers.AbstractJudgelsController;
@@ -45,7 +45,7 @@ public final class ApplicationController extends AbstractJudgelsController {
             return redirect(routes.ApplicationController.authRole(returnUri));
         } else {
             String newReturnUri = routes.ApplicationController.afterLogin(returnUri).absoluteURL(request(), request().secure());
-            return redirect(org.iatoki.judgels.jophiel.controllers.routes.JophielClientController.login(newReturnUri));
+            return redirect(org.iatoki.judgels.jophiel.routes.JophielClientController.login(newReturnUri));
         }
     }
 

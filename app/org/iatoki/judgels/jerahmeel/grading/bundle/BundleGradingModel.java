@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.grading.bundle;
 
-import org.iatoki.judgels.sandalphon.models.entities.AbstractBundleGradingModel;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.AbstractBundleGradingModel;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

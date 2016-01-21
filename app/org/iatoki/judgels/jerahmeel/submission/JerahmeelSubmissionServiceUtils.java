@@ -3,8 +3,8 @@ package org.iatoki.judgels.jerahmeel.submission;
 import org.iatoki.judgels.jerahmeel.ProblemScore;
 import org.iatoki.judgels.jerahmeel.scorecache.ContainerProblemScoreCacheDao;
 import org.iatoki.judgels.jerahmeel.scorecache.ContainerProblemScoreCacheModel;
-import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
 
 import java.util.List;
 

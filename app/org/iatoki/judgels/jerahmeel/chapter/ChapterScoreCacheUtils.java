@@ -26,7 +26,7 @@ import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionDao;
 import org.iatoki.judgels.jerahmeel.submission.bundle.BundleSubmissionModel;
 import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionModel;
-import org.iatoki.judgels.sandalphon.ProblemType;
+import org.iatoki.judgels.sandalphon.problem.base.ProblemType;
 
 import java.util.List;
 import java.util.Map;

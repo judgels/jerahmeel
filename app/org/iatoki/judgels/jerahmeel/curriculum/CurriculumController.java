@@ -9,7 +9,7 @@ import org.iatoki.judgels.jerahmeel.controllers.securities.LoggedIn;
 import org.iatoki.judgels.jerahmeel.curriculum.html.createCurriculumView;
 import org.iatoki.judgels.jerahmeel.curriculum.html.editCurriculumGeneralView;
 import org.iatoki.judgels.jerahmeel.curriculum.html.listCurriculumsView;
-import org.iatoki.judgels.jophiel.BasicActivityKeys;
+import org.iatoki.judgels.jophiel.activity.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;

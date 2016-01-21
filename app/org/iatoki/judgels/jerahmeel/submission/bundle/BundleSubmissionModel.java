@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.submission.bundle;
 
-import org.iatoki.judgels.sandalphon.models.entities.AbstractBundleSubmissionModel;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.AbstractBundleSubmissionModel;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;

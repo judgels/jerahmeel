@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.activity;
 
-import org.iatoki.judgels.jophiel.ThreeEntityActivityKey;
+import org.iatoki.judgels.jophiel.activity.ThreeEntityActivityKey;
 
 public final class JerahmeelActivityKeys {
 

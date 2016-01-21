@@ -17,11 +17,11 @@ import org.iatoki.judgels.jerahmeel.scorecache.ProblemSetScoreCacheUtils;
 import org.iatoki.judgels.jerahmeel.submission.JerahmeelSubmissionServiceUtils;
 import org.iatoki.judgels.jerahmeel.submission.programming.ProgrammingSubmissionDao;
 import org.iatoki.judgels.jerahmeel.user.item.UserItemDao;
-import org.iatoki.judgels.sandalphon.BundleAnswer;
-import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.services.BundleProblemGrader;
-import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
-import org.iatoki.judgels.sandalphon.services.impls.AbstractBundleSubmissionServiceImpl;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.BundleAnswer;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.BundleProblemGrader;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.AbstractBundleSubmissionServiceImpl;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

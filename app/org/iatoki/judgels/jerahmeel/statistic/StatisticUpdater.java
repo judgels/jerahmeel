@@ -8,10 +8,10 @@ import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemStatisticEntry
 import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticService;
-import org.iatoki.judgels.sandalphon.BundleSubmission;
-import org.iatoki.judgels.sandalphon.ProgrammingSubmission;
-import org.iatoki.judgels.sandalphon.services.BundleSubmissionService;
-import org.iatoki.judgels.sandalphon.services.ProgrammingSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
+import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
 import play.db.jpa.JPA;
 
 import java.util.Collections;

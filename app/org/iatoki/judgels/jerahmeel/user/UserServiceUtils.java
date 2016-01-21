@@ -1,6 +1,6 @@
 package org.iatoki.judgels.jerahmeel.user;
 
-import org.iatoki.judgels.jophiel.UserTokens;
+import org.iatoki.judgels.jophiel.user.UserTokens;
 
 import java.util.Arrays;
 

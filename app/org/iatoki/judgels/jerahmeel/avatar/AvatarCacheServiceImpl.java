@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.avatar;
 
-import org.iatoki.judgels.jophiel.models.daos.BaseAvatarCacheDao;
-import org.iatoki.judgels.jophiel.services.impls.AbstractBaseAvatarCacheServiceImpl;
+import org.iatoki.judgels.jophiel.avatar.BaseAvatarCacheDao;
+import org.iatoki.judgels.jophiel.avatar.AbstractBaseAvatarCacheServiceImpl;
 
 public final class AvatarCacheServiceImpl extends AbstractBaseAvatarCacheServiceImpl<AvatarCacheModel> {
 

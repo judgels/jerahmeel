@@ -22,7 +22,7 @@ import org.iatoki.judgels.jerahmeel.chapter.problem.html.addChapterProblemView;
 import org.iatoki.judgels.jerahmeel.chapter.problem.html.editChapterProblemView;
 import org.iatoki.judgels.jerahmeel.chapter.problem.html.listChapterProblemsView;
 import org.iatoki.judgels.jerahmeel.chapter.problem.html.viewProblemView;
-import org.iatoki.judgels.jophiel.BasicActivityKeys;
+import org.iatoki.judgels.jophiel.activity.BasicActivityKeys;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.LazyHtml;

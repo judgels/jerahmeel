@@ -7,7 +7,7 @@ import org.iatoki.judgels.api.jophiel.JophielUser;
 import org.iatoki.judgels.jerahmeel.JerahmeelUtils;
 import org.iatoki.judgels.jerahmeel.avatar.AvatarCacheServiceImpl;
 import org.iatoki.judgels.jerahmeel.jid.JidCacheServiceImpl;
-import org.iatoki.judgels.jophiel.UserTokens;
+import org.iatoki.judgels.jophiel.user.UserTokens;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
 import org.iatoki.judgels.play.Page;

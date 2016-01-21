@@ -1,7 +1,7 @@
 package org.iatoki.judgels.jerahmeel.user;
 
 import com.google.common.collect.ImmutableList;
-import org.iatoki.judgels.play.models.daos.impls.AbstractHibernateDao;
+import org.iatoki.judgels.play.model.AbstractHibernateDao;
 import play.db.jpa.JPA;
 
 import javax.inject.Singleton;

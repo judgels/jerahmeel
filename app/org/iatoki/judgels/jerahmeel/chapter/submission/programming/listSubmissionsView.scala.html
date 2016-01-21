@@ -1,4 +1,5 @@
 @import org.iatoki.judgels.jerahmeel.jid.JidCacheServiceImpl
+@import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission
 @import play.i18n.Messages
 @import org.iatoki.judgels.play.views.html.table.tableView
 @import org.iatoki.judgels.play.views.html.table.tableHeadersWithSelectionFormView
@@ -6,7 +7,6 @@
 @import org.iatoki.judgels.play.JudgelsPlayUtils
 @import scala.collection.JavaConversions
 @import org.iatoki.judgels.play.Page
-@import org.iatoki.judgels.sandalphon.ProgrammingSubmission
 @import org.iatoki.judgels.jerahmeel.chapter.submission.programming.routes
 
 @(chapterId: Long, pageOfSubmissions: Page[ProgrammingSubmission], userJids: List[String], problemJidToAliasMap: Map[String, String], gradingLanguageToNameMap: Map[String, String], pageIndex: Long, orderBy: String, orderDir: String, userJid: String, problemJid: String)
