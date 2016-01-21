@@ -12,7 +12,7 @@ import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
 import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
-import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,13 +21,15 @@ import java.util.concurrent.TimeUnit;
 
 public final class StatisticUpdater implements Runnable {
 
+    private final JPAApi jpaApi;
     private final BundleSubmissionService bundleSubmissionService;
     private final PointStatisticService pointStatisticService;
     private final ProblemScoreStatisticService problemScoreStatisticService;
     private final ProblemStatisticService problemStatisticService;
     private final ProgrammingSubmissionService programmingSubmissionService;
 
-    public StatisticUpdater(BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+    public StatisticUpdater(JPAApi jpaApi, BundleSubmissionService bundleSubmissionService, PointStatisticService pointStatisticService, ProblemScoreStatisticService problemScoreStatisticService, ProblemStatisticService problemStatisticService, ProgrammingSubmissionService programmingSubmissionService) {
+        this.jpaApi = jpaApi;
         this.bundleSubmissionService = bundleSubmissionService;
         this.pointStatisticService = pointStatisticService;
         this.problemScoreStatisticService = problemScoreStatisticService;
@@ -37,7 +39,7 @@ public final class StatisticUpdater implements Runnable {
 
     @Override
     public void run() {
-        JPA.withTransaction(() -> {
+        jpaApi.withTransaction(() -> {
                 long timeNow = System.currentTimeMillis();
                 Map<String, Map<String, Double>> userJidToMapProblemJidToPoints = Maps.newHashMap();
                 Map<String, Long> problemJidToTotalSubmissions = Maps.newHashMap();
