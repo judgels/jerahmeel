@@ -2,43 +2,54 @@ package org.iatoki.judgels.jerahmeel;
 
 import org.hibernate.Session;
 import org.hibernate.internal.SessionImpl;
-import org.iatoki.judgels.play.migration.AbstractBaseDataMigrationServiceImpl;
-import play.db.jpa.JPA;
+import org.iatoki.judgels.play.migration.AbstractJudgelsDataMigrator;
+import org.iatoki.judgels.play.migration.DataMigrationEntityManager;
+import org.iatoki.judgels.play.migration.DataVersionDao;
 
+import javax.inject.Inject;
+import javax.persistence.EntityManager;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMigrationServiceImpl {
+public final class JerahmeelDataMigrator extends AbstractJudgelsDataMigrator {
+
+    private final EntityManager entityManager;
+
+    @Inject
+    public JerahmeelDataMigrator(DataVersionDao dataVersionDao) {
+        super(dataVersionDao);
+        this.entityManager = DataMigrationEntityManager.createEntityManager();
+    }
 
     @Override
-    public long getCodeDataVersion() {
+    public long getLatestDataVersion() {
         return 6;
     }
 
     @Override
-    protected void onUpgrade(long databaseVersion, long codeDatabaseVersion) throws SQLException {
-        if (databaseVersion < 2) {
+    protected void migrate(long currentDataVersion) throws SQLException {
+        if (currentDataVersion < 2) {
             migrateV1toV2();
         }
-        if (databaseVersion < 3) {
+        if (currentDataVersion < 3) {
             migrateV2toV3();
         }
-        if (databaseVersion < 4) {
+        if (currentDataVersion < 4) {
             migrateV3toV4();
         }
-        if (databaseVersion < 5) {
+        if (currentDataVersion < 5) {
             migrateV4toV5();
         }
-        if (databaseVersion < 6) {
+        if (currentDataVersion < 6) {
             migrateV5toV6();
         }
     }
 
     private void migrateV5toV6() throws SQLException {
-        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        SessionImpl session = (SessionImpl) entityManager.unwrap(Session.class);
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         Statement statement = connection.createStatement();
@@ -62,7 +73,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
     }
 
     private void migrateV4toV5() throws SQLException {
-        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        SessionImpl session = (SessionImpl) entityManager.unwrap(Session.class);
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         Statement statement = connection.createStatement();
@@ -72,7 +83,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
     }
 
     private void migrateV3toV4() throws SQLException {
-        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        SessionImpl session = (SessionImpl) entityManager.unwrap(Session.class);
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         Statement statement = connection.createStatement();
@@ -82,7 +93,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
     }
 
     private void migrateV2toV3() throws SQLException {
-        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        SessionImpl session = (SessionImpl) entityManager.unwrap(Session.class);
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         String jidCacheTable = "jerahmeel_jid_cache";
@@ -108,7 +119,7 @@ public final class JerahmeelDataMigrationServiceImpl extends AbstractBaseDataMig
     }
 
     private void migrateV1toV2() throws SQLException {
-        SessionImpl session = (SessionImpl) JPA.em().unwrap(Session.class);
+        SessionImpl session = (SessionImpl) entityManager.unwrap(Session.class);
         Connection connection = session.getJdbcConnectionAccess().obtainConnection();
 
         String programmingSubmissionTable = "jerahmeel_programming_submission";

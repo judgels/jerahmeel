@@ -29,7 +29,7 @@ import org.iatoki.judgels.play.JudgelsPlayProperties;
 import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.play.general.GeneralName;
 import org.iatoki.judgels.play.general.GeneralVersion;
-import org.iatoki.judgels.play.migration.BaseDataMigrationService;
+import org.iatoki.judgels.play.migration.JudgelsDataMigrator;
 import org.iatoki.judgels.sandalphon.problem.bundle.grading.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.problem.bundle.grading.BundleProblemGrader;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
@@ -49,10 +49,9 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         JudgelsPlayProperties.buildInstance(buildInfo.name(), buildInfo.version(), config);
         JerahmeelProperties.buildInstance(config);
         bind(JerahmeelSingletonsBuilder.class).asEagerSingleton();
-        bind(JerahmeelThreadsScheduler.class).asEagerSingleton();
         // </DEPRECATED>
 
-        bind(BaseDataMigrationService.class).to(JerahmeelDataMigrationServiceImpl.class);
+        bind(JudgelsDataMigrator.class).to(JerahmeelDataMigrator.class);
 
         bind(BundleSubmissionService.class).to(BundleSubmissionServiceImpl.class);
         bind(ProgrammingSubmissionService.class).to(ProgrammingSubmissionServiceImpl.class);
