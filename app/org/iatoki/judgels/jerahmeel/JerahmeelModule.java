@@ -2,6 +2,7 @@ package org.iatoki.judgels.jerahmeel;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.google.inject.AbstractModule;
 import com.google.inject.util.Providers;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
@@ -26,19 +27,18 @@ import org.iatoki.judgels.jerahmeel.user.UserServiceImpl;
 import org.iatoki.judgels.jophiel.JophielAuthAPI;
 import org.iatoki.judgels.jophiel.user.BaseUserService;
 import org.iatoki.judgels.play.JudgelsPlayProperties;
-import org.iatoki.judgels.play.config.AbstractJudgelsPlayModule;
 import org.iatoki.judgels.play.general.GeneralName;
 import org.iatoki.judgels.play.general.GeneralVersion;
 import org.iatoki.judgels.play.migration.JudgelsDataMigrator;
-import org.iatoki.judgels.sandalphon.problem.bundle.grading.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.problem.bundle.grading.BundleProblemGrader;
+import org.iatoki.judgels.sandalphon.problem.bundle.grading.SandalphonBundleProblemGrader;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
 
-public class JerahmeelModule extends AbstractJudgelsPlayModule {
+public final class JerahmeelModule extends AbstractModule {
 
     @Override
-    protected void manualBinding() {
+    public void configure() {
         org.iatoki.judgels.jerahmeel.BuildInfo$ buildInfo = org.iatoki.judgels.jerahmeel.BuildInfo$.MODULE$;
 
         bindConstant().annotatedWith(GeneralName.class).to(buildInfo.name());
@@ -83,16 +83,6 @@ public class JerahmeelModule extends AbstractJudgelsPlayModule {
         bindConstant().annotatedWith(GabrielClientJid.class).to(gabrielClientJid());
         bind(BaseUserService.class).to(UserServiceImpl.class);
         bind(BundleProblemGrader.class).to(SandalphonBundleProblemGrader.class);
-    }
-
-    @Override
-    protected String getDaosImplPackage() {
-        return "org.iatoki.judgels.jerahmeel.models.daos.hibernate";
-    }
-
-    @Override
-    protected String getServicesImplPackage() {
-        return "org.iatoki.judgels.jerahmeel.services.impls";
     }
 
     private JerahmeelProperties jerahmeelProperties() {
