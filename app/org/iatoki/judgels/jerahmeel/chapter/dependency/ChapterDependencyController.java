@@ -105,6 +105,8 @@ public final class ChapterDependencyController extends AbstractJudgelsController
             return forbidden();
         }
 
+        chapterDependencyService.removeChapterDependency(chapterDependencyId);
+
         JerahmeelControllerUtils.getInstance().addActivityLog(BasicActivityKeys.REMOVE_FROM.construct(CHAPTER, chapter.getJid(), chapter.getName(), DEPENDENCY, chapterDependency.getDependedChapterJid(), chapterDependency.getDependedChapterName()));
 
         return redirect(routes.ChapterDependencyController.viewDependencies(chapter.getId()));
