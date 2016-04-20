@@ -119,7 +119,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
             double totalScore = ChapterScoreCacheUtils.getInstance().getUserTotalScoreFromCourseChapterModels(userJid, curriculumCourseModel.courseJid, currentCourseChapterModels, mapChapterJidToChapterProblemModels);
 
-            curriculumCourseProgressBuilder.add(new CurriculumCourseWithProgress(CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel), courseProgressWithCompleted.courseProgress, courseProgressWithCompleted.completed, courseChapterModels.size(), totalScore));
+            curriculumCourseProgressBuilder.add(new CurriculumCourseWithProgress(CurriculumCourseServiceUtils.createFromModel(curriculumCourseModel), courseProgressWithCompleted.courseProgress, courseProgressWithCompleted.completed, currentCourseChapterModels.size(), totalScore));
         }
 
         return new Page<>(curriculumCourseProgressBuilder.build(), totalPages, pageIndex, pageSize);
