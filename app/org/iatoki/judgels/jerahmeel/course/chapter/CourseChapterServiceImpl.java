@@ -105,7 +105,7 @@ public final class CourseChapterServiceImpl implements CourseChapterService {
             long solvedProblems = 0;
             double totalScore = ChapterScoreCacheUtils.getInstance().getUserTotalScoreFromChapterProblemModels(userJid, courseChapterModel.chapterJid, currentChapterProblemModels);
             for (ChapterProblemModel chapterProblemModel : currentChapterProblemModels) {
-                if (userItemDao.existsByUserJidItemJidAndStatus(IdentityUtils.getUserJid(), chapterProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
+                if (userItemDao.existsByUserJidItemJidAndStatus(userJid, chapterProblemModel.problemJid, UserItemStatus.COMPLETED.name())) {
                     solvedProblems++;
                 }
             }
