@@ -218,6 +218,8 @@ GET         /statistics/submission                                              
 
 # Internal API
 
+POST         /api/indo2sv                                                                                                                    org.iatoki.judgels.jerahmeel.controllers.api.internal.Indo2svAPIController.getResult()
+
 GET         /api/courses/autocomplete                                                                                                       org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalCourseAPIController.autocompleteCourse(term ?= null)
 
 GET         /api/chapters/autocomplete                                                                                                      org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalChapterAPIController.autocompleteChapter(term ?= null)
