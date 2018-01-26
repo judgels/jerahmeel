@@ -31,6 +31,8 @@ public final class JerahmeelProperties {
     private String sealtielClientSecret;
     private String sealtielGabrielClientJid;
 
+    private String raphaelBaseUrl;
+
     private Boolean globalAWSUsingKeys;
     private String globalAWSAccessKey;
     private String globalAWSSecretKey;
@@ -110,6 +112,10 @@ public final class JerahmeelProperties {
 
     public String getSealtielGabrielClientJid() {
         return sealtielGabrielClientJid;
+    }
+
+    public String getRaphaelBaseUrl() {
+        return raphaelBaseUrl;
     }
 
     public boolean isSubmissionUsingAWSS3() {
@@ -202,6 +208,8 @@ public final class JerahmeelProperties {
         sealtielClientJid = requireStringValue("sealtiel.clientJid");
         sealtielClientSecret = requireStringValue("sealtiel.clientSecret");
         sealtielGabrielClientJid = requireStringValue("sealtiel.gabrielClientJid");
+
+        raphaelBaseUrl = requireStringValue("raphael.baseUrl");
 
         globalAWSUsingKeys = getBooleanValue("aws.global.key.use");
         globalAWSAccessKey = getStringValue("aws.global.key.access");

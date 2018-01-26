@@ -8,8 +8,6 @@ import org.iatoki.judgels.jerahmeel.statistic.StatisticUpdater;
 import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticService;
-import org.iatoki.judgels.jophiel.activity.UserActivityMessagePusher;
-import org.iatoki.judgels.jophiel.activity.UserActivityMessageServiceImpl;
 import org.iatoki.judgels.sandalphon.problem.programming.grading.GradingResponsePoller;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
 import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
@@ -34,11 +32,9 @@ public final class JerahmeelThreadsScheduler {
         ExecutionContextExecutor context = actorSystem.dispatcher();
 
         GradingResponsePoller poller = new GradingResponsePoller(scheduler, context, programmingSubmissionService, sealtielClientAPI, TimeUnit.MILLISECONDS.convert(2, TimeUnit.SECONDS));
-        UserActivityMessagePusher userActivityMessagePusher = new UserActivityMessagePusher(jpaApi, jophielClientAPI, UserActivityMessageServiceImpl.getInstance());
         StatisticUpdater pointStatisticUpdater = new StatisticUpdater(jpaApi, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
-        scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(1, TimeUnit.MINUTES), userActivityMessagePusher, context);
         scheduler.schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(1, TimeUnit.HOURS), pointStatisticUpdater, context);
     }
 }

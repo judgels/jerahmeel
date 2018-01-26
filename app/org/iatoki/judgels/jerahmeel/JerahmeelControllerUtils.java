@@ -5,30 +5,25 @@ import com.google.common.collect.Lists;
 import org.iatoki.judgels.api.jophiel.JophielClientAPI;
 import org.iatoki.judgels.api.jophiel.JophielPublicAPI;
 import org.iatoki.judgels.api.sandalphon.SandalphonResourceDisplayNameUtils;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatistic;
-import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticService;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatisticService;
-import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.activity.ActivityLogServiceImpl;
 import org.iatoki.judgels.jerahmeel.jid.JidCacheServiceImpl;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatistic;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemStatistic;
-import org.iatoki.judgels.jerahmeel.statistic.submission.SubmissionEntry;
+import org.iatoki.judgels.jerahmeel.statistic.point.PointStatistic;
+import org.iatoki.judgels.jerahmeel.statistic.point.PointStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.point.html.pointStatisticView;
-import org.iatoki.judgels.jerahmeel.statistic.problemscore.html.problemScoreStatisticLayout;
+import org.iatoki.judgels.jerahmeel.statistic.problem.ProblemStatisticService;
 import org.iatoki.judgels.jerahmeel.statistic.problem.html.problemStatisticView;
+import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatistic;
+import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemScoreStatisticService;
+import org.iatoki.judgels.jerahmeel.statistic.problemscore.ProblemStatistic;
+import org.iatoki.judgels.jerahmeel.statistic.problemscore.html.problemScoreStatisticLayout;
+import org.iatoki.judgels.jerahmeel.statistic.submission.SubmissionEntry;
 import org.iatoki.judgels.jerahmeel.statistic.submission.html.recentSubmissionView;
+import org.iatoki.judgels.jophiel.JophielClientControllerUtils;
 import org.iatoki.judgels.jophiel.activity.ActivityKey;
 import org.iatoki.judgels.jophiel.activity.UserActivityMessage;
-import org.iatoki.judgels.jophiel.JophielClientControllerUtils;
-import org.iatoki.judgels.jophiel.profile.SearchProfileForm;
-import org.iatoki.judgels.jophiel.viewpoint.ViewpointForm;
 import org.iatoki.judgels.jophiel.activity.UserActivityMessageServiceImpl;
-import org.iatoki.judgels.jophiel.client.html.linkedClientsLayout;
 import org.iatoki.judgels.jophiel.logincheck.html.isLoggedInLayout;
 import org.iatoki.judgels.jophiel.logincheck.html.isLoggedOutLayout;
-import org.iatoki.judgels.jophiel.profile.html.searchProfileLayout;
-import org.iatoki.judgels.jophiel.viewpoint.html.viewAsLayout;
 import org.iatoki.judgels.play.IdentityUtils;
 import org.iatoki.judgels.play.InternalLink;
 import org.iatoki.judgels.play.JudgelsPlayUtils;
@@ -43,10 +38,9 @@ import org.iatoki.judgels.play.views.html.layouts.profileView;
 import org.iatoki.judgels.play.views.html.layouts.sidebarLayout;
 import org.iatoki.judgels.play.views.html.layouts.threeWidgetLayout;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmission;
-import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.problem.bundle.submission.BundleSubmissionService;
+import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmission;
 import org.iatoki.judgels.sandalphon.problem.programming.submission.ProgrammingSubmissionService;
-import play.data.Form;
 import play.i18n.Messages;
 import play.mvc.Http;
 
@@ -124,19 +118,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
                     org.iatoki.judgels.jophiel.routes.JophielClientController.logout(ControllerUtils.getCurrentUrl(Http.Context.current().request())).absoluteURL(Http.Context.current().request(), Http.Context.current().request().secure())
                 ));
         }
-        if (JerahmeelUtils.trullyHasRole("admin")) {
-            Form<ViewpointForm> form = Form.form(ViewpointForm.class);
-            if (JudgelsPlayUtils.hasViewPoint()) {
-                ViewpointForm viewpointForm = new ViewpointForm();
-                viewpointForm.username = IdentityUtils.getUsername();
-                form.fill(viewpointForm);
-            }
-            sidebarContent.appendLayout(c -> viewAsLayout.render(form, jophielPublicAPI.getUserAutocompleteAPIEndpoint(), "lib/jophielcommons/javascripts/userAutoComplete.js", routes.ApplicationController.postViewAs(), routes.ApplicationController.resetViewAs(), c));
-        }
         sidebarContent.appendLayout(c -> menusLayout.render(internalLinkBuilder.build(), c));
-        sidebarContent.appendLayout(c -> linkedClientsLayout.render(jophielClientAPI.getLinkedClientsAPIEndpoint(), "lib/jophielcommons/javascripts/linkedClients.js", c));
-        Form<SearchProfileForm> searchProfileForm = Form.form(SearchProfileForm.class);
-        sidebarContent.appendLayout(c -> searchProfileLayout.render(searchProfileForm, jophielPublicAPI.getUserAutocompleteAPIEndpoint(), "lib/jophielcommons/javascripts/userAutoComplete.js", JophielClientControllerUtils.getInstance().getUserSearchProfileUrl(), c));
 
         content.appendLayout(c -> sidebarLayout.render(sidebarContent.render(), c));
 

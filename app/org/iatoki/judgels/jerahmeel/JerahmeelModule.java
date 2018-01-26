@@ -90,7 +90,7 @@ public final class JerahmeelModule extends AbstractModule {
     }
 
     private JophielAuthAPI jophielAuthAPI() {
-        return new JophielAuthAPI(jerahmeelProperties().getJophielBaseUrl(), jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
+        return new JophielAuthAPI(jerahmeelProperties().getRaphaelBaseUrl(), jerahmeelProperties().getJophielBaseUrl(), jerahmeelProperties().getJophielClientJid(), jerahmeelProperties().getJophielClientSecret());
     }
 
     private JophielClientAPI jophielClientAPI() {
