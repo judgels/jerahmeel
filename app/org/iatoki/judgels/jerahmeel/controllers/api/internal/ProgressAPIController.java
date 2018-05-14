@@ -62,7 +62,7 @@ public class ProgressAPIController extends Controller {
         }
 
         // TODO: put in config
-        if (courseId != 1 && courseId != 11) {
+        if (courseId != 1 && courseId != 14) {
             return forbidden();
         }
 
