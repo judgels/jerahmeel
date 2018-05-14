@@ -35,6 +35,8 @@ public final class JerahmeelThreadsScheduler {
         StatisticUpdater pointStatisticUpdater = new StatisticUpdater(jpaApi, bundleSubmissionService, pointStatisticService, problemScoreStatisticService, problemStatisticService, programmingSubmissionService);
 
         scheduler.schedule(Duration.create(1, TimeUnit.SECONDS), Duration.create(3, TimeUnit.SECONDS), poller, context);
-        scheduler.schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(1, TimeUnit.HOURS), pointStatisticUpdater, context);
+
+        // Disabled until we found better implementation
+        // scheduler.schedule(Duration.create(10, TimeUnit.SECONDS), Duration.create(1, TimeUnit.HOURS), pointStatisticUpdater, context);
     }
 }

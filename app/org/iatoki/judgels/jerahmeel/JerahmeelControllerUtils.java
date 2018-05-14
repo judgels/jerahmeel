@@ -100,7 +100,7 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
         ImmutableList.Builder<InternalLink> internalLinkBuilder = ImmutableList.builder();
         internalLinkBuilder.add(new InternalLink(Messages.get("training.training"), org.iatoki.judgels.jerahmeel.training.routes.TrainingController.index()));
         internalLinkBuilder.add(new InternalLink(Messages.get("submission.submissions"), org.iatoki.judgels.jerahmeel.submission.routes.SubmissionController.jumpToSubmissions()));
-        internalLinkBuilder.add(new InternalLink(Messages.get("statistic.statistics"), org.iatoki.judgels.jerahmeel.statistic.routes.StatisticController.index()));
+        // internalLinkBuilder.add(new InternalLink(Messages.get("statistic.statistics"), org.iatoki.judgels.jerahmeel.statistic.routes.StatisticController.index()));
         if (isAdmin()) {
             internalLinkBuilder.add(new InternalLink(Messages.get("curriculum.curriculums"), org.iatoki.judgels.jerahmeel.curriculum.routes.CurriculumController.viewCurriculums()));
             internalLinkBuilder.add(new InternalLink(Messages.get("course.courses"), org.iatoki.judgels.jerahmeel.course.routes.CourseController.viewCourses()));
@@ -196,6 +196,6 @@ public final class JerahmeelControllerUtils extends AbstractJudgelsControllerUti
 
         Collections.sort(submissionEntries);
 
-        content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic, problemStatisticsTitleMap), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
+        // content.appendLayout(c -> threeWidgetLayout.render(pointStatisticView.render(pointStatistic), problemStatisticView.render(problemStatistic, problemStatisticsTitleMap), recentSubmissionView.render(submissionEntries, problemTitlesMap), c));
     }
 }
