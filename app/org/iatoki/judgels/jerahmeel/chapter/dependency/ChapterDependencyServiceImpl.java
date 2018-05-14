@@ -2,15 +2,11 @@ package org.iatoki.judgels.jerahmeel.chapter.dependency;
 
 import com.google.common.collect.ImmutableMap;
 import org.iatoki.judgels.jerahmeel.chapter.ChapterDao;
-import org.iatoki.judgels.jerahmeel.user.item.UserItemStatus;
-import org.iatoki.judgels.jerahmeel.user.item.UserItemDao;
-import org.iatoki.judgels.jerahmeel.user.item.UserItemModel;
 import org.iatoki.judgels.play.Page;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -18,25 +14,17 @@ public final class ChapterDependencyServiceImpl implements ChapterDependencyServ
 
     private final ChapterDao chapterDao;
     private final ChapterDependencyDao chapterDependencyDao;
-    private final UserItemDao userItemDao;
 
     @Inject
-    public ChapterDependencyServiceImpl(ChapterDao chapterDao, ChapterDependencyDao chapterDependencyDao, UserItemDao userItemDao) {
+    public ChapterDependencyServiceImpl(ChapterDao chapterDao, ChapterDependencyDao chapterDependencyDao) {
         this.chapterDao = chapterDao;
         this.chapterDependencyDao = chapterDependencyDao;
-        this.userItemDao = userItemDao;
     }
 
     @Override
     public boolean isDependenciesFulfilled(String userJid, String chapterJid) {
-        List<UserItemModel> completedUserItemModel = userItemDao.getByUserJidAndStatus(userJid, UserItemStatus.COMPLETED.name());
-        Set<String> completedJids = completedUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
-
-        List<ChapterDependencyModel> chapterDependencyModels = chapterDependencyDao.getByChapterJid(chapterJid);
-        Set<String> dependencyJids = chapterDependencyModels.stream().map(m -> m.dependedChapterJid).collect(Collectors.toSet());
-
-        dependencyJids.removeAll(completedJids);
-        return dependencyJids.isEmpty();
+        // We disable locking feature
+        return true;
     }
 
     @Override

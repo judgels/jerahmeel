@@ -31,15 +31,13 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
 
     private final CourseChapterDao courseChapterDao;
     private final CurriculumCourseDao curriculumCourseDao;
-    private final ChapterDependencyDao chapterDependencyDao;
     private final ChapterProblemDao chapterProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CurriculumCourseServiceImpl(CourseChapterDao courseChapterDao, CurriculumCourseDao curriculumCourseDao, ChapterDependencyDao chapterDependencyDao, ChapterProblemDao chapterProblemDao, UserItemDao userItemDao) {
+    public CurriculumCourseServiceImpl(CourseChapterDao courseChapterDao, CurriculumCourseDao curriculumCourseDao, ChapterProblemDao chapterProblemDao, UserItemDao userItemDao) {
         this.courseChapterDao = courseChapterDao;
         this.curriculumCourseDao = curriculumCourseDao;
-        this.chapterDependencyDao = chapterDependencyDao;
         this.chapterProblemDao = chapterProblemDao;
         this.userItemDao = userItemDao;
     }
@@ -159,7 +157,7 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
         Set<String> onProgressJids = onProgressUserItemModel.stream().map(m -> m.itemJid).collect(Collectors.toSet());
 
         int completed = 0;
-        CourseProgress progress = CourseProgress.LOCKED;
+        CourseProgress progress = CourseProgress.AVAILABLE;
         for (CourseChapterModel courseChapterModel : courseChapterModels) {
             if (completedJids.contains(courseChapterModel.chapterJid)) {
                 progress = CourseProgress.IN_PROGRESS;
@@ -167,14 +165,6 @@ public final class CurriculumCourseServiceImpl implements CurriculumCourseServic
             } else if (onProgressJids.contains(courseChapterModel.chapterJid)) {
                 progress = CourseProgress.IN_PROGRESS;
                 break;
-            } else {
-                List<ChapterDependencyModel> chapterDependencyModels = chapterDependencyDao.getByChapterJid(courseChapterModel.chapterJid);
-                Set<String> dependencyJids = chapterDependencyModels.stream().map(m -> m.dependedChapterJid).collect(Collectors.toSet());
-                dependencyJids.removeAll(completedJids);
-                if (dependencyJids.isEmpty() && progress.equals(CourseProgress.LOCKED)) {
-                    progress = CourseProgress.AVAILABLE;
-                    break;
-                }
             }
         }
         if (completed == courseChapterModels.size()) {

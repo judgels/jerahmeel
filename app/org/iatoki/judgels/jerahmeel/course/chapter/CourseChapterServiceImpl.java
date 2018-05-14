@@ -27,14 +27,12 @@ import java.util.stream.Collectors;
 public final class CourseChapterServiceImpl implements CourseChapterService {
 
     private final CourseChapterDao courseChapterDao;
-    private final ChapterDependencyDao chapterDependencyDao;
     private final ChapterProblemDao chapterProblemDao;
     private final UserItemDao userItemDao;
 
     @Inject
-    public CourseChapterServiceImpl(CourseChapterDao courseChapterDao, ChapterDependencyDao chapterDependencyDao, ChapterProblemDao chapterProblemDao, UserItemDao userItemDao) {
+    public CourseChapterServiceImpl(CourseChapterDao courseChapterDao, ChapterProblemDao chapterProblemDao, UserItemDao userItemDao) {
         this.courseChapterDao = courseChapterDao;
-        this.chapterDependencyDao = chapterDependencyDao;
         this.chapterProblemDao = chapterProblemDao;
         this.userItemDao = userItemDao;
     }
@@ -110,18 +108,11 @@ public final class CourseChapterServiceImpl implements CourseChapterService {
                 }
             }
 
-            ChapterProgress progress = ChapterProgress.LOCKED;
+            ChapterProgress progress = ChapterProgress.AVAILABLE;
             if (completedJids.contains(courseChapterModel.chapterJid)) {
                 progress = ChapterProgress.COMPLETED;
             } else if (onProgressJids.contains(courseChapterModel.chapterJid)) {
                 progress = ChapterProgress.IN_PROGRESS;
-            } else {
-                List<ChapterDependencyModel> chapterDependencyModels = chapterDependencyDao.getByChapterJid(courseChapterModel.chapterJid);
-                Set<String> dependencyJids = chapterDependencyModels.stream().map(m -> m.dependedChapterJid).collect(Collectors.toSet());
-                dependencyJids.removeAll(completedJids);
-                if (dependencyJids.isEmpty()) {
-                    progress = ChapterProgress.AVAILABLE;
-                }
             }
             courseChapterProgressBuilder.add(new CourseChapterWithProgress(CourseChapterServiceUtils.createFromModel(courseChapterModel), progress, solvedProblems, totalProblems, totalScore));
         }
