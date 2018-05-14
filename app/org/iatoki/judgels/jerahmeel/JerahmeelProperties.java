@@ -1,11 +1,13 @@
 package org.iatoki.judgels.jerahmeel;
 
 import com.amazonaws.services.s3.model.Region;
+import com.google.common.collect.Maps;
 import com.typesafe.config.Config;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 public final class JerahmeelProperties {
 
@@ -45,6 +47,9 @@ public final class JerahmeelProperties {
     private String submissionAWSSecretKey;
     private String submissionAWSS3BucketName;
     private Region submissionAWSS3BucketRegion;
+
+    private String progressApiToken;
+    private Map<String, String> progressApiUsers;
 
     private JerahmeelProperties(Config config) {
         this.config = config;
@@ -124,6 +129,14 @@ public final class JerahmeelProperties {
 
     public File getSubmissionLocalDir() {
         return submissionLocalDir;
+    }
+
+    public String getProgressApiToken() {
+        return progressApiToken;
+    }
+
+    public Map<String, String> getProgressApiUsers() {
+        return progressApiUsers;
     }
 
     public String getSubmissionAWSAccessKey() {
@@ -223,6 +236,9 @@ public final class JerahmeelProperties {
         submissionAWSS3BucketName = getStringValue("aws.submission.s3.bucket.name");
         submissionAWSS3BucketRegion = Region.fromValue(getStringValue("aws.submission.s3.bucket.regionId"));
 
+        progressApiToken = requireStringValue("progressApi.token");
+        progressApiUsers = requireMapValue("progressApi.users");
+
         try {
             submissionLocalDir = new File(jerahmeelBaseDataDir, "submission");
             FileUtils.forceMkdir(submissionLocalDir);
@@ -261,5 +277,10 @@ public final class JerahmeelProperties {
             throw new RuntimeException("Directory " + dir.getAbsolutePath() + " does not exist");
         }
         return dir;
+    }
+
+    private Map<String, String> requireMapValue(String key) {
+        Map<String, Object> map = config.getObject(key).unwrapped();
+        return Maps.transformValues(map, v -> (String)v);
     }
 }

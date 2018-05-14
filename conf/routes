@@ -218,6 +218,8 @@ GET         /statistics/submission                                              
 
 # Internal API
 
+GET         /api/progress/:courseId                                                                                                         org.iatoki.judgels.jerahmeel.controllers.api.internal.ProgressAPIController.getResult(courseId: Long)
+
 GET         /api/courses/autocomplete                                                                                                       org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalCourseAPIController.autocompleteCourse(term ?= null)
 
 GET         /api/chapters/autocomplete                                                                                                      org.iatoki.judgels.jerahmeel.controllers.api.internal.InternalChapterAPIController.autocompleteChapter(term ?= null)
